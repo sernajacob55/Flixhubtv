@@ -23,8 +23,8 @@ app.get("/api/movies", (req, res) => {
   res.json(movies);
 });
 
-// Fallback to index.html
-app.get("*", (req, res) => {
+// Fallback to index.html (Express v5 compatible)
+app.get("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "frontend", "index.html"));
 });
 
