@@ -8,7 +8,13 @@ const PORT = process.env.PORT || 5000;
 app.use(express.static(path.join(__dirname, "..", "frontend")));
 
 // Your Dropbox scl/fi link
-const dropboxLink = "https://www.dropbox.com/scl/fi/b9m39omdl7mtrnzg0yq24/The-Matrix.mp4?rlkey=4xfnp6hxt8lggvw2uxgp0oyuk&st=111s85s9&dl=0";
+const movies = [
+  {
+    title: "The Matrix",
+    cover: "/covers/matrix.jpg",
+    url: "https://download1351.mediafire.com/3yzrkgjjifhg-kBE2HT1i1X9UAOckBG5zokIOlih39t_HouFQji-qXpatH5FZw4-C20r5fD-Do-cJ7MyM7aRD8Uhz-BWQJcs5amcyCuEtcHjyhO0h9VWx1VfHxjIiSyiHJGpXfJ7VTnSDmR4Snc7RL0MH0eoZtOMVXw0Pr_Jfhb4N3Y/rks796idw5xqo2i/The+Matrix.mp4"
+  }
+];
 
 // Movies array
 let movies = [
