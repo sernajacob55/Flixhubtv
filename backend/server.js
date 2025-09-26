@@ -1,6 +1,5 @@
 const express = require("express");
 const path = require("path");
-const fetch = require("node-fetch");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -8,7 +7,7 @@ const PORT = process.env.PORT || 5000;
 // Serve frontend
 app.use(express.static(path.join(__dirname, "..", "frontend")));
 
-// Your Dropbox link (scl/fi/... style)
+// Your Dropbox scl/fi link
 const dropboxLink = "https://www.dropbox.com/scl/fi/b9m39omdl7mtrnzg0yq24/The-Matrix.mp4?rlkey=4xfnp6hxt8lggvw2uxgp0oyuk&st=111s85s9&dl=0";
 
 // Movies array
@@ -24,15 +23,14 @@ let movies = [
 async function unwrapDropbox(link) {
   try {
     const res = await fetch(link, { redirect: "follow" });
-    // The final redirected URL is the real file
-    return res.url;
+    return res.url; // final redirected URL
   } catch (err) {
     console.error("Failed to unwrap Dropbox link:", err);
     return null;
   }
 }
 
-// Endpoint for movies
+// API for movies
 app.get("/api/movies", async (req, res) => {
   if (!movies[0].url) {
     const realUrl = await unwrapDropbox(dropboxLink);
