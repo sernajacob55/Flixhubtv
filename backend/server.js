@@ -1,29 +1,48 @@
 const express = require("express");
 const path = require("path");
+const fetch = require("node-fetch");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Serve everything inside /frontend as static files (images, index.html, etc.)
+// Serve frontend
 app.use(express.static(path.join(__dirname, "..", "frontend")));
 
-// ---- MOVIE LIST (edit this later to add more) ----
-// Tip: avoid spaces in cover filenames; use lowercase like "matrix.jpg".
-const movies = [
+// Your Dropbox link (scl/fi/... style)
+const dropboxLink = "https://www.dropbox.com/scl/fi/b9m39omdl7mtrnzg0yq24/The-Matrix.mp4?rlkey=4xfnp6hxt8lggvw2uxgp0oyuk&st=111s85s9&dl=0";
+
+// Movies array
+let movies = [
   {
     title: "The Matrix",
     cover: "/covers/matrix.jpg",
-    url: "https://dl.dropboxusercontent.com/s/abcd1234efgh567/The%20Matrix.mp4"
+    url: null // will be filled in after unwrapping
   }
 ];
 
-// API to get movies
-app.get("/api/movies", (req, res) => {
+// Function to unwrap Dropbox link
+async function unwrapDropbox(link) {
+  try {
+    const res = await fetch(link, { redirect: "follow" });
+    // The final redirected URL is the real file
+    return res.url;
+  } catch (err) {
+    console.error("Failed to unwrap Dropbox link:", err);
+    return null;
+  }
+}
+
+// Endpoint for movies
+app.get("/api/movies", async (req, res) => {
+  if (!movies[0].url) {
+    const realUrl = await unwrapDropbox(dropboxLink);
+    movies[0].url = realUrl;
+  }
   res.json(movies);
 });
 
-// Fallback to index.html (Express v5 compatible)
-app.get("/*", (req, res) => {
+// Fallback
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "frontend", "index.html"));
 });
 
