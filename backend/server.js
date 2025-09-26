@@ -13,7 +13,7 @@ const movies = [
   {
     title: "The Matrix",
     cover: "/covers/matrix.jpg",
-    url: "https://dl.dropboxusercontent.com/scl/fi/b9m39omdl7mtrnzg0yq24/The-Matrix.mp4"
+    url: "https://dl.dropboxusercontent.com/s/abcd1234efgh567/The%20Matrix.mp4"
   }
 ];
 
