@@ -13,8 +13,7 @@ const movies = [
   {
     title: "The Matrix",
     cover: "/covers/matrix.jpg",
-    // Replace FILE_ID with your Google Drive file id (see Step 10)
-    url: "https://drive.google.com/uc?export=download&id=REPLACE_FILE_ID"
+    url: "https://drive.google.com/uc?export=download&id=1_ElrW-wWfq5ljXe_0eJF8p3Jn8DdVTAA"
   }
 ];
 

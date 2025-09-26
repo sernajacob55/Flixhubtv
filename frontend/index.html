@@ -32,52 +32,48 @@
   </div>
 
   <script>
-    async function loadMovies() {
-      const res = await fetch('/api/movies');
-      const list = await res.json();
-      const grid = document.getElementById('grid');
-      grid.innerHTML = '';
+  async function loadMovies() {
+    const res = await fetch('/api/movies');
+    const list = await res.json();
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
 
-      list.forEach(movie => {
-        const card = document.createElement('div');
-        card.className = 'card';
+    list.forEach(movie => {
+      const card = document.createElement('div');
+      card.className = 'card';
 
-        const img = document.createElement('img');
-        img.src = movie.cover;  // e.g. /covers/matrix.jpg
-        img.alt = movie.title || 'Movie';
+      const img = document.createElement('img');
+      img.src = movie.cover;
+      img.alt = movie.title;
 
-        const title = document.createElement('div');
-        title.className = 'title';
-        title.textContent = movie.title || 'Untitled';
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = movie.title;
 
-        card.appendChild(img);
-        card.appendChild(title);
+      card.appendChild(img);
+      card.appendChild(title);
 
-        card.onclick = () => play(movie.url);
+      // CLICK to play
+      card.onclick = () => {
+        const overlay = document.getElementById('overlay');
+        const video = document.getElementById('player');
+        video.src = movie.url;
+        video.load();
+        video.oncanplay = () => video.play();
+        overlay.style.display = 'flex';
+      };
 
-        grid.appendChild(card);
-      });
-    }
+      grid.appendChild(card);
+    });
+  }
 
-    function play(url) {
-      const overlay = document.getElementById('overlay');
-      const video = document.getElementById('player');
+  document.getElementById('closeBtn').onclick = () => {
+    const overlay = document.getElementById('overlay');
+    const video = document.getElementById('player');
+    video.pause();
+    video.src = '';
+    overlay.style.display = 'none';
+  };
 
-      video.src = url;
-      video.load();
-      video.oncanplay = () => { video.play(); };
-      overlay.style.display = 'flex';
-    }
-
-    document.getElementById('closeBtn').onclick = () => {
-      const overlay = document.getElementById('overlay');
-      const video = document.getElementById('player');
-      video.pause();
-      video.src = '';
-      overlay.style.display = 'none';
-    };
-
-    loadMovies();
-  </script>
-</body>
-</html>
+  loadMovies();
+</script>
