@@ -75,24 +75,25 @@
       flex: 0 0 auto;
       width: 180px;
       cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
       background: #1c1c1c;
       border-radius: 8px;
-      overflow: hidden; /* keeps rounded corners while zooming */
+      overflow: hidden; /* ensures image stays rounded */
       text-align: center;
       position: relative;
-      transform-origin: center center;
     }
 
     .movie-tile img {
       width: 100%;
       height: auto;
       display: block;
-      border-radius: 0; /* let parent handle rounding */
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .movie-tile:hover img {
+      transform: scale(1.08); /* zoom only the image */
     }
 
     .movie-tile:hover {
-      transform: scale(1.08);
       box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.7);
       z-index: 10;
     }
