@@ -17,7 +17,7 @@
       overflow-x: hidden;
     }
 
-    /* Login screen */
+    /* --- Login screen --- */
     #loginScreen {
       display: flex;
       flex-direction: column;
@@ -67,7 +67,7 @@
       display: none;
     }
 
-    /* Profiles screen */
+    /* --- Profile screen --- */
     #profileScreen {
       display: none;
       flex-direction: column;
@@ -101,7 +101,7 @@
       background: #26c6da;
     }
 
-    /* Main app */
+    /* --- Main app --- */
     #app {
       display: none;
     }
@@ -112,6 +112,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
     }
 
     header .title {
@@ -128,6 +129,14 @@
       color: #aaa;
     }
 
+    header .right-side {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
     #searchBar {
       padding: 8px 14px;
       font-size: 16px;
@@ -135,18 +144,21 @@
       border: none;
       outline: none;
       width: 300px;
+      max-width: 90vw;
       text-align: center;
     }
 
     #logoutBtn, #switchProfileBtn {
-      background: red;
-      color: white;
       border: none;
       padding: 8px 16px;
       font-size: 14px;
       border-radius: 5px;
       cursor: pointer;
-      margin-left: 10px;
+    }
+
+    #logoutBtn {
+      background: red;
+      color: white;
     }
 
     #switchProfileBtn {
@@ -154,7 +166,32 @@
       color: #000;
     }
 
-    /* Category nav bar */
+    /* ✅ Mobile optimization */
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      header .right-side {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      #searchBar {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      #logoutBtn, #switchProfileBtn {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    /* --- Category nav bar --- */
     nav {
       background: #1c1c1c;
       padding: 10px 20px;
@@ -256,6 +293,7 @@
       background: rgba(0, 200, 0, 0.9);
     }
 
+    /* --- Video overlay --- */
     #videoOverlay {
       display: none;
       position: fixed;
@@ -317,7 +355,7 @@
         <span class="title">FlixHubTV</span>
         <span class="profile-name" id="profileName"></span>
       </div>
-      <div>
+      <div class="right-side">
         <input type="text" id="searchBar" placeholder="Search movies or categories...">
         <button id="switchProfileBtn" onclick="switchProfile()">Switch Profile</button>
         <button id="logoutBtn" onclick="logout()">Logout</button>
@@ -386,7 +424,7 @@
 
     let allCategories = [];
     let myList = [];
-    let continueWatching = [];
+    let continueWatching = {};
 
     async function loadMovies() {
       const res = await fetch("/api/movies");
