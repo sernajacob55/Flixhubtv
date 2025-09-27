@@ -122,6 +122,12 @@
       white-space: nowrap;
     }
 
+    header .profile-name {
+      font-size: 16px;
+      margin-left: 15px;
+      color: #aaa;
+    }
+
     #searchBar {
       padding: 8px 14px;
       font-size: 16px;
@@ -307,7 +313,10 @@
   <!-- Main App -->
   <div id="app">
     <header>
-      <div class="title">FlixHubTV</div>
+      <div>
+        <span class="title">FlixHubTV</span>
+        <span class="profile-name" id="profileName"></span>
+      </div>
       <div>
         <input type="text" id="searchBar" placeholder="Search movies or categories...">
         <button id="switchProfileBtn" onclick="switchProfile()">Switch Profile</button>
@@ -354,6 +363,7 @@
       localStorage.setItem("activeProfile", profile);
       document.getElementById("profileScreen").style.display = "none";
       document.getElementById("app").style.display = "block";
+      document.getElementById("profileName").textContent = `(Profile: ${profile})`;
       loadMovies();
     }
 
@@ -376,7 +386,7 @@
 
     let allCategories = [];
     let myList = [];
-    let continueWatching = {};
+    let continueWatching = [];
 
     async function loadMovies() {
       const res = await fetch("/api/movies");
@@ -499,6 +509,25 @@
       }
     }
 
+    // ✅ Live search
+    document.getElementById("searchBar").addEventListener("input", (e) => {
+      const term = e.target.value.toLowerCase();
+      if (!term) {
+        renderMovies(allCategories);
+        return;
+      }
+
+      const filtered = allCategories.map(cat => ({
+        name: cat.name,
+        movies: cat.movies.filter(movie =>
+          movie.title.toLowerCase().includes(term) ||
+          cat.name.toLowerCase().includes(term)
+        )
+      })).filter(cat => cat.movies.length > 0);
+
+      renderMovies(filtered);
+    });
+
     const closeBtn = document.getElementById("closeBtn");
     if (closeBtn) {
       closeBtn.onclick = () => {
@@ -516,6 +545,7 @@
       if (localStorage.getItem("activeProfile")) {
         document.getElementById("loginScreen").style.display = "none";
         document.getElementById("app").style.display = "block";
+        document.getElementById("profileName").textContent = `(Profile: ${localStorage.getItem("activeProfile")})`;
         loadMovies();
       } else {
         document.getElementById("loginScreen").style.display = "none";
