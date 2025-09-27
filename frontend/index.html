@@ -78,7 +78,7 @@
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       background: #1c1c1c;
       border-radius: 8px;
-      overflow: hidden; /* keeps rounded edges while zooming */
+      overflow: hidden; /* keeps rounded corners while zooming */
       text-align: center;
       position: relative;
       transform-origin: center center;
@@ -88,6 +88,7 @@
       width: 100%;
       height: auto;
       display: block;
+      border-radius: 0; /* let parent handle rounding */
     }
 
     .movie-tile:hover {
