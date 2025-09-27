@@ -6,8 +6,8 @@
     container.innerHTML = "";
 
     categories.forEach(category => {
-      if (category.movies.length === 0) {
-        return; // skip empty categories
+      if (!category.movies || category.movies.length === 0) {
+        return; // Skip empty categories
       }
 
       const section = document.createElement("div");

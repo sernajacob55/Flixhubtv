@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5000;
 // Serve frontend
 app.use(express.static(path.join(__dirname, "..", "frontend")));
 
-// Categories with movies
+// Categories
 const categories = [
   {
     name: "Sci-Fi",
@@ -16,23 +16,16 @@ const categories = [
         title: "The Matrix",
         cover: "/covers/matrix.jpg",
         url: "https://download1351.mediafire.com/.../The+Matrix.mp4"
-      },
-      {
-        title: "Inception",
-        cover: "/covers/inception.jpg",
-        url: "https://download1234.mediafire.com/.../Inception.mp4"
       }
     ]
   },
   {
     name: "Action",
-    movies: [
-      {
-        title: "John Wick",
-        cover: "/covers/johnwick.jpg",
-        url: "https://download1234.mediafire.com/.../JohnWick.mp4"
-      }
-    ]
+    movies: [] // empty for now
+  },
+  {
+    name: "Drama",
+    movies: [] // empty for now
   }
 ];
 
