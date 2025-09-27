@@ -33,47 +33,51 @@
 
   <script>
   async function loadMovies() {
-    const res = await fetch('/api/movies');
-    const list = await res.json();
-    const grid = document.getElementById('grid');
-    grid.innerHTML = '';
+    const res = await fetch("/api/movies");
+    const movies = await res.json();
+    const container = document.getElementById("movies");
+    container.innerHTML = "";
 
-    list.forEach(movie => {
-      const card = document.createElement('div');
-      card.className = 'card';
+    movies.forEach(movie => {
+      const tile = document.createElement("div");
+      tile.className = "movie-tile";
 
-      const img = document.createElement('img');
+      const img = document.createElement("img");
       img.src = movie.cover;
       img.alt = movie.title;
 
-      const title = document.createElement('div');
-      title.className = 'title';
-      title.textContent = movie.title;
-
-      card.appendChild(img);
-      card.appendChild(title);
-
-      // CLICK to play
-      card.onclick = () => {
-        const overlay = document.getElementById('overlay');
-        const video = document.getElementById('player');
+      // When you click a tile
+      tile.onclick = async () => {
+        const video = document.createElement("video");
         video.src = movie.url;
-        video.load();
-        video.oncanplay = () => video.play();
-        overlay.style.display = 'flex';
+        video.controls = true;
+        video.autoplay = true;
+        video.style.width = "100%";
+        video.style.height = "100%";
+
+        // Replace page with just the video
+        document.body.innerHTML = "";
+        document.body.appendChild(video);
+
+        // Try to force fullscreen
+        try {
+          await video.play();
+          if (video.requestFullscreen) {
+            video.requestFullscreen();
+          } else if (video.webkitRequestFullscreen) {
+            video.webkitRequestFullscreen();
+          } else if (video.msRequestFullscreen) {
+            video.msRequestFullscreen();
+          }
+        } catch (err) {
+          console.log("Autoplay blocked:", err);
+        }
       };
 
-      grid.appendChild(card);
+      tile.appendChild(img);
+      container.appendChild(tile);
     });
   }
-
-  document.getElementById('closeBtn').onclick = () => {
-    const overlay = document.getElementById('overlay');
-    const video = document.getElementById('player');
-    video.pause();
-    video.src = '';
-    overlay.style.display = 'none';
-  };
 
   loadMovies();
 </script>
