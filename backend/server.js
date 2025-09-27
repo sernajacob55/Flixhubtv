@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5000;
 // Serve frontend
 app.use(express.static(path.join(__dirname, "..", "frontend")));
 
-// Your Dropbox scl/fi link
+// Movies array (only once!)
 const movies = [
   {
     title: "The Matrix",
@@ -16,32 +16,8 @@ const movies = [
   }
 ];
 
-// Movies array
-let movies = [
-  {
-    title: "The Matrix",
-    cover: "/covers/matrix.jpg",
-    url: null // will be filled in after unwrapping
-  }
-];
-
-// Function to unwrap Dropbox link
-async function unwrapDropbox(link) {
-  try {
-    const res = await fetch(link, { redirect: "follow" });
-    return res.url; // final redirected URL
-  } catch (err) {
-    console.error("Failed to unwrap Dropbox link:", err);
-    return null;
-  }
-}
-
-// API for movies
-app.get("/api/movies", async (req, res) => {
-  if (!movies[0].url) {
-    const realUrl = await unwrapDropbox(dropboxLink);
-    movies[0].url = realUrl;
-  }
+// API endpoint
+app.get("/api/movies", (req, res) => {
   res.json(movies);
 });
 
