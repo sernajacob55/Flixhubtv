@@ -1,83 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FlixHubTV</title>
   <style>
-    body { background:#111; color:#fff; font-family:Arial, sans-serif; margin:0; }
-    header { padding:16px 20px; font-size:20px; font-weight:bold; }
-    #grid { display:flex; flex-wrap:wrap; gap:16px; padding:16px; justify-content:center; }
-    .card { width:180px; cursor:pointer; border-radius:8px; overflow:hidden; background:#222; box-shadow:0 4px 10px rgba(0,0,0,0.4); transition:transform .15s; }
-    .card:hover { transform: scale(1.05); }
-    .card img { width:100%; height:270px; object-fit:cover; display:block; }
-    .card .title { padding:8px; text-align:center; font-size:14px; background:#111;}
-    /* Player overlay */
-    #overlay { position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:9999; }
-    #overlayContent { width:90%; max-width:1000px; display:flex; flex-direction:column; align-items:center; }
-    video { width:100%; max-height:80vh; border-radius:8px; }
-    #closeBtn { margin-top:12px; padding:8px 16px; background:#e50914; color:#fff; border:none; border-radius:6px; cursor:pointer; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #141414;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #000;
+      padding: 15px 30px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #e50914; /* Netflix red */
+      letter-spacing: 2px;
+    }
+
+    .category {
+      margin: 20px 30px;
+    }
+
+    .category h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .row {
+      display: flex;
+      overflow-x: auto;
+      gap: 15px;
+      padding-bottom: 10px;
+    }
+
+    .row::-webkit-scrollbar {
+      height: 8px;
+    }
+    .row::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 4px;
+    }
+
+    .movie-tile {
+      flex: 0 0 auto;
+      width: 180px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      background: #1c1c1c;
+      border-radius: 8px;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .movie-tile img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-bottom: 2px solid #222;
+    }
+
+    .movie-tile:hover {
+      transform: scale(1.08);
+      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.7);
+    }
+
+    .movie-title {
+      padding: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    /* Overlay for video */
+    #videoOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    #videoOverlay video {
+      width: 100%;
+      height: 100%;
+      background: black;
+    }
+
+    /* Close button */
+    #closeBtn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 30px;
+      color: white;
+      cursor: pointer;
+      z-index: 10000;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
   <header>FlixHubTV</header>
+  <div id="categories"></div>
 
-  <div id="grid"></div>
-
-  <div id="overlay">
-    <div id="overlayContent">
-      <video id="player" controls></video>
-      <button id="closeBtn">Close</button>
-    </div>
+  <!-- Video Player Overlay -->
+  <div id="videoOverlay">
+    <span id="closeBtn">&times;</span>
+    <video id="player" controls autoplay></video>
   </div>
 
   <script>
-  async function loadMovies() {
-    const res = await fetch("/api/movies");
-    const movies = await res.json();
-    const container = document.getElementById("movies");
-    container.innerHTML = "";
+    async function loadMovies() {
+      const res = await fetch("/api/movies");
+      const categories = await res.json();
+      const container = document.getElementById("categories");
+      container.innerHTML = "";
 
-    movies.forEach(movie => {
-      const tile = document.createElement("div");
-      tile.className = "movie-tile";
+      categories.forEach(category => {
+        const section = document.createElement("div");
+        section.className = "category";
 
-      const img = document.createElement("img");
-      img.src = movie.cover;
-      img.alt = movie.title;
+        const heading = document.createElement("h2");
+        heading.textContent = category.name;
+        section.appendChild(heading);
 
-      // When you click a tile
-      tile.onclick = async () => {
-        const video = document.createElement("video");
-        video.src = movie.url;
-        video.controls = true;
-        video.autoplay = true;
-        video.style.width = "100%";
-        video.style.height = "100%";
+        const row = document.createElement("div");
+        row.className = "row";
 
-        // Replace page with just the video
-        document.body.innerHTML = "";
-        document.body.appendChild(video);
+        category.movies.forEach(movie => {
+          const tile = document.createElement("div");
+          tile.className = "movie-tile";
 
-        // Try to force fullscreen
-        try {
-          await video.play();
-          if (video.requestFullscreen) {
-            video.requestFullscreen();
-          } else if (video.webkitRequestFullscreen) {
-            video.webkitRequestFullscreen();
-          } else if (video.msRequestFullscreen) {
-            video.msRequestFullscreen();
-          }
-        } catch (err) {
-          console.log("Autoplay blocked:", err);
-        }
-      };
+          const img = document.createElement("img");
+          img.src = movie.cover;
+          img.alt = movie.title;
 
-      tile.appendChild(img);
-      container.appendChild(tile);
-    });
-  }
+          const title = document.createElement("div");
+          title.className = "movie-title";
+          title.textContent = movie.title;
 
-  loadMovies();
-</script>
+          tile.onclick = async () => {
+            const overlay = document.getElementById("videoOverlay");
+            const player = document.getElementById("player");
+
+            player.src = movie.url;
+            overlay.style.display = "flex";
+
+            try {
+              await player.play();
+              if (player.requestFullscreen) {
+                player.requestFullscreen();
+              } else if (player.webkitRequestFullscreen) {
+                player.webkitRequestFullscreen();
+              } else if (player.msRequestFullscreen) {
+                player.msRequestFullscreen();
+              }
+            } catch (err) {
+              console.log("Autoplay blocked:", err);
+            }
+          };
+
+          tile.appendChild(img);
+          tile.appendChild(title);
+          row.appendChild(tile);
+        });
+
+        section.appendChild(row);
+        container.appendChild(section);
+      });
+    }
+
+    // Close button functionality
+    document.getElementById("closeBtn").onclick = () => {
+      const overlay = document.getElementById("videoOverlay");
+      const player = document.getElementById("player");
+      player.pause();
+      overlay.style.display = "none";
+    };
+
+    loadMovies();
+  </script>
+</body>
+</html>
