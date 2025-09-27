@@ -26,7 +26,6 @@
       height: 100vh;
       background: #000;
     }
-
     #loginBox {
       background: #1c1c1c;
       padding: 30px;
@@ -34,108 +33,65 @@
       box-shadow: 0px 8px 20px rgba(0,0,0,0.7);
       text-align: center;
     }
-
-    #loginBox h2 {
-      margin-bottom: 20px;
-      color: #26c6da;
-    }
-
+    #loginBox h2 { margin-bottom: 20px; color: #26c6da; }
     #loginBox input {
-      display: block;
-      margin: 10px auto;
-      padding: 10px;
-      border-radius: 5px;
-      border: none;
-      width: 220px;
-      font-size: 16px;
+      display: block; margin: 10px auto; padding: 10px;
+      border-radius: 5px; border: none; width: 220px; font-size: 16px;
     }
-
     #loginBox button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      background: #26c6da;
-      color: white;
-      cursor: pointer;
+      margin-top: 15px; padding: 10px 20px; font-size: 16px;
+      border: none; border-radius: 5px; background: #26c6da;
+      color: white; cursor: pointer;
     }
-
-    #loginError {
-      color: red;
-      margin-top: 10px;
-      display: none;
-    }
+    #loginError { color: red; margin-top: 10px; display: none; }
 
     /* --- Profile screen --- */
     #profileScreen {
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #000;
-      text-align: center;
+      display: none; flex-direction: column; justify-content: center;
+      align-items: center; height: 100vh; background: #000; text-align: center;
     }
-
-    #profileScreen h2 {
-      margin-bottom: 20px;
-      color: #26c6da;
-    }
-
-    .profiles {
-      display: flex;
-      gap: 40px;
-    }
-
+    #profileScreen h2 { margin-bottom: 20px; color: #26c6da; }
+    .profiles { display: flex; gap: 40px; }
     .profile {
-      background: #1c1c1c;
-      padding: 20px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: transform 0.2s;
+      background: #1c1c1c; padding: 20px; border-radius: 10px;
+      cursor: pointer; transition: transform 0.2s;
     }
-
-    .profile:hover {
-      transform: scale(1.1);
-      background: #26c6da;
-    }
+    .profile:hover { transform: scale(1.1); background: #26c6da; }
 
     /* --- Main app --- */
-    #app {
-      display: none;
-    }
+    #app { display: none; }
 
     header {
       background: #000;
-      padding: 15px 30px;
+      padding: 15px 20px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 10px;
     }
-
-    header .title {
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    .title {
       font-size: 24px;
       font-weight: bold;
       color: #26c6da;
       letter-spacing: 2px;
       white-space: nowrap;
     }
-
-    header .profile-name {
-      font-size: 16px;
-      margin-left: 15px;
-      color: #aaa;
+    .profile-name { font-size: 14px; margin-left: 8px; color: #aaa; }
+    .header-buttons { display: flex; gap: 5px; }
+    #switchProfileBtn, #logoutBtn {
+      border: none;
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 5px;
+      cursor: pointer;
     }
-
-    header .right-side {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
+    #switchProfileBtn { background: #26c6da; color: #000; }
+    #logoutBtn { background: red; color: white; }
 
     #searchBar {
       padding: 8px 14px;
@@ -143,52 +99,11 @@
       border-radius: 20px;
       border: none;
       outline: none;
-      width: 300px;
-      max-width: 90vw;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
       text-align: center;
-    }
-
-    #logoutBtn, #switchProfileBtn {
-      border: none;
-      padding: 8px 16px;
-      font-size: 14px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    #logoutBtn {
-      background: red;
-      color: white;
-    }
-
-    #switchProfileBtn {
-      background: #26c6da;
-      color: #000;
-    }
-
-    /* ✅ Mobile optimization */
-    @media (max-width: 600px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      header .right-side {
-        flex-direction: column;
-        align-items: stretch;
-        width: 100%;
-        margin-top: 10px;
-      }
-
-      #searchBar {
-        width: 100%;
-        max-width: 100%;
-      }
-
-      #logoutBtn, #switchProfileBtn {
-        width: 100%;
-        text-align: center;
-      }
+      display: block;
     }
 
     /* --- Category nav bar --- */
@@ -203,126 +118,46 @@
       top: 0;
       z-index: 1000;
     }
-
     nav button {
-      background: transparent;
-      border: none;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 6px 12px;
-      border-radius: 5px;
-      transition: background 0.2s;
+      background: transparent; border: none; color: white;
+      font-size: 16px; cursor: pointer; padding: 6px 12px;
+      border-radius: 5px; transition: background 0.2s;
     }
+    nav button:hover { background: #26c6da; color: #000; }
+    nav button.active { background: #26c6da; color: #000; }
 
-    nav button:hover {
-      background: #26c6da;
-      color: #000;
-    }
-
-    nav button.active {
-      background: #26c6da;
-      color: #000;
-    }
-
-    .category {
-      margin: 20px 30px;
-    }
-
-    .category h2 {
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-
-    .row {
-      display: flex;
-      overflow-x: auto;
-      gap: 15px;
-      padding-bottom: 10px;
-    }
-
+    /* --- Categories & movies --- */
+    .category { margin: 20px 30px; }
+    .category h2 { font-size: 20px; margin-bottom: 10px; }
+    .row { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; }
     .movie-tile {
-      flex: 0 0 auto;
-      width: 180px;
-      cursor: pointer;
-      background: #1c1c1c;
-      border-radius: 8px;
-      overflow: hidden;
-      text-align: center;
-      position: relative;
+      flex: 0 0 auto; width: 180px; cursor: pointer; background: #1c1c1c;
+      border-radius: 8px; overflow: hidden; text-align: center; position: relative;
     }
-
     .movie-tile img {
-      width: 100%;
-      display: block;
-      transition: transform 0.3s ease;
+      width: 100%; display: block; transition: transform 0.3s ease;
       border-radius: 8px;
     }
-
-    .movie-tile:hover img {
-      transform: scale(1.08);
-    }
-
-    .movie-tile:hover {
-      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.7);
-      z-index: 10;
-    }
-
-    .movie-title {
-      padding: 8px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #fff;
-    }
-
+    .movie-tile:hover img { transform: scale(1.08); }
+    .movie-tile:hover { box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.7); z-index: 10; }
+    .movie-title { padding: 8px; font-size: 14px; font-weight: bold; color: #fff; }
     .add-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(38, 198, 218, 0.9);
-      border: none;
-      color: white;
-      font-size: 18px;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      cursor: pointer;
+      position: absolute; top: 8px; right: 8px; background: rgba(38,198,218,0.9);
+      border: none; color: white; font-size: 18px; border-radius: 50%;
+      width: 28px; height: 28px; cursor: pointer;
     }
-
-    .add-btn.added {
-      background: rgba(0, 200, 0, 0.9);
-    }
+    .add-btn.added { background: rgba(0,200,0,0.9); }
 
     /* --- Video overlay --- */
     #videoOverlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: black;
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: black; z-index: 9999; justify-content: center;
+      align-items: center; flex-direction: column;
     }
-
-    #videoOverlay video {
-      width: 100%;
-      height: 100%;
-      background: black;
-    }
-
+    #videoOverlay video { width: 100%; height: 100%; background: black; }
     #closeBtn {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 30px;
-      color: white;
-      cursor: pointer;
-      z-index: 10000;
-      font-weight: bold;
+      position: absolute; top: 20px; right: 30px; font-size: 30px;
+      color: white; cursor: pointer; z-index: 10000; font-weight: bold;
     }
   </style>
 </head>
@@ -351,15 +186,17 @@
   <!-- Main App -->
   <div id="app">
     <header>
-      <div>
-        <span class="title">FlixHubTV</span>
-        <span class="profile-name" id="profileName"></span>
+      <div class="header-top">
+        <div>
+          <span class="title">FlixHubTV</span>
+          <span class="profile-name" id="profileName"></span>
+        </div>
+        <div class="header-buttons">
+          <button id="switchProfileBtn" onclick="switchProfile()">Switch</button>
+          <button id="logoutBtn" onclick="logout()">Logout</button>
+        </div>
       </div>
-      <div class="right-side">
-        <input type="text" id="searchBar" placeholder="Search movies or categories...">
-        <button id="switchProfileBtn" onclick="switchProfile()">Switch Profile</button>
-        <button id="logoutBtn" onclick="logout()">Logout</button>
-      </div>
+      <input type="text" id="searchBar" placeholder="Search movies or categories...">
     </header>
 
     <!-- Category Nav Bar -->
@@ -387,7 +224,6 @@
     function login() {
       const user = document.getElementById("username").value;
       const pass = document.getElementById("password").value;
-
       if (user === validUser && pass === validPass) {
         localStorage.setItem("loggedIn", "true");
         document.getElementById("loginScreen").style.display = "none";
@@ -440,14 +276,9 @@
       const container = document.getElementById("categories");
       container.innerHTML = "";
 
-      if (myList.length > 0) {
-        renderCategory("My List", myList, container);
-      }
-
+      if (myList.length > 0) renderCategory("My List", myList, container);
       const cwMovies = Object.values(continueWatching);
-      if (cwMovies.length > 0) {
-        renderCategory("Continue Watching", cwMovies, container, true);
-      }
+      if (cwMovies.length > 0) renderCategory("Continue Watching", cwMovies, container, true);
 
       categories.forEach(category => {
         if (!category.movies || category.movies.length === 0) return;
@@ -459,7 +290,6 @@
       const section = document.createElement("div");
       section.className = "category";
       section.id = `cat-${name}`;
-
       const heading = document.createElement("h2");
       heading.textContent = name;
       section.appendChild(heading);
@@ -498,28 +328,19 @@
         tile.onclick = async () => {
           const overlay = document.getElementById("videoOverlay");
           const player = document.getElementById("player");
-
           player.src = movie.url;
           overlay.style.display = "flex";
-
           if (resume && continueWatching[movie.title]) {
             player.currentTime = continueWatching[movie.title].time || 0;
           }
-
           try {
             await player.play();
             if (overlay.requestFullscreen) overlay.requestFullscreen();
-          } catch (err) {
-            console.log("Autoplay blocked:", err);
-          }
-
+          } catch {}
           player.onpause = () => {
             const remaining = player.duration - player.currentTime;
-            if (remaining <= 600) {
-              delete continueWatching[movie.title];
-            } else {
-              continueWatching[movie.title] = { ...movie, time: player.currentTime };
-            }
+            if (remaining <= 600) delete continueWatching[movie.title];
+            else continueWatching[movie.title] = { ...movie, time: player.currentTime };
             localStorage.setItem(getProfileKey("continueWatching"), JSON.stringify(continueWatching));
             renderMovies(allCategories);
           };
@@ -538,23 +359,13 @@
     function filterCategory(name, btn) {
       document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-
-      if (name === "All") {
-        renderMovies(allCategories);
-      } else {
-        const filtered = allCategories.filter(cat => cat.name === name);
-        renderMovies(filtered);
-      }
+      if (name === "All") renderMovies(allCategories);
+      else renderMovies(allCategories.filter(cat => cat.name === name));
     }
 
-    // ✅ Live search
     document.getElementById("searchBar").addEventListener("input", (e) => {
       const term = e.target.value.toLowerCase();
-      if (!term) {
-        renderMovies(allCategories);
-        return;
-      }
-
+      if (!term) { renderMovies(allCategories); return; }
       const filtered = allCategories.map(cat => ({
         name: cat.name,
         movies: cat.movies.filter(movie =>
@@ -562,7 +373,6 @@
           cat.name.toLowerCase().includes(term)
         )
       })).filter(cat => cat.movies.length > 0);
-
       renderMovies(filtered);
     });
 
@@ -573,9 +383,7 @@
         const player = document.getElementById("player");
         player.pause();
         overlay.style.display = "none";
-        if (document.fullscreenElement) {
-          document.exitFullscreen();
-        }
+        if (document.fullscreenElement) document.exitFullscreen();
       };
     }
 
