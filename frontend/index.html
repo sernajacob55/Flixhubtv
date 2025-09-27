@@ -17,7 +17,95 @@
       overflow-x: hidden;
     }
 
-    /* Header */
+    /* Login screen */
+    #loginScreen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #000;
+    }
+
+    #loginBox {
+      background: #1c1c1c;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 8px 20px rgba(0,0,0,0.7);
+      text-align: center;
+    }
+
+    #loginBox h2 {
+      margin-bottom: 20px;
+      color: #26c6da;
+    }
+
+    #loginBox input {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      width: 220px;
+      font-size: 16px;
+    }
+
+    #loginBox button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background: #26c6da;
+      color: white;
+      cursor: pointer;
+    }
+
+    #loginError {
+      color: red;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* Profiles screen */
+    #profileScreen {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #000;
+      text-align: center;
+    }
+
+    #profileScreen h2 {
+      margin-bottom: 20px;
+      color: #26c6da;
+    }
+
+    .profiles {
+      display: flex;
+      gap: 40px;
+    }
+
+    .profile {
+      background: #1c1c1c;
+      padding: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .profile:hover {
+      transform: scale(1.1);
+      background: #26c6da;
+    }
+
+    /* Main app */
+    #app {
+      display: none;
+    }
+
     header {
       background: #000;
       padding: 15px 30px;
@@ -172,39 +260,84 @@
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <header>
-    <div class="title">FlixHubTV</div>
-    <div>
-      <input type="text" id="searchBar" placeholder="Search movies or categories...">
-      <button id="logoutBtn" onclick="logout()">Logout</button>
+  <!-- Login Screen -->
+  <div id="loginScreen">
+    <div id="loginBox">
+      <h2>Login to FlixHubTV</h2>
+      <input type="text" id="username" placeholder="Username">
+      <input type="password" id="password" placeholder="Password">
+      <button onclick="login()">Login</button>
+      <div id="loginError">Invalid username or password</div>
     </div>
-  </header>
+  </div>
 
-  <!-- Category Nav Bar -->
-  <nav>
-    <button class="active" onclick="filterCategory('All', this)">All</button>
-    <button onclick="filterCategory('Action', this)">Action</button>
-    <button onclick="filterCategory('Comedy', this)">Comedy</button>
-    <button onclick="filterCategory('Horror', this)">Horror</button>
-    <button onclick="filterCategory('Drama', this)">Drama</button>
-    <button onclick="filterCategory('Sci-Fi', this)">Sci-Fi</button>
-  </nav>
+  <!-- Profile Screen -->
+  <div id="profileScreen">
+    <h2>Select Profile</h2>
+    <div class="profiles">
+      <div class="profile" onclick="selectProfile('Serna')">Serna</div>
+      <div class="profile" onclick="selectProfile('Whitfield')">Whitfield</div>
+      <div class="profile" onclick="selectProfile('Brandt')">Brandt</div>
+    </div>
+  </div>
 
-  <!-- Categories -->
-  <div id="categories"></div>
+  <!-- Main App -->
+  <div id="app">
+    <header>
+      <div class="title">FlixHubTV</div>
+      <div>
+        <input type="text" id="searchBar" placeholder="Search movies or categories...">
+        <button id="logoutBtn" onclick="logout()">Logout</button>
+      </div>
+    </header>
 
-  <!-- Video Player Overlay -->
-  <div id="videoOverlay">
-    <span id="closeBtn">&times;</span>
-    <video id="player" controls autoplay></video>
+    <!-- Category Nav Bar -->
+    <nav>
+      <button class="active" onclick="filterCategory('All', this)">All</button>
+      <button onclick="filterCategory('Action', this)">Action</button>
+      <button onclick="filterCategory('Comedy', this)">Comedy</button>
+      <button onclick="filterCategory('Horror', this)">Horror</button>
+      <button onclick="filterCategory('Drama', this)">Drama</button>
+      <button onclick="filterCategory('Sci-Fi', this)">Sci-Fi</button>
+    </nav>
+
+    <div id="categories"></div>
+
+    <div id="videoOverlay">
+      <span id="closeBtn">&times;</span>
+      <video id="player" controls autoplay></video>
+    </div>
   </div>
 
   <script>
+    const validUser = "Streamme69420";
+    const validPass = "Xenomorph69420!";
+
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+
+      if (user === validUser && pass === validPass) {
+        localStorage.setItem("loggedIn", "true");
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("profileScreen").style.display = "flex";
+      } else {
+        document.getElementById("loginError").style.display = "block";
+      }
+    }
+
+    function selectProfile(profile) {
+      localStorage.setItem("activeProfile", profile);
+      document.getElementById("profileScreen").style.display = "none";
+      document.getElementById("app").style.display = "block";
+      loadMovies();
+    }
+
     function logout() {
       localStorage.removeItem("loggedIn");
       localStorage.removeItem("activeProfile");
-      location.reload();
+      document.getElementById("app").style.display = "none";
+      document.getElementById("loginScreen").style.display = "flex";
     }
 
     let allCategories = [];
@@ -271,7 +404,6 @@
     }
 
     function filterCategory(name, btn) {
-      // Reset active state
       document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
 
@@ -296,7 +428,16 @@
       };
     }
 
-    loadMovies();
+    if (localStorage.getItem("loggedIn") === "true") {
+      if (localStorage.getItem("activeProfile")) {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        loadMovies();
+      } else {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("profileScreen").style.display = "flex";
+      }
+    }
   </script>
 </body>
 </html>
