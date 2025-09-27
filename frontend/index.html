@@ -315,7 +315,6 @@
       document.getElementById("loginScreen").style.display = "flex";
     }
 
-    // Profile-specific storage
     function getProfileKey(key) {
       const profile = localStorage.getItem("activeProfile");
       return profile ? `${profile}_${key}` : key;
@@ -412,7 +411,15 @@
           }
 
           player.onpause = () => {
-            continueWatching[movie.title] = { ...movie, time: player.currentTime };
+            const remaining = player.duration - player.currentTime;
+
+            // If less than 10 minutes left, remove from continue watching
+            if (remaining <= 600) {
+              delete continueWatching[movie.title];
+            } else {
+              continueWatching[movie.title] = { ...movie, time: player.currentTime };
+            }
+
             localStorage.setItem(getProfileKey("continueWatching"), JSON.stringify(continueWatching));
             renderMovies(allCategories);
           };
@@ -462,7 +469,6 @@
       });
     }
 
-    // Auto-load correct screen on refresh
     if (localStorage.getItem("loggedIn") === "true") {
       if (localStorage.getItem("activeProfile")) {
         document.getElementById("loginScreen").style.display = "none";
