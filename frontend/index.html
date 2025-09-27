@@ -23,14 +23,14 @@
       padding: 15px 30px;
       display: flex;
       align-items: center;
-      justify-content: center; /* centers search bar */
-      gap: 40px; /* space between title and search */
+      justify-content: center;
+      gap: 40px;
     }
 
     header .title {
       font-size: 24px;
       font-weight: bold;
-      color: #26c6da; /* Custom teal color */
+      color: #26c6da; /* Teal */
       letter-spacing: 2px;
       white-space: nowrap;
     }
@@ -62,14 +62,6 @@
       padding-bottom: 10px;
     }
 
-    .row::-webkit-scrollbar {
-      height: 8px;
-    }
-    .row::-webkit-scrollbar-thumb {
-      background: #333;
-      border-radius: 4px;
-    }
-
     .movie-tile {
       flex: 0 0 auto;
       width: 180px;
@@ -79,6 +71,7 @@
       border-radius: 8px;
       overflow: hidden;
       text-align: center;
+      position: relative;
     }
 
     .movie-tile img {
@@ -98,6 +91,21 @@
       font-size: 14px;
       font-weight: bold;
       color: #fff;
+    }
+
+    /* Add to My List button */
+    .add-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(38, 198, 218, 0.8);
+      border: none;
+      color: white;
+      font-size: 18px;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
     }
 
     /* Overlay for video */
@@ -150,6 +158,8 @@
 
   <script>
     let allCategories = [];
+    let myList = JSON.parse(localStorage.getItem("myList")) || [];
+    let continueWatching = JSON.parse(localStorage.getItem("continueWatching")) || {};
 
     async function loadMovies() {
       const res = await fetch("/api/movies");
@@ -161,62 +171,92 @@
       const container = document.getElementById("categories");
       container.innerHTML = "";
 
+      // --- My List Row ---
+      if (myList.length > 0) {
+        renderCategory("My List", myList, container);
+      }
+
+      // --- Continue Watching Row ---
+      const cwMovies = Object.values(continueWatching);
+      if (cwMovies.length > 0) {
+        renderCategory("Continue Watching", cwMovies, container, true);
+      }
+
+      // --- Normal Categories ---
       categories.forEach(category => {
-        if (!category.movies || category.movies.length === 0) {
-          return; // Skip empty categories
-        }
-
-        const section = document.createElement("div");
-        section.className = "category";
-
-        const heading = document.createElement("h2");
-        heading.textContent = category.name;
-        section.appendChild(heading);
-
-        const row = document.createElement("div");
-        row.className = "row";
-
-        category.movies.forEach(movie => {
-          const tile = document.createElement("div");
-          tile.className = "movie-tile";
-
-          const img = document.createElement("img");
-          img.src = movie.cover;
-          img.alt = movie.title;
-
-          const title = document.createElement("div");
-          title.className = "movie-title";
-          title.textContent = movie.title;
-
-          tile.onclick = async () => {
-            const overlay = document.getElementById("videoOverlay");
-            const player = document.getElementById("player");
-
-            player.src = movie.url;
-            overlay.style.display = "flex";
-
-            try {
-              await player.play();
-              if (overlay.requestFullscreen) {
-                overlay.requestFullscreen();
-              } else if (overlay.webkitRequestFullscreen) {
-                overlay.webkitRequestFullscreen();
-              } else if (overlay.msRequestFullscreen) {
-                overlay.msRequestFullscreen();
-              }
-            } catch (err) {
-              console.log("Autoplay blocked:", err);
-            }
-          };
-
-          tile.appendChild(img);
-          tile.appendChild(title);
-          row.appendChild(tile);
-        });
-
-        section.appendChild(row);
-        container.appendChild(section);
+        if (!category.movies || category.movies.length === 0) return;
+        renderCategory(category.name, category.movies, container);
       });
+    }
+
+    function renderCategory(name, movies, container, resume = false) {
+      const section = document.createElement("div");
+      section.className = "category";
+
+      const heading = document.createElement("h2");
+      heading.textContent = name;
+      section.appendChild(heading);
+
+      const row = document.createElement("div");
+      row.className = "row";
+
+      movies.forEach(movie => {
+        const tile = document.createElement("div");
+        tile.className = "movie-tile";
+
+        const img = document.createElement("img");
+        img.src = movie.cover;
+        img.alt = movie.title;
+
+        const title = document.createElement("div");
+        title.className = "movie-title";
+        title.textContent = movie.title;
+
+        const addBtn = document.createElement("button");
+        addBtn.textContent = "+";
+        addBtn.className = "add-btn";
+        addBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (!myList.find(m => m.title === movie.title)) {
+            myList.push(movie);
+            localStorage.setItem("myList", JSON.stringify(myList));
+            renderMovies(allCategories);
+          }
+        };
+
+        tile.onclick = async () => {
+          const overlay = document.getElementById("videoOverlay");
+          const player = document.getElementById("player");
+
+          player.src = movie.url;
+          overlay.style.display = "flex";
+
+          if (resume && continueWatching[movie.title]) {
+            player.currentTime = continueWatching[movie.title].time || 0;
+          }
+
+          try {
+            await player.play();
+            if (overlay.requestFullscreen) overlay.requestFullscreen();
+          } catch (err) {
+            console.log("Autoplay blocked:", err);
+          }
+
+          player.onpause = () => {
+            continueWatching[movie.title] = { ...movie, time: player.currentTime };
+            localStorage.setItem("continueWatching", JSON.stringify(continueWatching));
+            renderMovies(allCategories);
+          };
+        };
+
+        tile.appendChild(img);
+        tile.appendChild(title);
+        tile.appendChild(addBtn);
+        row.appendChild(tile);
+      });
+
+      section.appendChild(row);
+      container.appendChild(section);
     }
 
     // Close button functionality
@@ -235,14 +275,13 @@
       };
     }
 
-    // Search functionality (movies + categories)
+    // Search functionality
     const searchBar = document.getElementById("searchBar");
     searchBar.addEventListener("input", (e) => {
       const query = e.target.value.toLowerCase();
 
       const filteredCategories = allCategories.map(category => {
         const categoryMatch = category.name.toLowerCase().includes(query);
-
         return {
           ...category,
           movies: categoryMatch
