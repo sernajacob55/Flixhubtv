@@ -16,6 +16,7 @@
       color: white;
       margin: 0;
       padding: 0;
+      overflow-x: hidden; /* prevent extra scrollbar */
     }
 
     header {
@@ -74,10 +75,10 @@
       flex: 0 0 auto;
       width: 180px;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       background: #1c1c1c;
       border-radius: 8px;
-      overflow: hidden;
+      overflow: hidden; /* keeps rounded edges while zooming */
       text-align: center;
       position: relative;
       transform-origin: center center;
@@ -87,15 +88,12 @@
       width: 100%;
       height: auto;
       display: block;
-      border-bottom: 2px solid #222;
-      border-radius: 8px; /* keep rounded edges when zooming */
     }
 
     .movie-tile:hover {
       transform: scale(1.08);
       box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.7);
       z-index: 10;
-      border-radius: 8px; /* stay rounded */
     }
 
     .movie-title {
