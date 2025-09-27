@@ -132,7 +132,7 @@
       text-align: center;
     }
 
-    #logoutBtn {
+    #logoutBtn, #switchProfileBtn {
       background: red;
       color: white;
       border: none;
@@ -140,7 +140,12 @@
       font-size: 14px;
       border-radius: 5px;
       cursor: pointer;
-      margin-left: 20px;
+      margin-left: 10px;
+    }
+
+    #switchProfileBtn {
+      background: #26c6da;
+      color: #000;
     }
 
     /* Category nav bar */
@@ -305,6 +310,7 @@
       <div class="title">FlixHubTV</div>
       <div>
         <input type="text" id="searchBar" placeholder="Search movies or categories...">
+        <button id="switchProfileBtn" onclick="switchProfile()">Switch Profile</button>
         <button id="logoutBtn" onclick="logout()">Logout</button>
       </div>
     </header>
@@ -356,6 +362,11 @@
       localStorage.removeItem("activeProfile");
       document.getElementById("app").style.display = "none";
       document.getElementById("loginScreen").style.display = "flex";
+    }
+
+    function switchProfile() {
+      document.getElementById("app").style.display = "none";
+      document.getElementById("profileScreen").style.display = "flex";
     }
 
     function getProfileKey(key) {
