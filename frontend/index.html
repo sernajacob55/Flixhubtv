@@ -80,8 +80,7 @@
       overflow: hidden;
       text-align: center;
       position: relative;
-
-      transform-origin: center center; 
+      transform-origin: center center;
     }
 
     .movie-tile img {
@@ -89,12 +88,14 @@
       height: auto;
       display: block;
       border-bottom: 2px solid #222;
+      border-radius: 8px; /* keep rounded edges when zooming */
     }
 
     .movie-tile:hover {
       transform: scale(1.08);
       box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.7);
       z-index: 10;
+      border-radius: 8px; /* stay rounded */
     }
 
     .movie-title {
@@ -231,14 +232,12 @@
         const inList = myList.find(m => m.title === movie.title);
         addBtn.textContent = inList ? "✓" : "+";
         addBtn.className = "add-btn" + (inList ? " added" : "");
-        
+
         addBtn.onclick = (e) => {
           e.stopPropagation();
           if (inList) {
-            // Remove from list
             myList = myList.filter(m => m.title !== movie.title);
           } else {
-            // Add to list
             myList.push(movie);
           }
           localStorage.setItem("myList", JSON.stringify(myList));
