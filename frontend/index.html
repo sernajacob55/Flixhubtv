@@ -163,12 +163,13 @@
 
             try {
               await player.play();
-              if (player.requestFullscreen) {
-                player.requestFullscreen();
-              } else if (player.webkitRequestFullscreen) {
-                player.webkitRequestFullscreen();
-              } else if (player.msRequestFullscreen) {
-                player.msRequestFullscreen();
+              // Fullscreen the overlay (video + X button)
+              if (overlay.requestFullscreen) {
+                overlay.requestFullscreen();
+              } else if (overlay.webkitRequestFullscreen) {
+                overlay.webkitRequestFullscreen();
+              } else if (overlay.msRequestFullscreen) {
+                overlay.msRequestFullscreen();
               }
             } catch (err) {
               console.log("Autoplay blocked:", err);
@@ -191,8 +192,14 @@
       closeBtn.onclick = () => {
         const overlay = document.getElementById("videoOverlay");
         const player = document.getElementById("player");
+
         player.pause();
         overlay.style.display = "none";
+
+        // Exit fullscreen if active
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        }
       };
     }
 
