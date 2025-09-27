@@ -131,7 +131,7 @@
 <body>
   <header>
     FlixHubTV
-    <input type="text" id="searchBar" placeholder="Search movies...">
+    <input type="text" id="searchBar" placeholder="Search movies or categories...">
   </header>
 
   <div id="categories"></div>
@@ -229,17 +229,22 @@
       };
     }
 
-    // Search functionality
+    // Search functionality (movies + categories)
     const searchBar = document.getElementById("searchBar");
     searchBar.addEventListener("input", (e) => {
       const query = e.target.value.toLowerCase();
 
       const filteredCategories = allCategories.map(category => {
+        // Match if category name matches search OR if movies match
+        const categoryMatch = category.name.toLowerCase().includes(query);
+
         return {
           ...category,
-          movies: category.movies.filter(movie =>
-            movie.title.toLowerCase().includes(query)
-          )
+          movies: categoryMatch
+            ? category.movies
+            : category.movies.filter(movie =>
+                movie.title.toLowerCase().includes(query)
+              )
         };
       });
 
