@@ -7,21 +7,41 @@ const PORT = process.env.PORT || 5000;
 // Serve frontend
 app.use(express.static(path.join(__dirname, "..", "frontend")));
 
-// Movies array (only once!)
-const movies = [
+// Categories with movies
+const categories = [
   {
-    title: "The Matrix",
-    cover: "/covers/matrix.jpg",
-    url: "https://download1351.mediafire.com/3yzrkgjjifhg-kBE2HT1i1X9UAOckBG5zokIOlih39t_HouFQji-qXpatH5FZw4-C20r5fD-Do-cJ7MyM7aRD8Uhz-BWQJcs5amcyCuEtcHjyhO0h9VWx1VfHxjIiSyiHJGpXfJ7VTnSDmR4Snc7RL0MH0eoZtOMVXw0Pr_Jfhb4N3Y/rks796idw5xqo2i/The+Matrix.mp4"
+    name: "Sci-Fi",
+    movies: [
+      {
+        title: "The Matrix",
+        cover: "/covers/matrix.jpg",
+        url: "https://download1351.mediafire.com/.../The+Matrix.mp4"
+      },
+      {
+        title: "Inception",
+        cover: "/covers/inception.jpg",
+        url: "https://download1234.mediafire.com/.../Inception.mp4"
+      }
+    ]
+  },
+  {
+    name: "Action",
+    movies: [
+      {
+        title: "John Wick",
+        cover: "/covers/johnwick.jpg",
+        url: "https://download1234.mediafire.com/.../JohnWick.mp4"
+      }
+    ]
   }
 ];
 
 // API endpoint
 app.get("/api/movies", (req, res) => {
-  res.json(movies);
+  res.json(categories);
 });
 
-// Fallback
+// Fallback to frontend
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "frontend", "index.html"));
 });
