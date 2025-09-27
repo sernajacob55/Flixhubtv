@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FlixHubTV</title>
 
-  <!-- Favicon (tab icon) -->
+  <!-- Favicons -->
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png">
 
@@ -25,6 +25,19 @@
       font-weight: bold;
       color: #26c6da; /* Custom teal color */
       letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Search bar */
+    #searchBar {
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: none;
+      outline: none;
+      width: 200px;
     }
 
     .category {
@@ -116,7 +129,11 @@
   </style>
 </head>
 <body>
-  <header>FlixHubTV</header>
+  <header>
+    FlixHubTV
+    <input type="text" id="searchBar" placeholder="Search movies...">
+  </header>
+
   <div id="categories"></div>
 
   <!-- Video Player Overlay -->
@@ -126,9 +143,15 @@
   </div>
 
   <script>
+    let allCategories = [];
+
     async function loadMovies() {
       const res = await fetch("/api/movies");
-      const categories = await res.json();
+      allCategories = await res.json();
+      renderMovies(allCategories);
+    }
+
+    function renderMovies(categories) {
       const container = document.getElementById("categories");
       container.innerHTML = "";
 
@@ -168,7 +191,6 @@
 
             try {
               await player.play();
-              // Fullscreen the overlay (video + X button)
               if (overlay.requestFullscreen) {
                 overlay.requestFullscreen();
               } else if (overlay.webkitRequestFullscreen) {
@@ -191,7 +213,7 @@
       });
     }
 
-    // Safe close button functionality
+    // Close button functionality
     const closeBtn = document.getElementById("closeBtn");
     if (closeBtn) {
       closeBtn.onclick = () => {
@@ -201,12 +223,28 @@
         player.pause();
         overlay.style.display = "none";
 
-        // Exit fullscreen if active
         if (document.fullscreenElement) {
           document.exitFullscreen();
         }
       };
     }
+
+    // Search functionality
+    const searchBar = document.getElementById("searchBar");
+    searchBar.addEventListener("input", (e) => {
+      const query = e.target.value.toLowerCase();
+
+      const filteredCategories = allCategories.map(category => {
+        return {
+          ...category,
+          movies: category.movies.filter(movie =>
+            movie.title.toLowerCase().includes(query)
+          )
+        };
+      });
+
+      renderMovies(filteredCategories);
+    });
 
     loadMovies();
   </script>
