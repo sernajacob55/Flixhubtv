@@ -21,23 +21,29 @@
     header {
       background: #000;
       padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center; /* centers search bar */
+      gap: 40px; /* space between title and search */
+    }
+
+    header .title {
       font-size: 24px;
       font-weight: bold;
       color: #26c6da; /* Custom teal color */
       letter-spacing: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      white-space: nowrap;
     }
 
     /* Search bar */
     #searchBar {
-      padding: 6px 12px;
-      font-size: 14px;
-      border-radius: 4px;
+      padding: 8px 14px;
+      font-size: 16px;
+      border-radius: 20px;
       border: none;
       outline: none;
-      width: 200px;
+      width: 300px;
+      text-align: center;
     }
 
     .category {
@@ -130,7 +136,7 @@
 </head>
 <body>
   <header>
-    FlixHubTV
+    <div class="title">FlixHubTV</div>
     <input type="text" id="searchBar" placeholder="Search movies or categories...">
   </header>
 
@@ -235,7 +241,6 @@
       const query = e.target.value.toLowerCase();
 
       const filteredCategories = allCategories.map(category => {
-        // Match if category name matches search OR if movies match
         const categoryMatch = category.name.toLowerCase().includes(query);
 
         return {
