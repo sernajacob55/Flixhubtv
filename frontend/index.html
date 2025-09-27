@@ -227,6 +227,24 @@
       color: #fff;
     }
 
+    .add-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(38, 198, 218, 0.9);
+      border: none;
+      color: white;
+      font-size: 18px;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+    }
+
+    .add-btn.added {
+      background: rgba(0, 200, 0, 0.9);
+    }
+
     #videoOverlay {
       display: none;
       position: fixed;
@@ -340,11 +358,22 @@
       document.getElementById("loginScreen").style.display = "flex";
     }
 
+    function getProfileKey(key) {
+      const profile = localStorage.getItem("activeProfile");
+      return profile ? `${profile}_${key}` : key;
+    }
+
     let allCategories = [];
+    let myList = [];
+    let continueWatching = {};
 
     async function loadMovies() {
       const res = await fetch("/api/movies");
       allCategories = await res.json();
+
+      myList = JSON.parse(localStorage.getItem(getProfileKey("myList"))) || [];
+      continueWatching = JSON.parse(localStorage.getItem(getProfileKey("continueWatching"))) || {};
+
       renderMovies(allCategories);
     }
 
@@ -352,13 +381,22 @@
       const container = document.getElementById("categories");
       container.innerHTML = "";
 
+      if (myList.length > 0) {
+        renderCategory("My List", myList, container);
+      }
+
+      const cwMovies = Object.values(continueWatching);
+      if (cwMovies.length > 0) {
+        renderCategory("Continue Watching", cwMovies, container, true);
+      }
+
       categories.forEach(category => {
         if (!category.movies || category.movies.length === 0) return;
         renderCategory(category.name, category.movies, container);
       });
     }
 
-    function renderCategory(name, movies, container) {
+    function renderCategory(name, movies, container, resume = false) {
       const section = document.createElement("div");
       section.className = "category";
       section.id = `cat-${name}`;
@@ -382,20 +420,55 @@
         title.className = "movie-title";
         title.textContent = movie.title;
 
-        tile.onclick = () => {
+        const addBtn = document.createElement("button");
+        const inList = myList.find(m => m.title === movie.title);
+        addBtn.textContent = inList ? "✓" : "+";
+        addBtn.className = "add-btn" + (inList ? " added" : "");
+
+        addBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (inList) {
+            myList = myList.filter(m => m.title !== movie.title);
+          } else {
+            myList.push(movie);
+          }
+          localStorage.setItem(getProfileKey("myList"), JSON.stringify(myList));
+          renderMovies(allCategories);
+        };
+
+        tile.onclick = async () => {
           const overlay = document.getElementById("videoOverlay");
           const player = document.getElementById("player");
 
           player.src = movie.url;
           overlay.style.display = "flex";
 
-          player.play().catch(err => console.log("Autoplay blocked:", err));
+          if (resume && continueWatching[movie.title]) {
+            player.currentTime = continueWatching[movie.title].time || 0;
+          }
 
-          if (overlay.requestFullscreen) overlay.requestFullscreen();
+          try {
+            await player.play();
+            if (overlay.requestFullscreen) overlay.requestFullscreen();
+          } catch (err) {
+            console.log("Autoplay blocked:", err);
+          }
+
+          player.onpause = () => {
+            const remaining = player.duration - player.currentTime;
+            if (remaining <= 600) {
+              delete continueWatching[movie.title];
+            } else {
+              continueWatching[movie.title] = { ...movie, time: player.currentTime };
+            }
+            localStorage.setItem(getProfileKey("continueWatching"), JSON.stringify(continueWatching));
+            renderMovies(allCategories);
+          };
         };
 
         tile.appendChild(img);
         tile.appendChild(title);
+        tile.appendChild(addBtn);
         row.appendChild(tile);
       });
 
