@@ -196,11 +196,12 @@
 
   <!-- Category Nav Bar -->
   <nav>
-    <button onclick="scrollToCategory('Action')">Action</button>
-    <button onclick="scrollToCategory('Comedy')">Comedy</button>
-    <button onclick="scrollToCategory('Horror')">Horror</button>
-    <button onclick="scrollToCategory('Drama')">Drama</button>
-    <button onclick="scrollToCategory('Sci-Fi')">Sci-Fi</button>
+    <button onclick="filterCategory('All')">All</button>
+    <button onclick="filterCategory('Action')">Action</button>
+    <button onclick="filterCategory('Comedy')">Comedy</button>
+    <button onclick="filterCategory('Horror')">Horror</button>
+    <button onclick="filterCategory('Drama')">Drama</button>
+    <button onclick="filterCategory('Sci-Fi')">Sci-Fi</button>
   </nav>
 
   <!-- Categories -->
@@ -213,19 +214,10 @@
   </div>
 
   <script>
-    // 🔑 Logout
     function logout() {
       localStorage.removeItem("loggedIn");
       localStorage.removeItem("activeProfile");
       location.reload();
-    }
-
-    // 🔍 Scroll to category
-    function scrollToCategory(name) {
-      const section = document.getElementById(`cat-${name}`);
-      if (section) {
-        section.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
     }
 
     let allCategories = [];
@@ -235,7 +227,6 @@
     async function loadMovies() {
       const res = await fetch("/api/movies");
       allCategories = await res.json();
-
       renderMovies(allCategories);
     }
 
@@ -292,6 +283,15 @@
 
       section.appendChild(row);
       container.appendChild(section);
+    }
+
+    function filterCategory(name) {
+      if (name === "All") {
+        renderMovies(allCategories);
+      } else {
+        const filtered = allCategories.filter(cat => cat.name === name);
+        renderMovies(filtered);
+      }
     }
 
     const closeBtn = document.getElementById("closeBtn");
