@@ -84,6 +84,11 @@
       color: #000;
     }
 
+    nav button.active {
+      background: #26c6da;
+      color: #000;
+    }
+
     .category {
       margin: 20px 30px;
     }
@@ -134,24 +139,6 @@
       color: #fff;
     }
 
-    .add-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(38, 198, 218, 0.9);
-      border: none;
-      color: white;
-      font-size: 18px;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      cursor: pointer;
-    }
-
-    .add-btn.added {
-      background: rgba(0, 200, 0, 0.9);
-    }
-
     #videoOverlay {
       display: none;
       position: fixed;
@@ -196,12 +183,12 @@
 
   <!-- Category Nav Bar -->
   <nav>
-    <button onclick="filterCategory('All')">All</button>
-    <button onclick="filterCategory('Action')">Action</button>
-    <button onclick="filterCategory('Comedy')">Comedy</button>
-    <button onclick="filterCategory('Horror')">Horror</button>
-    <button onclick="filterCategory('Drama')">Drama</button>
-    <button onclick="filterCategory('Sci-Fi')">Sci-Fi</button>
+    <button class="active" onclick="filterCategory('All', this)">All</button>
+    <button onclick="filterCategory('Action', this)">Action</button>
+    <button onclick="filterCategory('Comedy', this)">Comedy</button>
+    <button onclick="filterCategory('Horror', this)">Horror</button>
+    <button onclick="filterCategory('Drama', this)">Drama</button>
+    <button onclick="filterCategory('Sci-Fi', this)">Sci-Fi</button>
   </nav>
 
   <!-- Categories -->
@@ -221,8 +208,6 @@
     }
 
     let allCategories = [];
-    let myList = [];
-    let continueWatching = {};
 
     async function loadMovies() {
       const res = await fetch("/api/movies");
@@ -285,7 +270,11 @@
       container.appendChild(section);
     }
 
-    function filterCategory(name) {
+    function filterCategory(name, btn) {
+      // Reset active state
+      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
       if (name === "All") {
         renderMovies(allCategories);
       } else {
