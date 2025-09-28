@@ -1,79 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Matrix - FlixHubTV</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Navbar -->
-  <div class="navbar">
-    <div class="logo">Flix<span>HubTV</span></div>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2>Genres</h2>
+    <ul id="genreList"></ul>
+  </aside>
+
+  <!-- Header -->
+  <header>
+    <h1><span>Flix</span>HubTV</h1>
     <div class="nav-actions">
-      <button onclick="window.location.href='profiles.html'" class="nav-btn">Switch Profile</button>
-      <button onclick="window.location.href='login.html'" class="nav-btn">Logout</button>
-      <button onclick="window.location.href='index.html'" class="nav-btn">Home</button>
+      <input type="text" placeholder="Search movies...">
+      <button onclick="window.location.href='profiles.html'">Switch Profile</button>
+      <button onclick="window.location.href='login.html'">Logout</button>
+      <button onclick="window.location.href='index.html'">Home</button>
     </div>
-  </div>
+  </header>
 
-  <!-- Movie Info Section -->
-  <div class="movie-container">
-    <img id="poster" alt="Movie Poster" class="movie-poster" />
-    <div class="movie-info">
-      <h1 id="title">Loading...</h1>
-      <p id="profileName" style="color:#00e5ff; font-style:italic; margin-bottom:15px;"></p>
-      <p id="year"></p>
-      <p id="runtime"></p>
-      <p id="genre"></p>
-      <p id="plot"></p>
-      <button id="playBtn" class="play-btn">▶ Play</button>
-      <button id="watchlistBtn" class="play-btn">+ Add to Watchlist</button>
-    </div>
-  </div>
+  <!-- Movie Info -->
+  <main>
+    <section class="movie-details">
+      <img id="poster" src="" alt="Movie Poster">
+      <div class="movie-info">
+        <h2 id="title">Loading...</h2>
+        <p class="movie-meta" id="meta"></p>
+        <p id="plot"></p>
+        <button class="watchlist-btn" id="watchlistBtn">+ Add to Watchlist</button>
+        <button class="watchlist-btn" onclick="openVideo()">▶ Play</button>
+      </div>
+    </section>
+  </main>
 
-  <!-- Fullscreen Video Player -->
-  <div id="video-container" style="display:none;">
-    <span id="closeBtn">✖</span>
-    <video id="moviePlayer" controls>
-      <source src="https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4" type="video/mp4" />
+  <!-- Video Overlay -->
+  <div id="video-overlay" style="display: none;">
+    <video id="movie-player" controls autoplay>
+      <source src="https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
+    <span class="close-btn" onclick="closeVideo()">✖</span>
   </div>
 
-  <!-- External Scripts -->
-  <script src="player.js"></script>
+  <!-- Scripts -->
   <script>
-    const activeProfile = localStorage.getItem("activeProfile");
-    if (activeProfile) {
-      document.getElementById("profileName").textContent = `Watching as ${activeProfile}`;
-    }
-
-    const movieId = "tt0133093";
     const apiKey = "ea7569d7";
+    const movieId = "tt0133093"; // The Matrix
 
     async function fetchMovie() {
       const response = await fetch(`https://www.omdbapi.com/?i=${movieId}&apikey=${apiKey}`);
       const data = await response.json();
+
       if (data.Response === "True") {
         document.getElementById("poster").src = data.Poster;
         document.getElementById("title").textContent = data.Title;
-        document.getElementById("year").textContent = `Year: ${data.Year}`;
-        document.getElementById("runtime").textContent = `Duration: ${data.Runtime}`;
-        document.getElementById("genre").textContent = `Genres: ${data.Genre}`;
+        document.getElementById("meta").textContent = `Year: ${data.Year} | Duration: ${data.Runtime} | Genres: ${data.Genre}`;
         document.getElementById("plot").textContent = data.Plot;
 
-        // Watchlist toggle
+        // Build dynamic sidebar genres with sync
+        const genreList = document.getElementById("genreList");
+        data.Genre.split(", ").forEach(genre => {
+          const li = document.createElement("li");
+          li.textContent = genre;
+          li.style.cursor = "pointer";
+          li.onclick = () => {
+            localStorage.setItem("selectedGenre", genre);
+            window.location.href = "index.html";
+          };
+          genreList.appendChild(li);
+        });
+
+        // Watchlist button setup
         const watchlistBtn = document.getElementById("watchlistBtn");
         let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
-        const isInWatchlist = watchlist.some(m => m.id === movieId);
+        const exists = watchlist.some(m => m.id === movieId);
 
-        if (isInWatchlist) {
+        if (exists) {
           watchlistBtn.textContent = "✓ Remove from Watchlist";
         }
 
         watchlistBtn.addEventListener("click", () => {
-          watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
           if (watchlist.some(m => m.id === movieId)) {
             watchlist = watchlist.filter(m => m.id !== movieId);
             watchlistBtn.textContent = "+ Add to Watchlist";
@@ -83,24 +94,20 @@
           }
           localStorage.setItem("watchlist", JSON.stringify(watchlist));
         });
-
-        // Track Continue Watching
-        const video = document.getElementById("moviePlayer");
-        video.addEventListener("timeupdate", () => {
-          const continueWatching = JSON.parse(localStorage.getItem("continueWatching")) || [];
-          const index = continueWatching.findIndex(m => m.id === movieId);
-
-          if (index >= 0) {
-            continueWatching[index].time = video.currentTime;
-          } else {
-            continueWatching.push({ id: movieId, title: data.Title, poster: data.Poster, time: video.currentTime });
-          }
-          localStorage.setItem("continueWatching", JSON.stringify(continueWatching));
-        });
       }
     }
 
     fetchMovie();
+
+    // Video overlay controls
+    function openVideo() {
+      document.getElementById("video-overlay").style.display = "flex";
+    }
+
+    function closeVideo() {
+      document.getElementById("video-overlay").style.display = "none";
+      document.getElementById("movie-player").pause();
+    }
   </script>
 </body>
 </html>

@@ -1,35 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FlixHubTV - Browse</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
   <style>
-    /* Genre Highlight */
+    /* Highlight active genre */
     .sidebar ul li {
       cursor: pointer;
       padding: 8px 15px;
       transition: all 0.3s ease;
     }
-
     .sidebar ul li:hover {
       background: rgba(0, 229, 255, 0.1);
     }
-
     .sidebar ul li.active {
       color: #00e5ff;
       font-weight: bold;
       text-shadow: 0 0 10px #00e5ff;
     }
-
-    /* Movie card slide animation */
+    /* Slide animation for movies */
     .movie-card {
       opacity: 1;
       transform: translateY(0);
       transition: all 0.4s ease;
     }
-
     .movie-card.hide {
       opacity: 0;
       transform: translateY(30px);
@@ -39,88 +35,82 @@
 </head>
 <body>
   <!-- Sidebar -->
-  <div class="sidebar">
-    <h3>Genres</h3>
+  <aside class="sidebar">
+    <h2>Genres</h2>
     <ul id="genreList"></ul>
-  </div>
+  </aside>
 
-  <!-- Navbar -->
-  <div class="navbar">
-    <div class="logo">Flix<span>HubTV</span></div>
+  <!-- Header -->
+  <header>
+    <h1><span>Flix</span>HubTV</h1>
     <div class="nav-actions">
-      <input type="text" class="search-bar" placeholder="Search movies..." />
-      <button onclick="window.location.href='profiles.html'" class="nav-btn">Switch Profile</button>
-      <button onclick="window.location.href='login.html'" class="nav-btn">Logout</button>
-      <button onclick="window.location.href='index.html'" class="nav-btn">Home</button>
+      <input type="text" class="search-bar" placeholder="Search movies...">
+      <button onclick="window.location.href='profiles.html'">Switch Profile</button>
+      <button onclick="window.location.href='login.html'">Logout</button>
+      <button onclick="window.location.href='index.html'">Home</button>
     </div>
-  </div>
+  </header>
 
-  <!-- Welcome Section -->
-  <div class="welcome-container" style="text-align:center; margin: 30px 0;">
-    <h2 id="welcomeMessage" style="color:#00e5ff; text-shadow:0 0 10px #00e5ff;"></h2>
-  </div>
+  <!-- Welcome -->
+  <main>
+    <div class="welcome-container" style="text-align:center; margin: 30px 0;">
+      <h2 id="welcomeMessage" style="color:#00e5ff; text-shadow:0 0 10px #00e5ff;"></h2>
+    </div>
 
-  <!-- Watchlist Banner -->
-  <div id="watchlistBanner" class="banner" style="display:none;">
-    <h2>Your Watchlist</h2>
-    <div class="banner-items" id="watchlistItems"></div>
-  </div>
+    <!-- Watchlist -->
+    <div id="watchlistBanner" class="banner" style="display:none;">
+      <h2>Your Watchlist</h2>
+      <div class="banner-items" id="watchlistItems"></div>
+    </div>
 
-  <!-- Continue Watching Banner -->
-  <div id="continueBanner" class="banner" style="display:none;">
-    <h2>Continue Watching</h2>
-    <div class="banner-items" id="continueItems"></div>
-  </div>
+    <!-- Continue Watching -->
+    <div id="continueBanner" class="banner" style="display:none;">
+      <h2>Continue Watching</h2>
+      <div class="banner-items" id="continueItems"></div>
+    </div>
 
-  <!-- Movies Section -->
-  <div class="movies-container" id="moviesContainer"></div>
+    <!-- Movies -->
+    <section class="movie-grid" id="moviesContainer"></section>
+  </main>
 
+  <!-- Scripts -->
   <script>
     const apiKey = "ea7569d7";
     const movies = [
       { id: "tt0133093" } // The Matrix
+      // Add more movies here later...
     ];
 
-    // Active profile greeting
+    // Show profile welcome
     const activeProfile = localStorage.getItem("activeProfile");
-    const welcomeMessage = document.getElementById("welcomeMessage");
-    if (activeProfile) {
-      welcomeMessage.textContent = `Welcome, ${activeProfile}`;
-    } else {
-      welcomeMessage.textContent = "Welcome to FlixHubTV";
-    }
+    document.getElementById("welcomeMessage").textContent =
+      activeProfile ? `Welcome, ${activeProfile}` : "Welcome to FlixHubTV";
 
     // Load Watchlist
     const watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
-    const watchlistBanner = document.getElementById("watchlistBanner");
-    const watchlistItems = document.getElementById("watchlistItems");
-
     if (watchlist.length > 0) {
-      watchlistBanner.style.display = "block";
+      document.getElementById("watchlistBanner").style.display = "block";
       watchlist.forEach(movie => {
         const div = document.createElement("div");
         div.classList.add("banner-item");
-        div.innerHTML = `<img src="${movie.poster}" alt="${movie.title}" /><p>${movie.title}</p>`;
-        watchlistItems.appendChild(div);
+        div.innerHTML = `<img src="${movie.poster}" alt="${movie.title}"><p>${movie.title}</p>`;
+        document.getElementById("watchlistItems").appendChild(div);
       });
     }
 
     // Load Continue Watching
     const continueWatching = JSON.parse(localStorage.getItem("continueWatching")) || [];
-    const continueBanner = document.getElementById("continueBanner");
-    const continueItems = document.getElementById("continueItems");
-
     if (continueWatching.length > 0) {
-      continueBanner.style.display = "block";
+      document.getElementById("continueBanner").style.display = "block";
       continueWatching.forEach(movie => {
         const div = document.createElement("div");
         div.classList.add("banner-item");
-        div.innerHTML = `<img src="${movie.poster}" alt="${movie.title}" /><p>${movie.title}</p>`;
-        continueItems.appendChild(div);
+        div.innerHTML = `<img src="${movie.poster}" alt="${movie.title}"><p>${movie.title}</p>`;
+        document.getElementById("continueItems").appendChild(div);
       });
     }
 
-    // Fetch Movies and Build Dynamic Genres
+    // Fetch Movies and Build Dynamic Sidebar Genres
     const genreSet = new Set();
     const moviesContainer = document.getElementById("moviesContainer");
 
@@ -134,7 +124,7 @@
           card.classList.add("movie-card");
           card.setAttribute("data-genres", data.Genre);
           card.innerHTML = `
-            <img src="${data.Poster}" alt="${data.Title}" />
+            <img src="${data.Poster}" alt="${data.Title}">
             <h3>${data.Title}</h3>
           `;
           card.onclick = () => {
@@ -142,16 +132,17 @@
           };
           moviesContainer.appendChild(card);
 
-          // Collect genres
+          // Collect genres across all movies
           data.Genre.split(", ").forEach(g => genreSet.add(g));
         }
       }
 
-      // Populate Sidebar Genres
+      // Populate Sidebar Genres dynamically
       const genreList = document.getElementById("genreList");
+      genreList.innerHTML = ""; // clear first
       const allOption = document.createElement("li");
       allOption.textContent = "All";
-      allOption.classList.add("active"); // default highlight
+      allOption.classList.add("active");
       allOption.onclick = () => setActiveGenre(allOption, "All");
       genreList.appendChild(allOption);
 
@@ -161,25 +152,27 @@
         li.onclick = () => setActiveGenre(li, genre);
         genreList.appendChild(li);
       });
+
+      // Apply saved genre from movie.html if exists
+      const savedGenre = localStorage.getItem("selectedGenre");
+      if (savedGenre) {
+        const li = [...document.querySelectorAll("#genreList li")].find(el => el.textContent === savedGenre);
+        if (li) setActiveGenre(li, savedGenre);
+        localStorage.removeItem("selectedGenre"); // clear after use
+      }
     }
 
     fetchMovies();
 
-    // Handle active genre + filtering with slide animation
+    // Genre filtering
     function setActiveGenre(selectedElement, genre) {
-      // Remove active class from all
       document.querySelectorAll(".sidebar ul li").forEach(li => li.classList.remove("active"));
-
-      // Add active to selected
       selectedElement.classList.add("active");
-
-      // Filter movies
       filterMovies(genre);
     }
 
     function filterMovies(genre) {
-      const cards = document.querySelectorAll(".movie-card");
-      cards.forEach(card => {
+      document.querySelectorAll(".movie-card").forEach(card => {
         const genres = card.getAttribute("data-genres");
         if (genre === "All" || genres.includes(genre)) {
           card.classList.remove("hide");
@@ -190,10 +183,9 @@
     }
 
     // Search handler
-    const searchBar = document.querySelector(".search-bar");
-    searchBar.addEventListener("keypress", function (e) {
+    document.querySelector(".search-bar").addEventListener("keypress", function (e) {
       if (e.key === "Enter") {
-        alert("Search feature coming soon: " + searchBar.value);
+        alert("Search feature coming soon: " + this.value);
       }
     });
   </script>
