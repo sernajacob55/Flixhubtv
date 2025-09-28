@@ -3,210 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FlixHubTV - Movie</title>
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: #fff;
-    }
-    .container {
-      display: flex;
-    }
-    .sidebar {
-      width: 200px;
-      background: #000;
-      height: 100vh;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-    .sidebar h1 {
-      font-size: 22px;
-      color: #00bcd4;
-      margin-bottom: 40px;
-    }
-    .sidebar a {
-      display: block;
-      margin: 15px 0;
-      color: white;
-      text-decoration: none;
-      font-size: 16px;
-    }
-    .sidebar a:hover {
-      color: #00bcd4;
-    }
-    .main {
-      flex: 1;
-      padding: 40px;
-    }
-    .movie-details {
-      display: flex;
-      align-items: flex-start;
-    }
-    .movie-details img {
-      width: 250px;
-      border-radius: 8px;
-      margin-right: 20px;
-    }
-    .movie-info h2 {
-      margin: 0 0 10px;
-    }
-    .movie-info p {
-      margin: 6px 0;
-    }
-    .play-btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #00bcd4;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      color: #000;
-    }
-    .play-btn:hover {
-      background: #0097a7;
-    }
-    #video-player {
-      margin-top: 20px;
-      position: relative;
-    }
-    video {
-      width: 100%;
-      max-width: 1000px;
-      border-radius: 8px;
-      background: black;
-    }
-    .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: red;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      z-index: 10;
-    }
-  </style>
+  <title>Movie Details</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="sidebar">
-      <h1>FlixHubTV</h1>
-      <a href="index.html">🏠 Home</a>
-      <a href="#" onclick="switchProfile()">👤 Switch Profile</a>
-      <a href="#" onclick="logout()">🚪 Logout</a>
-    </div>
-    <div class="main">
-      <div id="movie-container"></div>
-    </div>
+  <div class="sidebar">
+    <a href="index.html">🏠 Home</a>
+  </div>
+
+  <div class="main">
+    <div id="movieDetails"></div>
   </div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const movieId = urlParams.get("id");
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get("id"));
 
-    function setupVideoEndHandler(videoElement, redirectUrl) {
-      videoElement.addEventListener("ended", () => {
-        closeVideo(redirectUrl);
-      });
-    }
+    const movies = [
+      {
+        id: 1,
+        title: "The Matrix",
+        year: 1999,
+        duration: "2h 16m",
+        genre: "Sci-Fi",
+        description: "A computer hacker learns about the true nature of reality and his role in the war against its controllers.",
+        cover: "matrix.jpg",
+        video: "https://download1351.mediafire.com/3yzrkgjjifhg-kBE2HT1i1X9UAOckBG5zokIOlih39t_HouFQji-qXpatH5FZw4-C20r5fD-Do-cJ7MyM7aRD8Uhz-BWQJcs5amcyCuEtcHjyhO0h9VWx1VfHxjIiSyiHJGpXfJ7VTnSDmR4Snc7RL0MH0eoZtOMVXw0Pr_Jfhb4N3Y/rks796idw5xqo2i/The+Matrix.mp4"
+      }
+    ];
 
-    function closeVideo(redirectUrl) {
-      const videoWrapper = document.getElementById("video-player");
-      if (videoWrapper) {
-        videoWrapper.innerHTML = ""; // remove video completely
-      }
-      if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-      }
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-      }
-    }
+    const movie = movies.find(m => m.id === id);
+    const container = document.getElementById("movieDetails");
 
-    // === CASE 1: Direct Play Mode ===
-    if (movieId === "play") {
-      const videoSrc = urlParams.get("src");
-      document.getElementById("movie-container").innerHTML = `
-        <div id="video-player">
-          <button class="close-btn" onclick="closeVideo('index.html')">✖</button>
-          <video id="autoVideo" controls autoplay>
-            <source src="${videoSrc}" type="video/mp4">
+    if (!movie) {
+      container.innerHTML = "<h2>Movie not found</h2>";
+    } else {
+      container.innerHTML = `
+        <div class="movie-info">
+          <img src="${movie.cover}" alt="${movie.title}">
+          <div>
+            <h2>${movie.title}</h2>
+            <p><strong>Year:</strong> ${movie.year}</p>
+            <p><strong>Duration:</strong> ${movie.duration}</p>
+            <p><strong>Genres:</strong> ${movie.genre}</p>
+            <p>${movie.description}</p>
+            <button id="playBtn">▶ Play</button>
+          </div>
+        </div>
+        <div id="videoContainer" class="hidden">
+          <video id="moviePlayer" controls>
+            <source src="${movie.video}" type="video/mp4">
             Your browser does not support the video tag.
           </video>
+          <button id="closeBtn">✖</button>
         </div>
       `;
 
-      const videoElement = document.getElementById("autoVideo");
-      videoElement.addEventListener("canplay", () => {
-        setTimeout(() => {
-          if (videoElement.requestFullscreen) {
-            videoElement.requestFullscreen().catch(() => {});
-          }
-        }, 500);
+      const playBtn = document.getElementById("playBtn");
+      const videoContainer = document.getElementById("videoContainer");
+      const player = document.getElementById("moviePlayer");
+      const closeBtn = document.getElementById("closeBtn");
+
+      playBtn.addEventListener("click", () => {
+        videoContainer.classList.remove("hidden");
+        player.play();
+        if (player.requestFullscreen) {
+          player.requestFullscreen();
+        }
       });
 
-      setupVideoEndHandler(videoElement, "index.html");
-    }
-    // === CASE 2: Normal Details Page ===
-    else {
-      fetch(`/api/movies/${movieId}`)
-        .then(res => res.json())
-        .then(movie => {
-          if (movie.error) {
-            document.getElementById("movie-container").innerHTML = "<h1>Movie not found</h1>";
-          } else {
-            const genres = Array.isArray(movie.genre) ? movie.genre.join(", ") : movie.genre;
-            document.getElementById("movie-container").innerHTML = `
-              <div class="movie-details">
-                <img src="${movie.cover}" alt="${movie.title}">
-                <div class="movie-info">
-                  <h2>${movie.title}</h2>
-                  <p><strong>Year:</strong> ${movie.year}</p>
-                  <p><strong>Duration:</strong> ${movie.duration}</p>
-                  <p><strong>Genres:</strong> ${genres}</p>
-                  <p>${movie.description}</p>
-                  <button class="play-btn" onclick="playMovie('${movie.video}', ${movie.id})">▶ Play</button>
-                </div>
-              </div>
-              <div id="video-player"></div>
-            `;
-          }
-        });
-    }
-
-    function playMovie(videoUrl, movieId) {
-      document.getElementById("video-player").innerHTML = `
-        <button class="close-btn" onclick="closeVideo('movie.html?id=${movieId}')">✖</button>
-        <video id="manualVideo" controls autoplay>
-          <source src="${videoUrl}" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-      `;
-
-      const videoElement = document.getElementById("manualVideo");
-      if (videoElement.requestFullscreen) {
-        videoElement.requestFullscreen().catch(() => {});
-      }
-
-      setupVideoEndHandler(videoElement, `movie.html?id=${movieId}`);
-    }
-
-    // === Switch Profile + Logout Logic ===
-    function switchProfile() {
-      localStorage.removeItem("flixhubtv_profile");
-      window.location.href = "profiles.html"; 
-    }
-
-    function logout() {
-      localStorage.clear();
-      window.location.href = "login.html"; 
+      closeBtn.addEventListener("click", () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        }
+        player.pause();
+        player.currentTime = 0;
+        videoContainer.classList.add("hidden");
+      });
     }
   </script>
 </body>
