@@ -3,63 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Matrix • FlixHubTV</title>
+  <title>The Matrix - FlixHubTV</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="topbar">
-    <div class="wrapper topbar-inner">
-      <h1 id="brand">FlixHubTV</h1>
-
-      <div class="search-container">
-        <input type="text" id="search" placeholder="Search movies or categories...">
-      </div>
-
-      <div class="nav-buttons">
-        <a href="index.html" class="btn btn-ghost">Home</a>
-        <a href="profiles.html" class="btn btn-ghost">Switch</a>
-        <a href="login.html" class="btn btn-ghost">Logout</a>
-      </div>
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="logo">Flix<span>HubTV</span></div>
+    <div class="nav-actions">
+      <button onclick="window.location.href='profiles.html'" class="nav-btn">Switch Profile</button>
+      <button onclick="window.location.href='login.html'" class="nav-btn">Logout</button>
+      <button onclick="window.location.href='index.html'" class="nav-btn">Home</button>
     </div>
   </div>
 
-  <div class="wrapper">
-    <div class="detail">
-      <img id="poster" class="poster" alt="The Matrix Poster">
-      <div class="meta">
-        <h2 id="title">The Matrix</h2>
-        <div class="row">
-          <span id="year">Year: 1999</span>
-          <span id="duration">Duration: 2h 16m</span>
-          <span id="genre">Genres: Sci-Fi</span>
-        </div>
-        <p id="plot">A computer hacker learns about the true nature of reality and his role in the war against its controllers.</p>
-        <button id="playBtn" class="btn btn-primary">▶ Play</button>
-      </div>
+  <!-- Movie Info Section -->
+  <div class="movie-container">
+    <img id="poster" alt="Movie Poster" class="movie-poster">
+    <div class="movie-info">
+      <h1 id="title">Loading...</h1>
+      <p id="year"></p>
+      <p id="runtime"></p>
+      <p id="genre"></p>
+      <p id="plot"></p>
+      <button id="playBtn" class="play-btn">▶ Play</button>
     </div>
   </div>
 
-  <!-- Player Modal -->
-  <div id="playerModal" class="modal">
-    <div class="player-shell">
-      <video id="videoPlayer" preload="metadata">
-        <source src="https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4" type="video/mp4">
-        Your browser does not support HTML5 video.
-      </video>
-
-      <!-- Custom Controls -->
-      <div class="video-controls">
-        <button id="playPause" class="control-btn">▶</button>
-        <span id="currentTime">0:00</span>
-        <input type="range" id="progressBar" value="0" min="0" max="100">
-        <span id="durationTime">0:00</span>
-        <input type="range" id="volumeBar" min="0" max="1" step="0.05" value="1">
-        <button id="fullscreenBtn" class="control-btn">⛶</button>
-        <button id="closeBtn" class="control-btn close">✖</button>
-      </div>
-    </div>
+  <!-- Fullscreen Video Player -->
+  <div id="video-container" style="display:none;">
+    <span id="closeBtn">✖</span>
+    <video id="moviePlayer" controls>
+      <source src="https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
   </div>
 
+  <!-- External Scripts -->
   <script src="player.js"></script>
+  <script>
+    // Fetch Movie Metadata from OMDb
+    const movieId = "tt0133093"; // Matrix IMDb ID
+    const apiKey = "ea7569d7";   // Your OMDb key
+
+    async function fetchMovie() {
+      try {
+        const response = await fetch(`https://www.omdbapi.com/?i=${movieId}&apikey=${apiKey}`);
+        const data = await response.json();
+
+        if (data.Response === "True") {
+          document.getElementById("poster").src = data.Poster;
+          document.getElementById("title").textContent = data.Title;
+          document.getElementById("year").textContent = `Year: ${data.Year}`;
+          document.getElementById("runtime").textContent = `Duration: ${data.Runtime}`;
+          document.getElementById("genre").textContent = `Genres: ${data.Genre}`;
+          document.getElementById("plot").textContent = data.Plot;
+        }
+      } catch (err) {
+        console.error("Error fetching movie data:", err);
+      }
+    }
+
+    fetchMovie();
+  </script>
 </body>
 </html>

@@ -7,31 +7,37 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="navbar">
+    <div class="logo">Flix<span>HubTV</span></div>
+  </div>
+
   <div class="login-container">
-    <h1>FlixHubTV</h1>
-    <form id="loginForm">
-      <input type="text" id="username" placeholder="Username" required>
-      <input type="password" id="password" placeholder="Password" required>
-      <button type="submit">Login</button>
-    </form>
-    <p id="errorMessage" class="error hidden">Invalid username or password.</p>
+    <div class="login-box">
+      <h1>Login</h1>
+      <form onsubmit="return login(event)">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+      </form>
+      <p id="error-message" style="color:#ff4d4d; margin-top:10px; display:none;">
+        Invalid username or password.
+      </p>
+    </div>
   </div>
 
   <script>
-    const form = document.getElementById("loginForm");
-    const errorMessage = document.getElementById("errorMessage");
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
+    function login(event) {
+      event.preventDefault();
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
 
-      if (username === "Streamme69420" && password === "Xenomorph69420!") {
+      // Demo login (adjust if needed)
+      if (username === "streamme69420" && password === "password") {
         window.location.href = "profiles.html";
       } else {
-        errorMessage.classList.remove("hidden");
+        document.getElementById("error-message").style.display = "block";
       }
-    });
+    }
   </script>
 </body>
 </html>

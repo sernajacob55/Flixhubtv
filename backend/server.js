@@ -4,15 +4,35 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Serve static frontend files
-app.use(express.static(path.join(__dirname, "../frontend")));
+// Define path to frontend folder
+const frontendPath = path.join(__dirname, "../frontend");
 
-// Fallback to index.html for unmatched routes (so deep links still work)
+// Serve static files (CSS, JS, images)
+app.use(express.static(frontendPath));
+
+// Explicit routes for your main pages
+app.get("/", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
+
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(frontendPath, "login.html"));
+});
+
+app.get("/profiles", (req, res) => {
+  res.sendFile(path.join(frontendPath, "profiles.html"));
+});
+
+app.get("/movie", (req, res) => {
+  res.sendFile(path.join(frontendPath, "movie.html"));
+});
+
+// Catch-all fallback (for safety)
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ FlixHubTV backend running on port ${PORT}`);
 });

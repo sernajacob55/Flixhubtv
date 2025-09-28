@@ -7,18 +7,32 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="navbar">
+    <div class="logo">Flix<span>HubTV</span></div>
+    <div class="nav-actions">
+      <button onclick="window.location.href='login.html'" class="nav-btn">Logout</button>
+    </div>
+  </div>
+
+  <h1 style="text-align:center; margin-top:40px;">Choose Profile</h1>
   <div class="profiles-container">
-    <h1>Choose Profile</h1>
-    <div class="profiles">
-      <button onclick="selectProfile('Serna')">Serna</button>
-      <button onclick="selectProfile('Whitfield')">Whitfield</button>
-      <button onclick="selectProfile('Brandt')">Brandt</button>
+    <div class="profile-card" onclick="selectProfile('Serna')">
+      <img src="https://via.placeholder.com/150/00e5ff/000000?text=S" alt="Serna">
+      <h3>Serna</h3>
+    </div>
+    <div class="profile-card" onclick="selectProfile('Whitfield')">
+      <img src="https://via.placeholder.com/150/00e5ff/000000?text=W" alt="Whitfield">
+      <h3>Whitfield</h3>
+    </div>
+    <div class="profile-card" onclick="selectProfile('Brandt')">
+      <img src="https://via.placeholder.com/150/00e5ff/000000?text=B" alt="Brandt">
+      <h3>Brandt</h3>
     </div>
   </div>
 
   <script>
-    function selectProfile(name) {
-      localStorage.setItem("flixhubtv_profile", name);
+    function selectProfile(profile) {
+      localStorage.setItem("activeProfile", profile);
       window.location.href = "index.html";
     }
   </script>

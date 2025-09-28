@@ -1,95 +1,95 @@
-const modal = document.getElementById("playerModal");
-const video = document.getElementById("videoPlayer");
+const videoContainer = document.getElementById("video-container");
+const moviePlayer = document.getElementById("moviePlayer");
 const playBtn = document.getElementById("playBtn");
-
-const playPause = document.getElementById("playPause");
-const progressBar = document.getElementById("progressBar");
-const currentTimeEl = document.getElementById("currentTime");
-const durationTimeEl = document.getElementById("durationTime");
-const volumeBar = document.getElementById("volumeBar");
-const fullscreenBtn = document.getElementById("fullscreenBtn");
 const closeBtn = document.getElementById("closeBtn");
-const controls = document.querySelector(".video-controls");
 
+let controlsVisible = true;
 let hideControlsTimeout;
 
-// Open modal + autoplay
+// Open video player
 playBtn.addEventListener("click", () => {
-  modal.classList.add("open");
-  video.play();
-  updatePlayIcon();
+  videoContainer.style.display = "flex";
+  moviePlayer.play();
+
+  // Force true fullscreen
+  if (videoContainer.requestFullscreen) {
+    videoContainer.requestFullscreen();
+  } else if (videoContainer.webkitRequestFullscreen) {
+    videoContainer.webkitRequestFullscreen();
+  } else if (videoContainer.msRequestFullscreen) {
+    videoContainer.msRequestFullscreen();
+  }
+
   resetControlsTimer();
 });
 
-// Play/pause toggle
-playPause.addEventListener("click", () => {
-  if (video.paused) video.play();
-  else video.pause();
-  updatePlayIcon();
-  resetControlsTimer();
-});
+// Close video player
+closeBtn.addEventListener("click", () => {
+  moviePlayer.pause();
+  videoContainer.style.display = "none";
 
-function updatePlayIcon() {
-  playPause.textContent = video.paused ? "▶" : "⏸";
-}
-
-// Time update
-video.addEventListener("timeupdate", () => {
-  const percent = (video.currentTime / video.duration) * 100;
-  progressBar.value = percent;
-  currentTimeEl.textContent = formatTime(video.currentTime);
-  durationTimeEl.textContent = formatTime(video.duration);
-});
-
-// Seek
-progressBar.addEventListener("input", () => {
-  video.currentTime = (progressBar.value / 100) * video.duration;
-  resetControlsTimer();
-});
-
-// Volume
-volumeBar.addEventListener("input", () => {
-  video.volume = volumeBar.value;
-  resetControlsTimer();
-});
-
-// Fullscreen
-fullscreenBtn.addEventListener("click", () => {
-  if (!document.fullscreenElement) {
-    modal.requestFullscreen();
-  } else {
+  if (document.fullscreenElement) {
     document.exitFullscreen();
   }
-  resetControlsTimer();
 });
 
-// Close modal
-closeBtn.addEventListener("click", () => {
-  modal.classList.remove("open");
-  video.pause();
-});
-
-// Format time
-function formatTime(seconds) {
-  if (isNaN(seconds)) return "0:00";
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-}
-
-/* ---------- Auto-hide controls + cursor ---------- */
+// Auto-hide controls + cursor
 function resetControlsTimer() {
-  controls.classList.remove("hidden");
-  modal.classList.remove("hide-cursor");
+  showControls();
   clearTimeout(hideControlsTimeout);
   hideControlsTimeout = setTimeout(() => {
-    if (!video.paused) {
-      controls.classList.add("hidden");
-      modal.classList.add("hide-cursor");
+    if (!moviePlayer.paused) {
+      hideControls();
     }
-  }, 3000); // hide after 3s
+  }, 3000);
 }
 
-// Show controls on mouse move or tap
-modal.addEventListener("mousemove", resetControlsTimer);
-modal.addEventListener("click", resetControlsTimer);
+function showControls() {
+  controlsVisible = true;
+  videoContainer.classList.remove("hide-cursor");
+  if (moviePlayer.controls) {
+    moviePlayer.setAttribute("controls", "true");
+  }
+}
+
+function hideControls() {
+  controlsVisible = false;
+  videoContainer.classList.add("hide-cursor");
+  moviePlayer.removeAttribute("controls");
+}
+
+// Mouse movement resets timer
+videoContainer.addEventListener("mousemove", resetControlsTimer);
+videoContainer.addEventListener("click", resetControlsTimer);
+
+// Keep controls visible when paused
+moviePlayer.addEventListener("pause", showControls);
+
+// Sync progress bar (native controls styled via CSS)
+moviePlayer.addEventListener("timeupdate", () => {
+  // Nothing needed here since we’re using native styled controls
+});
+
+// Keyboard shortcuts
+document.addEventListener("keydown", (e) => {
+  if (!videoContainer.style.display || videoContainer.style.display === "none") return;
+
+  switch (e.key) {
+    case " ":
+      e.preventDefault();
+      if (moviePlayer.paused) {
+        moviePlayer.play();
+      } else {
+        moviePlayer.pause();
+      }
+      resetControlsTimer();
+      break;
+    case "Escape":
+      moviePlayer.pause();
+      videoContainer.style.display = "none";
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+      break;
+  }
+});
