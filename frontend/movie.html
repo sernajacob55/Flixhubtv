@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Movie Details - FlixhubTV</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png">
   <style>
     body {
       margin: 0;
@@ -16,12 +18,20 @@
 
     /* Sidebar */
     .sidebar {
-      width: 180px;
+      width: 200px;
       background: #111;
       padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
+    }
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #26c6da;
+      margin-bottom: 30px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
     }
     .back-btn {
       background: #26c6da;
@@ -90,6 +100,7 @@
 <body>
   <!-- Sidebar -->
   <div class="sidebar">
+    <div class="logo">FlixHubTV</div>
     <button class="back-btn" onclick="window.location.href='index.html'">← Back to Home</button>
   </div>
 
