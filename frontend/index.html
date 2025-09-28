@@ -148,16 +148,41 @@
     }
     .add-btn.added { background: rgba(0,200,0,0.9); }
 
+    /* --- Details overlay (new) --- */
+    #detailsOverlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95); z-index: 9999;
+      justify-content: center; align-items: center;
+    }
+    #detailsContent {
+      display: flex; gap: 20px; background: #1c1c1c;
+      padding: 20px; border-radius: 10px; max-width: 900px; width: 90%;
+    }
+    #detailsContent img {
+      width: 250px; border-radius: 10px;
+    }
+    #detailsText { flex: 1; }
+    #detailsText h2 { margin-top: 0; }
+    #detailsText p { margin: 6px 0; }
+    #playBtn {
+      background: #26c6da; border: none; padding: 10px 20px;
+      font-size: 16px; cursor: pointer; border-radius: 5px; margin-top: 10px;
+    }
+    #closeDetails {
+      position: absolute; top: 20px; right: 30px; font-size: 30px;
+      color: white; cursor: pointer; font-weight: bold;
+    }
+
     /* --- Video overlay --- */
     #videoOverlay {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: black; z-index: 9999; justify-content: center;
+      background: black; z-index: 10000; justify-content: center;
       align-items: center; flex-direction: column;
     }
     #videoOverlay video { width: 100%; height: 100%; background: black; }
-    #closeBtn {
+    #closePlayer {
       position: absolute; top: 20px; right: 30px; font-size: 30px;
-      color: white; cursor: pointer; z-index: 10000; font-weight: bold;
+      color: white; cursor: pointer; font-weight: bold;
     }
   </style>
 </head>
@@ -210,16 +235,36 @@
     </nav>
 
     <div id="categories"></div>
+  </div>
 
-    <div id="videoOverlay">
-      <span id="closeBtn">&times;</span>
-      <video id="player" controls autoplay></video>
+  <!-- Details Overlay -->
+  <div id="detailsOverlay">
+    <span id="closeDetails">&times;</span>
+    <div id="detailsContent">
+      <img id="detailsCover" src="" alt="Movie Cover">
+      <div id="detailsText">
+        <h2 id="detailsTitle"></h2>
+        <p id="detailsYear"></p>
+        <p id="detailsDuration"></p>
+        <p id="detailsRating"></p>
+        <p id="detailsDesc"></p>
+        <p id="detailsActors"></p>
+        <button id="playBtn">▶ Play</button>
+      </div>
     </div>
+  </div>
+
+  <!-- Video Overlay -->
+  <div id="videoOverlay">
+    <span id="closePlayer">&times;</span>
+    <video id="player" controls autoplay></video>
   </div>
 
   <script>
     const validUser = "Streamme69420";
     const validPass = "Xenomorph69420!";
+
+    let selectedMovie = null;
 
     function login() {
       const user = document.getElementById("username").value;
@@ -265,10 +310,8 @@
     async function loadMovies() {
       const res = await fetch("/api/movies");
       allCategories = await res.json();
-
       myList = JSON.parse(localStorage.getItem(getProfileKey("myList"))) || [];
       continueWatching = JSON.parse(localStorage.getItem(getProfileKey("continueWatching"))) || {};
-
       renderMovies(allCategories);
     }
 
@@ -313,7 +356,6 @@
         const inList = myList.find(m => m.title === movie.title);
         addBtn.textContent = inList ? "✓" : "+";
         addBtn.className = "add-btn" + (inList ? " added" : "");
-
         addBtn.onclick = (e) => {
           e.stopPropagation();
           if (inList) {
@@ -325,25 +367,9 @@
           renderMovies(allCategories);
         };
 
-        tile.onclick = async () => {
-          const overlay = document.getElementById("videoOverlay");
-          const player = document.getElementById("player");
-          player.src = movie.url;
-          overlay.style.display = "flex";
-          if (resume && continueWatching[movie.title]) {
-            player.currentTime = continueWatching[movie.title].time || 0;
-          }
-          try {
-            await player.play();
-            if (overlay.requestFullscreen) overlay.requestFullscreen();
-          } catch {}
-          player.onpause = () => {
-            const remaining = player.duration - player.currentTime;
-            if (remaining <= 600) delete continueWatching[movie.title];
-            else continueWatching[movie.title] = { ...movie, time: player.currentTime };
-            localStorage.setItem(getProfileKey("continueWatching"), JSON.stringify(continueWatching));
-            renderMovies(allCategories);
-          };
+        tile.onclick = () => {
+          selectedMovie = movie;
+          openDetails(movie, resume);
         };
 
         tile.appendChild(img);
@@ -356,12 +382,50 @@
       container.appendChild(section);
     }
 
-    function filterCategory(name, btn) {
-      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      if (name === "All") renderMovies(allCategories);
-      else renderMovies(allCategories.filter(cat => cat.name === name));
+    function openDetails(movie, resume) {
+      document.getElementById("detailsCover").src = movie.cover;
+      document.getElementById("detailsTitle").textContent = movie.title;
+      document.getElementById("detailsYear").textContent = `Year: ${movie.year || ""}`;
+      document.getElementById("detailsDuration").textContent = `Duration: ${movie.duration || ""}`;
+      document.getElementById("detailsRating").textContent = `Rating: ${movie.rating || ""}`;
+      document.getElementById("detailsDesc").textContent = `Description: ${movie.description || ""}`;
+      document.getElementById("detailsActors").textContent = `Actors: ${movie.actors || ""}`;
+      document.getElementById("detailsOverlay").style.display = "flex";
+
+      document.getElementById("playBtn").onclick = () => {
+        playMovie(movie, resume);
+      };
     }
+
+    function playMovie(movie, resume) {
+      document.getElementById("detailsOverlay").style.display = "none";
+      const overlay = document.getElementById("videoOverlay");
+      const player = document.getElementById("player");
+      player.src = movie.url;
+      overlay.style.display = "flex";
+      if (resume && continueWatching[movie.title]) {
+        player.currentTime = continueWatching[movie.title].time || 0;
+      }
+      player.play();
+      player.onpause = () => {
+        const remaining = player.duration - player.currentTime;
+        if (remaining <= 600) delete continueWatching[movie.title];
+        else continueWatching[movie.title] = { ...movie, time: player.currentTime };
+        localStorage.setItem(getProfileKey("continueWatching"), JSON.stringify(continueWatching));
+        renderMovies(allCategories);
+      };
+    }
+
+    document.getElementById("closeDetails").onclick = () => {
+      document.getElementById("detailsOverlay").style.display = "none";
+    };
+
+    document.getElementById("closePlayer").onclick = () => {
+      const overlay = document.getElementById("videoOverlay");
+      const player = document.getElementById("player");
+      player.pause();
+      overlay.style.display = "none";
+    };
 
     document.getElementById("searchBar").addEventListener("input", (e) => {
       const term = e.target.value.toLowerCase();
@@ -376,28 +440,21 @@
       renderMovies(filtered);
     });
 
-    const closeBtn = document.getElementById("closeBtn");
-    if (closeBtn) {
-      closeBtn.onclick = () => {
-        const overlay = document.getElementById("videoOverlay");
-        const player = document.getElementById("player");
-        player.pause();
-        overlay.style.display = "none";
-        if (document.fullscreenElement) document.exitFullscreen();
-      };
-    }
-
-    if (localStorage.getItem("loggedIn") === "true") {
-      if (localStorage.getItem("activeProfile")) {
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("app").style.display = "block";
-        document.getElementById("profileName").textContent = `(Profile: ${localStorage.getItem("activeProfile")})`;
-        loadMovies();
-      } else {
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("profileScreen").style.display = "flex";
+    // Auto login/session restore
+    window.onload = () => {
+      if (localStorage.getItem("loggedIn") === "true") {
+        if (localStorage.getItem("activeProfile")) {
+          document.getElementById("loginScreen").style.display = "none";
+          document.getElementById("app").style.display = "block";
+          document.getElementById("profileName").textContent =
+            `(Profile: ${localStorage.getItem("activeProfile")})`;
+          loadMovies();
+        } else {
+          document.getElementById("loginScreen").style.display = "none";
+          document.getElementById("profileScreen").style.display = "flex";
+        }
       }
-    }
+    };
   </script>
 </body>
 </html>
