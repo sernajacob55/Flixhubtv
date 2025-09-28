@@ -1,48 +1,43 @@
 const express = require("express");
 const path = require("path");
-
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
-// Serve frontend (index.html + CSS + JS)
-app.use(express.static(path.join(__dirname, "..", "frontend")));
+// Serve frontend files
+app.use(express.static(path.join(__dirname, "../frontend")));
 
-// Movie categories
-const categories = [
+// Movie data
+let movies = [
   {
-    name: "Sci-Fi",
-    movies: [
-      {
-        title: "The Matrix",
-        cover: "/covers/matrix.jpg",  // make sure matrix.jpg is in frontend/covers/
-        url: "https://download1351.mediafire.com/3yzrkgjjifhg-kBE2HT1i1X9UAOckBG5zokIOlih39t_HouFQji-qXpatH5FZw4-C20r5fD-Do-cJ7MyM7aRD8Uhz-BWQJcs5amcyCuEtcHjyhO0h9VWx1VfHxjIiSyiHJGpXfJ7VTnSDmR4Snc7RL0MH0eoZtOMVXw0Pr_Jfhb4N3Y/rks796idw5xqo2i/The+Matrix.mp4"
-      }
-    ]
-  },
-  {
-    name: "Action",
-    movies: [] // empty for now
-  },
-  {
-    name: "Comedy",
-    movies: [] // empty for now
-  },
-  {
-    name: "Drama",
-    movies: [] // empty for now
+    id: 1,
+    title: "The Matrix",
+    year: 1999,
+    duration: "2h 16m",
+    genre: "Sci-Fi",
+    description:
+      "A computer hacker learns about the true nature of reality and his role in the war against its controllers.",
+    cover: "/covers/matrix.jpg", // make sure this exists in frontend/covers/
+    video:
+      "https://download1351.mediafire.com/3yzrkgjjifhg-kBE2HT1i1X9UAOckBG5zokIOlih39t_HouFQji-qXpatH5FZw4-C20r5fD-Do-cJ7MyM7aRD8Uhz-BWQJcs5amcyCuEtcHjyhO0h9VWx1VfHxjIiSyiHJGpXfJ7VTnSDmR4Snc7RL0MH0eoZtOMVXw0Pr_Jfhb4N3Y/rks796idw5xqo2i/The+Matrix.mp4"
   }
 ];
 
-// API endpoint to send categories + movies to frontend
+// Endpoint to get all movies
 app.get("/api/movies", (req, res) => {
-  res.json(categories);
+  res.json(movies);
 });
 
-// Fallback: if no route matches, serve index.html
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "frontend", "index.html"));
+// Endpoint to get one movie by ID
+app.get("/api/movies/:id", (req, res) => {
+  const movie = movies.find((m) => m.id == req.params.id);
+  if (movie) {
+    res.json(movie);
+  } else {
+    res.status(404).json({ error: "Movie not found" });
+  }
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`FlixHubTV running at http://localhost:${PORT}`);
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
