@@ -69,12 +69,28 @@
     .play-btn:hover {
       background: #0097a7;
     }
-    video {
+    #video-player {
       margin-top: 20px;
+      position: relative;
+    }
+    video {
       width: 100%;
       max-width: 1000px;
       border-radius: 8px;
       background: black;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      z-index: 10;
     }
   </style>
 </head>
@@ -83,6 +99,8 @@
     <div class="sidebar">
       <h1>FlixHubTV</h1>
       <a href="index.html">🏠 Home</a>
+      <a href="#" onclick="switchProfile()">👤 Switch Profile</a>
+      <a href="#" onclick="logout()">🚪 Logout</a>
     </div>
     <div class="main">
       <div id="movie-container"></div>
@@ -95,27 +113,34 @@
 
     function setupVideoEndHandler(videoElement, redirectUrl) {
       videoElement.addEventListener("ended", () => {
-        // Exit fullscreen smoothly
-        if (document.fullscreenElement) {
-          document.exitFullscreen().catch(() => {});
-        } else if (document.webkitFullscreenElement) {
-          document.webkitExitFullscreen();
-        } else if (document.msFullscreenElement) {
-          document.msExitFullscreen();
-        }
-        // Redirect back to details
-        window.location.href = redirectUrl;
+        closeVideo(redirectUrl);
       });
+    }
+
+    function closeVideo(redirectUrl) {
+      const videoWrapper = document.getElementById("video-player");
+      if (videoWrapper) {
+        videoWrapper.innerHTML = ""; // remove video completely
+      }
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      }
     }
 
     // === CASE 1: Direct Play Mode ===
     if (movieId === "play") {
       const videoSrc = urlParams.get("src");
       document.getElementById("movie-container").innerHTML = `
-        <video id="autoVideo" controls autoplay>
-          <source src="${videoSrc}" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
+        <div id="video-player">
+          <button class="close-btn" onclick="closeVideo('index.html')">✖</button>
+          <video id="autoVideo" controls autoplay>
+            <source src="${videoSrc}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
       `;
 
       const videoElement = document.getElementById("autoVideo");
@@ -123,15 +148,10 @@
         setTimeout(() => {
           if (videoElement.requestFullscreen) {
             videoElement.requestFullscreen().catch(() => {});
-          } else if (videoElement.webkitRequestFullscreen) {
-            videoElement.webkitRequestFullscreen();
-          } else if (videoElement.msRequestFullscreen) {
-            videoElement.msRequestFullscreen();
           }
         }, 500);
       });
 
-      // When video ends, go back to home
       setupVideoEndHandler(videoElement, "index.html");
     }
     // === CASE 2: Normal Details Page ===
@@ -163,6 +183,7 @@
 
     function playMovie(videoUrl, movieId) {
       document.getElementById("video-player").innerHTML = `
+        <button class="close-btn" onclick="closeVideo('movie.html?id=${movieId}')">✖</button>
         <video id="manualVideo" controls autoplay>
           <source src="${videoUrl}" type="video/mp4">
           Your browser does not support the video tag.
@@ -170,18 +191,22 @@
       `;
 
       const videoElement = document.getElementById("manualVideo");
-
-      // Enter fullscreen
       if (videoElement.requestFullscreen) {
         videoElement.requestFullscreen().catch(() => {});
-      } else if (videoElement.webkitRequestFullscreen) {
-        videoElement.webkitRequestFullscreen();
-      } else if (videoElement.msRequestFullscreen) {
-        videoElement.msRequestFullscreen();
       }
 
-      // Redirect back to movie details when finished
       setupVideoEndHandler(videoElement, `movie.html?id=${movieId}`);
+    }
+
+    // === Switch Profile + Logout Logic ===
+    function switchProfile() {
+      localStorage.removeItem("flixhubtv_profile");
+      window.location.href = "profiles.html"; 
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "login.html"; 
     }
   </script>
 </body>
