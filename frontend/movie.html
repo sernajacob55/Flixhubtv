@@ -28,6 +28,7 @@
       <p id="genre"></p>
       <p id="plot"></p>
       <button id="playBtn" class="play-btn">▶ Play</button>
+      <button id="watchlistBtn" class="play-btn">+ Add to Watchlist</button>
     </div>
   </div>
 
@@ -43,32 +44,59 @@
   <!-- External Scripts -->
   <script src="player.js"></script>
   <script>
-    // Show active profile
     const activeProfile = localStorage.getItem("activeProfile");
-    const profileName = document.getElementById("profileName");
     if (activeProfile) {
-      profileName.textContent = `Watching as ${activeProfile}`;
+      document.getElementById("profileName").textContent = `Watching as ${activeProfile}`;
     }
 
-    // Fetch Movie Metadata from OMDb
-    const movieId = "tt0133093"; // Matrix IMDb ID
-    const apiKey = "ea7569d7";   // Your OMDb key
+    const movieId = "tt0133093";
+    const apiKey = "ea7569d7";
 
     async function fetchMovie() {
-      try {
-        const response = await fetch(`https://www.omdbapi.com/?i=${movieId}&apikey=${apiKey}`);
-        const data = await response.json();
+      const response = await fetch(`https://www.omdbapi.com/?i=${movieId}&apikey=${apiKey}`);
+      const data = await response.json();
+      if (data.Response === "True") {
+        document.getElementById("poster").src = data.Poster;
+        document.getElementById("title").textContent = data.Title;
+        document.getElementById("year").textContent = `Year: ${data.Year}`;
+        document.getElementById("runtime").textContent = `Duration: ${data.Runtime}`;
+        document.getElementById("genre").textContent = `Genres: ${data.Genre}`;
+        document.getElementById("plot").textContent = data.Plot;
 
-        if (data.Response === "True") {
-          document.getElementById("poster").src = data.Poster;
-          document.getElementById("title").textContent = data.Title;
-          document.getElementById("year").textContent = `Year: ${data.Year}`;
-          document.getElementById("runtime").textContent = `Duration: ${data.Runtime}`;
-          document.getElementById("genre").textContent = `Genres: ${data.Genre}`;
-          document.getElementById("plot").textContent = data.Plot;
+        // Watchlist toggle
+        const watchlistBtn = document.getElementById("watchlistBtn");
+        let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+        const isInWatchlist = watchlist.some(m => m.id === movieId);
+
+        if (isInWatchlist) {
+          watchlistBtn.textContent = "✓ Remove from Watchlist";
         }
-      } catch (err) {
-        console.error("Error fetching movie data:", err);
+
+        watchlistBtn.addEventListener("click", () => {
+          watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+          if (watchlist.some(m => m.id === movieId)) {
+            watchlist = watchlist.filter(m => m.id !== movieId);
+            watchlistBtn.textContent = "+ Add to Watchlist";
+          } else {
+            watchlist.push({ id: movieId, title: data.Title, poster: data.Poster });
+            watchlistBtn.textContent = "✓ Remove from Watchlist";
+          }
+          localStorage.setItem("watchlist", JSON.stringify(watchlist));
+        });
+
+        // Track Continue Watching
+        const video = document.getElementById("moviePlayer");
+        video.addEventListener("timeupdate", () => {
+          const continueWatching = JSON.parse(localStorage.getItem("continueWatching")) || [];
+          const index = continueWatching.findIndex(m => m.id === movieId);
+
+          if (index >= 0) {
+            continueWatching[index].time = video.currentTime;
+          } else {
+            continueWatching.push({ id: movieId, title: data.Title, poster: data.Poster, time: video.currentTime });
+          }
+          localStorage.setItem("continueWatching", JSON.stringify(continueWatching));
+        });
       }
     }
 
