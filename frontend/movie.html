@@ -31,13 +31,15 @@
         <p id="description" class="desc">
           A computer hacker learns about the true nature of reality and his role in the war against its controllers.
         </p>
-        <div id="castBlock" style="display:none;">
-          <strong>Actors:</strong> <span id="actors"></span>
+        <div id="castBlock">
+          <strong>Actors:</strong> <span id="actors">Loading...</span>
         </div>
-        <div id="crewBlock" style="display:none;">
-          <strong>Director:</strong> <span id="director"></span>
+        <div id="crewBlock">
+          <strong>Director:</strong> <span id="director">Loading...</span>
         </div>
-        <span id="rating" style="display:none;"></span>
+        <div>
+          <strong>IMDB Rating:</strong> <span id="rating">Loading...</span>
+        </div>
         <br><br>
         <button id="playBtn" class="btn btn-primary">▶ Play</button>
       </div>
@@ -61,12 +63,22 @@
     const playBtn = document.getElementById("playBtn");
     const closeBtn = document.getElementById("closePlayer");
 
-    // Play Matrix
+    // Play Matrix in fullscreen
     playBtn.addEventListener("click", () => {
       video.src = matrixFile;
       modal.classList.add("open");
+
+      // Try fullscreen
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+      } else if (video.webkitRequestFullscreen) { // Safari
+        video.webkitRequestFullscreen();
+      } else if (video.msRequestFullscreen) { // IE/Edge
+        video.msRequestFullscreen();
+      }
+
       video.play().catch(err => {
-        console.log("Autoplay blocked, user must press play:", err);
+        console.log("Autoplay blocked:", err);
       });
     });
 
@@ -75,10 +87,35 @@
       video.pause();
       video.currentTime = 0;
       modal.classList.remove("open");
+      document.exitFullscreen?.();
     });
   </script>
 
   <!-- Metadata fetcher -->
-  <script src="movie-metadata.js"></script>
+  <script>
+    const API_KEY = "ea7569d7"; // your OMDb key
+    async function loadMeta() {
+      try {
+        const url = `https://www.omdbapi.com/?t=${encodeURIComponent("The Matrix")}&apikey=${API_KEY}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.Response === "True") {
+          document.getElementById("poster").src = data.Poster;
+          document.getElementById("title").textContent = data.Title;
+          document.getElementById("year").textContent = `Year: ${data.Year}`;
+          document.getElementById("duration").textContent = `Duration: ${data.Runtime}`;
+          document.getElementById("genres").textContent = `Genres: ${data.Genre}`;
+          document.getElementById("description").textContent = data.Plot;
+          document.getElementById("actors").textContent = data.Actors;
+          document.getElementById("director").textContent = data.Director;
+          document.getElementById("rating").textContent = data.imdbRating;
+        }
+      } catch (err) {
+        console.error("Metadata fetch failed:", err);
+      }
+    }
+    loadMeta();
+  </script>
 </body>
 </html>
