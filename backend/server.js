@@ -1,38 +1,40 @@
 const express = require("express");
 const path = require("path");
+const bodyParser = require("body-parser");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
-// Define path to frontend folder
-const frontendPath = path.join(__dirname, "../frontend");
+// Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Serve static files (CSS, JS, images)
-app.use(express.static(frontendPath));
+// Serve frontend
+app.use(express.static(path.join(__dirname, "../frontend")));
 
-// Explicit routes for your main pages
-app.get("/", (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
+// ✅ Hardcoded login credentials
+const USERS = {
+  Streamme69420: "Xenomorph69420!"
+};
+
+// Login route
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+
+  if (USERS[username] && USERS[username] === password) {
+    // ✅ Redirect to profiles page after successful login
+    return res.redirect("/profiles.html");
+  } else {
+    // ✅ Reload login page with error flag
+    return res.redirect("/login.html?error=1");
+  }
 });
 
-app.get("/login", (req, res) => {
-  res.sendFile(path.join(frontendPath, "login.html"));
-});
-
-app.get("/profiles", (req, res) => {
-  res.sendFile(path.join(frontendPath, "profiles.html"));
-});
-
-app.get("/movie", (req, res) => {
-  res.sendFile(path.join(frontendPath, "movie.html"));
-});
-
-// Catch-all fallback (for safety)
+// Default route (catch-all)
 app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
+  res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });
 
-// Start server
 app.listen(PORT, () => {
-  console.log(`✅ FlixHubTV backend running on port ${PORT}`);
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });

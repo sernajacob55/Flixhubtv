@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Matrix - FlixHubTV</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <!-- Navbar -->
@@ -19,9 +19,10 @@
 
   <!-- Movie Info Section -->
   <div class="movie-container">
-    <img id="poster" alt="Movie Poster" class="movie-poster">
+    <img id="poster" alt="Movie Poster" class="movie-poster" />
     <div class="movie-info">
       <h1 id="title">Loading...</h1>
+      <p id="profileName" style="color:#00e5ff; font-style:italic; margin-bottom:15px;"></p>
       <p id="year"></p>
       <p id="runtime"></p>
       <p id="genre"></p>
@@ -34,7 +35,7 @@
   <div id="video-container" style="display:none;">
     <span id="closeBtn">✖</span>
     <video id="moviePlayer" controls>
-      <source src="https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4" type="video/mp4">
+      <source src="https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
   </div>
@@ -42,6 +43,13 @@
   <!-- External Scripts -->
   <script src="player.js"></script>
   <script>
+    // Show active profile
+    const activeProfile = localStorage.getItem("activeProfile");
+    const profileName = document.getElementById("profileName");
+    if (activeProfile) {
+      profileName.textContent = `Watching as ${activeProfile}`;
+    }
+
     // Fetch Movie Metadata from OMDb
     const movieId = "tt0133093"; // Matrix IMDb ID
     const apiKey = "ea7569d7";   // Your OMDb key

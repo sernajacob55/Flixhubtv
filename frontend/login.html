@@ -1,42 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - FlixHubTV</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="navbar">
-    <div class="logo">Flix<span>HubTV</span></div>
-  </div>
+  <header>
+    <h1 class="logo">FlixHubTV</h1>
+  </header>
 
-  <div class="login-container">
+  <main class="login-container">
     <div class="login-box">
-      <h1>Login</h1>
-      <form onsubmit="return login(event)">
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="password" id="password" placeholder="Password" required>
+      <h2>Login</h2>
+      <form method="POST" action="/login">
+        <input type="text" name="username" placeholder="Username" required />
+        <input type="password" name="password" placeholder="Password" required />
         <button type="submit">Login</button>
       </form>
-      <p id="error-message" style="color:#ff4d4d; margin-top:10px; display:none;">
+
+      <!-- Error message (hidden by default, shown if ?error=1 in URL) -->
+      <p id="error-message" style="color: red; display: none; text-align: center; margin-top: 10px;">
         Invalid username or password.
       </p>
     </div>
-  </div>
+  </main>
 
   <script>
-    function login(event) {
-      event.preventDefault();
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-
-      // Demo login (adjust if needed)
-      if (username === "streamme69420" && password === "password") {
-        window.location.href = "profiles.html";
-      } else {
-        document.getElementById("error-message").style.display = "block";
-      }
+    // Show error message if login.html?error=1 is in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("error") === "1") {
+      document.getElementById("error-message").style.display = "block";
     }
   </script>
 </body>

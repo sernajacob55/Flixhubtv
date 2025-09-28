@@ -1,35 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FlixHubTV - Browse</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <!-- Navbar -->
   <div class="navbar">
     <div class="logo">Flix<span>HubTV</span></div>
     <div class="nav-actions">
-      <input type="text" class="search-bar" placeholder="Search movies...">
+      <input type="text" class="search-bar" placeholder="Search movies..." />
       <button onclick="window.location.href='profiles.html'" class="nav-btn">Switch Profile</button>
       <button onclick="window.location.href='login.html'" class="nav-btn">Logout</button>
+      <button onclick="window.location.href='index.html'" class="nav-btn">Home</button>
     </div>
+  </div>
+
+  <!-- Welcome Section -->
+  <div class="welcome-container" style="text-align:center; margin: 30px 0;">
+    <h2 id="welcomeMessage" style="color:#00e5ff; text-shadow:0 0 10px #00e5ff;"></h2>
   </div>
 
   <!-- Movies Section -->
   <div class="movies-container">
     <div class="movie-card" onclick="window.location.href='movie.html'">
-      <img src="https://img.omdbapi.com/?i=tt0133093&apikey=ea7569d7" alt="The Matrix">
+      <img src="https://img.omdbapi.com/?i=tt0133093&apikey=ea7569d7" alt="The Matrix" />
       <h3>The Matrix</h3>
     </div>
-    <!-- Add more movie cards here when ready -->
+    <!-- More movie cards can go here -->
   </div>
 
   <script>
-    // Search functionality (basic demo)
+    // Load active profile from localStorage
+    const activeProfile = localStorage.getItem("activeProfile");
+    const welcomeMessage = document.getElementById("welcomeMessage");
+
+    if (activeProfile) {
+      welcomeMessage.textContent = `Welcome, ${activeProfile}`;
+    } else {
+      welcomeMessage.textContent = "Welcome to FlixHubTV";
+    }
+
+    // Simple search handler
     const searchBar = document.querySelector(".search-bar");
-    searchBar.addEventListener("keypress", function(e) {
+    searchBar.addEventListener("keypress", function (e) {
       if (e.key === "Enter") {
         alert("Search feature coming soon: " + searchBar.value);
       }

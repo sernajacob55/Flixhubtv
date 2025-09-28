@@ -15,6 +15,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 /* Navbar */
@@ -203,7 +204,7 @@ video::-webkit-media-controls-mute-button {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: calc(100vh - 70px);
 }
 
 .login-box {
@@ -214,7 +215,8 @@ video::-webkit-media-controls-mute-button {
   box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
 }
 
-.login-box h1 {
+.login-box h1,
+.login-box h2 {
   margin-bottom: 20px;
   color: #00e5ff;
 }
@@ -245,12 +247,21 @@ video::-webkit-media-controls-mute-button {
 }
 
 /* Profiles Page */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 70px); /* minus navbar */
+}
+
 .profiles-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 60px;
   gap: 40px;
+  flex-wrap: wrap;
+  margin-top: 30px;
 }
 
 .profile-card {
@@ -277,4 +288,5 @@ video::-webkit-media-controls-mute-button {
 
 .profile-card h3 {
   color: #fff;
+  text-transform: capitalize; /* ensure first letter is uppercase */
 }
