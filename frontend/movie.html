@@ -11,89 +11,54 @@
   <div class="topbar">
     <div class="wrapper topbar-inner">
       <h1 id="brand">FlixHubTV</h1>
-      <div class="controls">
-        <a href="index.html" class="btn btn-ghost">Home</a>
-      </div>
+      <a href="index.html" class="btn btn-ghost">Home</a>
     </div>
   </div>
 
-  <!-- Detail Section -->
+  <!-- Movie detail -->
   <div class="wrapper">
     <div class="detail">
-      <img id="poster" class="poster" src="assets/posters/placeholder.jpg" alt="The Matrix Poster" />
+      <img id="poster" class="poster" alt="The Matrix Poster">
       <div class="meta">
         <h2 id="title">The Matrix</h2>
         <div class="row">
           <span id="year">Year: 1999</span>
           <span id="duration">Duration: 2h 16m</span>
-          <span id="genres">Genres: Sci-Fi</span>
+          <span id="genre">Genres: Sci-Fi</span>
         </div>
-        <p id="description" class="desc">
-          A computer hacker learns about the true nature of reality and his role in the war against its controllers.
-        </p>
-        <div id="castBlock">
-          <strong>Actors:</strong> <span id="actors">Loading...</span>
-        </div>
-        <div id="crewBlock">
-          <strong>Director:</strong> <span id="director">Loading...</span>
-        </div>
-        <div>
-          <strong>IMDB Rating:</strong> <span id="rating">Loading...</span>
-        </div>
-        <br><br>
+        <p id="plot">A computer hacker learns about the true nature of reality and his role in the war against its controllers.</p>
         <button id="playBtn" class="btn btn-primary">▶ Play</button>
       </div>
     </div>
   </div>
 
-  <!-- Video Modal -->
+  <!-- Video Player Modal -->
   <div id="playerModal" class="modal">
     <div class="player-shell">
-      <button class="player-close" id="closePlayer">✕</button>
-      <video id="videoPlayer" controls preload="metadata"></video>
+      <video id="videoPlayer" preload="metadata">
+        <source src="https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4" type="video/mp4">
+        Your browser does not support HTML5 video.
+      </video>
+
+      <!-- Custom Controls -->
+      <div class="video-controls">
+        <button id="playPause" class="control-btn">▶</button>
+        <span id="currentTime">0:00</span>
+        <input type="range" id="progressBar" value="0" min="0" max="100">
+        <span id="durationTime">0:00</span>
+        <input type="range" id="volumeBar" min="0" max="1" step="0.05" value="1">
+        <button id="fullscreenBtn" class="control-btn">⛶</button>
+        <button id="closeBtn" class="control-btn close">✖</button>
+      </div>
     </div>
   </div>
 
-  <script>
-    // Matrix MediaFire link
-    const matrixFile = "https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4";
-
-    const modal = document.getElementById("playerModal");
-    const video = document.getElementById("videoPlayer");
-    const playBtn = document.getElementById("playBtn");
-    const closeBtn = document.getElementById("closePlayer");
-
-    // Play Matrix in fullscreen
-    playBtn.addEventListener("click", () => {
-      video.src = matrixFile;
-      modal.classList.add("open");
-
-      // Try fullscreen
-      if (video.requestFullscreen) {
-        video.requestFullscreen();
-      } else if (video.webkitRequestFullscreen) { // Safari
-        video.webkitRequestFullscreen();
-      } else if (video.msRequestFullscreen) { // IE/Edge
-        video.msRequestFullscreen();
-      }
-
-      video.play().catch(err => {
-        console.log("Autoplay blocked:", err);
-      });
-    });
-
-    // Close player
-    closeBtn.addEventListener("click", () => {
-      video.pause();
-      video.currentTime = 0;
-      modal.classList.remove("open");
-      document.exitFullscreen?.();
-    });
-  </script>
+  <!-- Player logic -->
+  <script src="player.js"></script>
 
   <!-- Metadata fetcher -->
   <script>
-    const API_KEY = "ea7569d7"; // your OMDb key
+    const API_KEY = "ea7569d7"; // OMDb key
     async function loadMeta() {
       try {
         const url = `https://www.omdbapi.com/?t=${encodeURIComponent("The Matrix")}&apikey=${API_KEY}`;
@@ -105,11 +70,8 @@
           document.getElementById("title").textContent = data.Title;
           document.getElementById("year").textContent = `Year: ${data.Year}`;
           document.getElementById("duration").textContent = `Duration: ${data.Runtime}`;
-          document.getElementById("genres").textContent = `Genres: ${data.Genre}`;
-          document.getElementById("description").textContent = data.Plot;
-          document.getElementById("actors").textContent = data.Actors;
-          document.getElementById("director").textContent = data.Director;
-          document.getElementById("rating").textContent = data.imdbRating;
+          document.getElementById("genre").textContent = `Genres: ${data.Genre}`;
+          document.getElementById("plot").textContent = data.Plot;
         }
       } catch (err) {
         console.error("Metadata fetch failed:", err);

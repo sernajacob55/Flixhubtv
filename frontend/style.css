@@ -2,7 +2,6 @@
    FlixHubTV – Netflix/Plex-inspired theme (Animated Gradient)
    ========================================================= */
 
-/* ---------- CSS Variables ---------- */
 :root {
   --bg-1:#0b0f16;
   --bg-2:#151824;
@@ -21,7 +20,6 @@
   --shadow:0 10px 30px rgba(0,0,0,.4);
 }
 
-/* ---------- Global Reset ---------- */
 * { box-sizing:border-box; margin:0; padding:0; }
 html, body {
   height: 100%;
@@ -29,24 +27,18 @@ html, body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial, sans-serif;
   color: var(--text);
 
-  /* Animated Gradient Background */
   background: linear-gradient(120deg, var(--bg-1), var(--bg-2), var(--bg-3), var(--plex-amber));
   background-size: 400% 400%;
   animation: gradientShift 20s ease infinite;
 }
 
-/* Gradient animation keyframes */
 @keyframes gradientShift {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-/* ---------- Layout Wrappers ---------- */
-.wrapper {
-  width: min(1200px, 92vw);
-  margin: 0 auto;
-}
+.wrapper { width: min(1200px, 92vw); margin: 0 auto; }
 
 /* ---------- Top bar ---------- */
 .topbar {
@@ -66,35 +58,17 @@ html, body {
 #brand {
   font-size: clamp(22px, 2.2vw, 28px);
   font-weight:800;
-  letter-spacing:.5px;
   background: linear-gradient(90deg, var(--brand), #fff);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
-.controls {
-  display:flex;
-  gap:10px;
-  margin-left:auto;
-  align-items:center;
-  flex-wrap: wrap;
-}
-input[type="search"] {
-  outline:none;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.06);
-  color:var(--text);
-  padding:10px 14px;
-  border-radius:999px;
-  width: clamp(220px, 26vw, 340px);
-}
-input[type="search"]::placeholder { color:var(--muted); }
+.controls { margin-left:auto; display:flex; gap:10px; }
 
 /* ---------- Buttons ---------- */
-button, .btn, a.button {
+button, .btn {
   cursor:pointer;
   font-weight:600;
-  letter-spacing:.2px;
   border:none;
   padding:10px 16px;
   border-radius:10px;
@@ -102,35 +76,13 @@ button, .btn, a.button {
   color:var(--text);
   border:1px solid rgba(255,255,255,.1);
   transition: all .2s ease;
-  text-decoration:none;
 }
-.btn:hover { background:var(--card-hover); transform: translateY(-1px); }
+.btn:hover { background:var(--card-hover); }
 .btn-primary {
   background: linear-gradient(180deg, var(--brand), var(--brand-2));
   color:#041017;
-  box-shadow:0 6px 22px rgba(34,211,238,.25);
 }
-.btn-ghost {
-  background:transparent;
-  border:1px solid rgba(255,255,255,.14);
-}
-.btn-ghost:hover { background:rgba(255,255,255,.06); }
-
-/* ---------- Chips / Filters ---------- */
-.chips { display:flex; flex-wrap:wrap; gap:8px; padding:14px 0 8px; }
-.chip {
-  padding:8px 12px;
-  border-radius:999px;
-  background:var(--chip-bg);
-  border:1px solid var(--chip-border);
-  color:var(--text);
-  font-size:14px;
-}
-.chip.active {
-  background:linear-gradient(180deg, var(--brand), var(--brand-2));
-  color:#0a0f14;
-  border-color:transparent;
-}
+.btn-ghost { background:transparent; }
 
 /* ---------- Movie Grid ---------- */
 .movie-grid {
@@ -147,51 +99,27 @@ button, .btn, a.button {
   box-shadow: var(--shadow);
   transition: all .18s ease;
 }
-.card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 18px 40px rgba(0,0,0,.55);
-}
-.card img {
-  width:100%;
-  aspect-ratio: 2/3;
-  object-fit: cover;
-  display:block;
-}
-.card .title {
-  padding:10px 12px 12px;
-  font-size:14px;
-  color:var(--text);
-}
+.card img { width:100%; aspect-ratio: 2/3; object-fit: cover; }
 
 /* ---------- Movie Detail ---------- */
-.detail {
-  display:flex;
-  gap:24px;
-  align-items:flex-start;
-  padding:20px 0 28px;
-}
+.detail { display:flex; gap:24px; padding:20px 0 28px; }
 .detail .poster {
   width: 180px;
   border-radius:12px;
   border:1px solid rgba(255,255,255,.1);
-  box-shadow: var(--shadow);
 }
-.meta h2 { margin:0 0 6px; font-size: clamp(22px, 2.8vw, 34px); }
-.meta .row {
-  color:var(--muted);
-  margin: 6px 0 12px;
-  display:flex; gap:18px; flex-wrap:wrap;
-}
-.meta .desc { margin: 10px 0 16px; color: var(--text); max-width: 70ch; line-height:1.5; }
+.meta h2 { font-size: clamp(22px, 2.8vw, 34px); }
+.meta .row { color:var(--muted); display:flex; gap:18px; }
+.meta .desc { margin: 10px 0; max-width: 70ch; }
 
 /* ---------- Player Modal ---------- */
 .modal {
   position: fixed;
-  inset: 0; /* cover whole screen */
+  inset: 0;
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,.95); /* dim backdrop */
+  background: rgba(0,0,0,.95);
   z-index: 1000;
 }
 .modal.open { display: flex; }
@@ -211,90 +139,91 @@ button, .btn, a.button {
   object-fit: contain;
   background: #000;
 }
-.player-close {
+
+/* ---------- Custom Controls ---------- */
+.video-controls {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,.85));
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text);
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+.video-controls.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Cursor auto-hide */
+.modal.hide-cursor { cursor: none; }
+
+/* Progress bar neon cyan */
+#progressBar {
+  flex-grow: 1;
+  height: 6px;
+  appearance: none;
+}
+#progressBar::-webkit-slider-runnable-track {
+  background: rgba(255,255,255,.2);
+  height: 6px;
+  border-radius: 3px;
+}
+#progressBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--brand);
+  border-radius: 50%;
+  margin-top: -4px;
+  box-shadow: 0 0 6px var(--brand), 0 0 12px var(--brand);
+}
+#progressBar::-moz-range-progress {
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  box-shadow: 0 0 6px var(--brand), 0 0 12px var(--brand);
+}
+
+/* Volume bar */
+#volumeBar { width: 80px; appearance: none; }
+#volumeBar::-webkit-slider-runnable-track { background: rgba(255,255,255,.2); height: 6px; }
+#volumeBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--brand);
+  border-radius: 50%;
+}
+
+/* Buttons */
+.control-btn {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.control-btn:hover { color: var(--brand); text-shadow: 0 0 6px var(--brand); }
+.control-btn.close {
+  background: var(--danger);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  background: linear-gradient(180deg, #ff7b7b, var(--danger));
-  color: #fff;
-  border: none;
-  font-weight: 900;
+  margin-left: auto;
   font-size: 18px;
-  cursor: pointer;
-  z-index: 1100;
 }
-
-/* ---------- Custom Video Player Styling ---------- */
-.player-shell video::-webkit-media-controls-panel {
-  background: rgba(0, 0, 0, 0.7) !important;
-  height: 50px;
-}
-.player-shell video::-webkit-media-controls-play-button,
-.player-shell video::-webkit-media-controls-volume-slider,
-.player-shell video::-webkit-media-controls-timeline,
-.player-shell video::-webkit-media-controls-current-time-display,
-.player-shell video::-webkit-media-controls-time-remaining-display,
-.player-shell video::-webkit-media-controls-fullscreen-button {
-  filter: invert(100%);
-  transform: scale(1.2);
-  margin: 0 5px;
-}
-.player-shell video::-webkit-media-controls-play-button:hover,
-.player-shell video::-webkit-media-controls-fullscreen-button:hover {
-  filter: invert(70%) sepia(100%) saturate(300%) hue-rotate(180deg);
-  transform: scale(1.3);
-}
-
-/* Scrub bar glow (Neon Cyan) */
-.player-shell video::-webkit-media-controls-timeline {
-  background: rgba(255, 255, 255, 0.1);
-  height: 6px;
-  border-radius: 3px;
-}
-.player-shell video::-webkit-media-controls-timeline-container {
-  background: transparent;
-}
-.player-shell video::-webkit-media-controls-current-time-display,
-.player-shell video::-webkit-media-controls-time-remaining-display {
-  font-size: 14px;
-}
-.player-shell video::-webkit-media-controls-seek-back-button,
-.player-shell video::-webkit-media-controls-seek-forward-button {
-  filter: invert(100%);
-}
-.player-shell video::-webkit-media-controls-progress-bar {
-  background: linear-gradient(90deg, var(--brand), var(--brand-2));
-  box-shadow: 0 0 10px var(--brand), 0 0 20px var(--brand);
-  height: 6px;
-  border-radius: 3px;
-}
-
-/* Firefox */
-.player-shell video::-moz-range-track {
-  background: rgba(255, 255, 255, 0.2);
-}
-.player-shell video::-moz-range-progress {
-  background: var(--brand);
-  box-shadow: 0 0 8px var(--brand), 0 0 15px var(--brand);
-}
-.player-shell video::-moz-range-thumb {
-  background: #fff;
-  border: 2px solid var(--brand);
-  box-shadow: 0 0 8px var(--brand);
-}
-
-/* ---------- Utility ---------- */
-.section { padding: 18px 0; }
-.muted { color:var(--muted); }
-.center { text-align:center; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 720px){
   .detail { flex-direction: column; }
-  .player-shell { width:100%; height:100%; }
+  .video-controls { font-size: 12px; gap: 6px; }
+  #volumeBar { width: 60px; }
 }
