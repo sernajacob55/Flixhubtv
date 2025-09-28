@@ -3,79 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Movie Info - FlixHubTV</title>
+  <title>Movie Details</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Sidebar -->
   <div class="sidebar">
     <a href="index.html">🏠 Home</a>
   </div>
 
-  <div class="main">
-    <div id="movieDetails" class="movie-info"></div>
-    <div id="videoContainer" class="hidden">
-      <button id="closeBtn">✖</button>
-      <video id="moviePlayer" controls></video>
-    </div>
+  <!-- Main Movie Info -->
+  <div class="main" id="movieDetails"></div>
+
+  <!-- Video Player (hidden until Play is clicked) -->
+  <div id="videoContainer" class="hidden">
+    <video id="videoPlayer" controls autoplay></video>
+    <button id="closeBtn" onclick="closeVideo()">✖</button>
   </div>
 
   <script>
-    // 🔒 Security check: redirect if not logged in
-    if (!localStorage.getItem("flixhubtv_profile")) {
-      window.location.href = "login.html";
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const movieId = parseInt(urlParams.get("id"));
-
+    // Movies data (must match index.html IDs)
     const movies = [
       {
         id: 1,
         title: "The Matrix",
+        year: "1999",
+        duration: "2h 16m",
         genre: "Sci-Fi",
-        year: 1999,
-        runtime: "2h 16m",
         description: "A computer hacker learns about the true nature of reality and his role in the war against its controllers.",
-        cover: "matrix.jpg",
+        cover: "covers/matrix.jpg",
         video: "https://download1351.mediafire.com/3yzrkgjjifhg-kBE2HT1i1X9UAOckBG5zokIOlih39t_HouFQji-qXpatH5FZw4-C20r5fD-Do-cJ7MyM7aRD8Uhz-BWQJcs5amcyCuEtcHjyhO0h9VWx1VfHxjIiSyiHJGpXfJ7VTnSDmR4Snc7RL0MH0eoZtOMVXw0Pr_Jfhb4N3Y/rks796idw5xqo2i/The+Matrix.mp4"
       }
     ];
 
+    // Grab movie ID from URL
+    const params = new URLSearchParams(window.location.search);
+    const movieId = parseInt(params.get("id"));
     const movie = movies.find(m => m.id === movieId);
-    const detailsDiv = document.getElementById("movieDetails");
-    const videoContainer = document.getElementById("videoContainer");
-    const videoPlayer = document.getElementById("moviePlayer");
-    const closeBtn = document.getElementById("closeBtn");
 
+    // Display movie info
     if (movie) {
-      detailsDiv.innerHTML = `
-        <img src="${movie.cover}" alt="${movie.title}">
-        <div>
-          <h2>${movie.title}</h2>
-          <p><strong>Genre:</strong> ${movie.genre}</p>
-          <p><strong>Year:</strong> ${movie.year}</p>
-          <p><strong>Runtime:</strong> ${movie.runtime}</p>
-          <p>${movie.description}</p>
-          <button onclick="playMovie()">▶ Play</button>
+      document.getElementById("movieDetails").innerHTML = `
+        <div class="movie-info">
+          <img src="${movie.cover}" alt="${movie.title}">
+          <div>
+            <h2>${movie.title}</h2>
+            <p><strong>Year:</strong> ${movie.year}</p>
+            <p><strong>Duration:</strong> ${movie.duration}</p>
+            <p><strong>Genres:</strong> ${movie.genre}</p>
+            <p>${movie.description}</p>
+            <button onclick="playMovie('${movie.video}')">▶ Play</button>
+          </div>
         </div>
       `;
     } else {
-      detailsDiv.innerHTML = "<p>Movie not found.</p>";
+      document.getElementById("movieDetails").innerHTML = "<h2>Movie not found</h2>";
     }
 
-    function playMovie() {
-      videoPlayer.src = movie.video;
+    // Play movie in fullscreen
+    function playMovie(videoUrl) {
+      const videoContainer = document.getElementById("videoContainer");
+      const videoPlayer = document.getElementById("videoPlayer");
+
+      videoPlayer.src = videoUrl;
       videoContainer.classList.remove("hidden");
-      videoPlayer.requestFullscreen().catch(() => {});
-      videoPlayer.play();
+
+      if (videoPlayer.requestFullscreen) {
+        videoPlayer.requestFullscreen();
+      } else if (videoPlayer.webkitRequestFullscreen) {
+        videoPlayer.webkitRequestFullscreen();
+      } else if (videoPlayer.msRequestFullscreen) {
+        videoPlayer.msRequestFullscreen();
+      }
     }
 
-    closeBtn.onclick = () => {
+    // Close video
+    function closeVideo() {
+      const videoContainer = document.getElementById("videoContainer");
+      const videoPlayer = document.getElementById("videoPlayer");
+
       videoPlayer.pause();
       videoPlayer.src = "";
       videoContainer.classList.add("hidden");
-      document.exitFullscreen().catch(() => {});
-    };
+
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    }
   </script>
 </body>
 </html>

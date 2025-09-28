@@ -1,242 +1,127 @@
-/* ====== General Page Styling ====== */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #111;
-  color: white;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlixHubTV</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <h1>FlixHubTV</h1>
+  </header>
 
-/* ====== Header / Title ====== */
-header {
-  background: black;
-  padding: 10px;
-  text-align: center;
-}
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <input type="text" id="searchBar" placeholder="Search movies or categories..." onkeyup="searchMovies()">
+    <button id="switchProfile" onclick="switchProfile()">Switch</button>
+    <button id="logoutBtn" onclick="logout()">Logout</button>
+  </div>
 
-header h1 {
-  color: #00c8ff;
-  margin: 0;
-}
+  <!-- Categories -->
+  <div class="categories">
+    <button onclick="filterCategory('all')">All</button>
+    <button onclick="filterCategory('Action')">Action</button>
+    <button onclick="filterCategory('Comedy')">Comedy</button>
+    <button onclick="filterCategory('Drama')">Drama</button>
+    <button onclick="filterCategory('Horror')">Horror</button>
+    <button onclick="filterCategory('Romance')">Romance</button>
+    <button onclick="filterCategory('Sci-Fi')">Sci-Fi</button>
+    <button onclick="filterCategory('Thriller')">Thriller</button>
+    <button onclick="filterCategory('Animation')">Animation</button>
+    <button onclick="filterCategory('Documentary')">Documentary</button>
+  </div>
 
-/* ====== Top Bar (Search + Buttons) ====== */
-.top-bar {
-  margin: 10px 0;
-}
+  <!-- Movies Container -->
+  <div id="moviesContainer"></div>
 
-.top-bar input {
-  padding: 8px;
-  width: 300px;
-  border-radius: 20px;
-  border: none;
-}
+  <script>
+    // Example movies
+    const movies = [
+      {
+        id: 1,
+        title: "The Matrix",
+        year: "1999",
+        duration: "2h 16m",
+        genre: "Sci-Fi",
+        description: "A computer hacker learns about the true nature of reality and his role in the war against its controllers.",
+        cover: "covers/matrix.jpg",
+        video: "https://download1351.mediafire.com/3yzrkgjjifhg-kBE2HT1i1X9UAOckBG5zokIOlih39t_HouFQji-qXpatH5FZw4-C20r5fD-Do-cJ7MyM7aRD8Uhz-BWQJcs5amcyCuEtcHjyhO0h9VWx1VfHxjIiSyiHJGpXfJ7VTnSDmR4Snc7RL0MH0eoZtOMVXw0Pr_Jfhb4N3Y/rks796idw5xqo2i/The+Matrix.mp4"
+      }
+    ];
 
-.top-bar button {
-  margin-left: 5px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
+    // Load movies
+    function loadMovies() {
+      const container = document.getElementById('moviesContainer');
+      container.innerHTML = '';
+      movies.forEach(movie => {
+        const tile = document.createElement('div');
+        tile.classList.add('movie-tile');
+        tile.innerHTML = `
+          <img src="${movie.cover}" alt="${movie.title}">
+          <p>${movie.title}</p>
+        `;
+        tile.onclick = () => {
+          window.location.href = `movie.html?id=${movie.id}`;
+        };
+        container.appendChild(tile);
+      });
+    }
 
-.top-bar button#switchProfile {
-  background: #00c8ff;
-  color: black;
-}
+    // Filter by category
+    function filterCategory(category) {
+      const container = document.getElementById('moviesContainer');
+      container.innerHTML = '';
+      const filtered = category === 'all' ? movies : movies.filter(m => m.genre === category);
+      filtered.forEach(movie => {
+        const tile = document.createElement('div');
+        tile.classList.add('movie-tile');
+        tile.innerHTML = `
+          <img src="${movie.cover}" alt="${movie.title}">
+          <p>${movie.title}</p>
+        `;
+        tile.onclick = () => {
+          window.location.href = `movie.html?id=${movie.id}`;
+        };
+        container.appendChild(tile);
+      });
+    }
 
-.top-bar button#logout {
-  background: red;
-  color: white;
-}
+    // Search function
+    function searchMovies() {
+      const query = document.getElementById('searchBar').value.toLowerCase();
+      const container = document.getElementById('moviesContainer');
+      container.innerHTML = '';
+      const filtered = movies.filter(movie =>
+        movie.title.toLowerCase().includes(query) ||
+        movie.genre.toLowerCase().includes(query)
+      );
+      filtered.forEach(movie => {
+        const tile = document.createElement('div');
+        tile.classList.add('movie-tile');
+        tile.innerHTML = `
+          <img src="${movie.cover}" alt="${movie.title}">
+          <p>${movie.title}</p>
+        `;
+        tile.onclick = () => {
+          window.location.href = `movie.html?id=${movie.id}`;
+        };
+        container.appendChild(tile);
+      });
+    }
 
-/* ====== Categories ====== */
-.categories {
-  margin-top: 10px;
-}
+    // Switch profile
+    function switchProfile() {
+      window.location.href = "profiles.html";
+    }
 
-.categories button {
-  margin: 5px;
-  padding: 8px 12px;
-  background: #00c8ff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
+    // Logout
+    function logout() {
+      window.location.href = "login.html";
+    }
 
-/* ====== Movie Tiles ====== */
-#moviesContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  justify-content: center;
-  margin: 20px;
-}
-
-.movie-tile {
-  width: 150px;
-  cursor: pointer;
-  text-align: center;
-}
-
-.movie-tile img {
-  width: 100%;
-  border-radius: 10px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.movie-tile img:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(0, 200, 255, 0.6);
-}
-
-.movie-tile p {
-  margin-top: 5px;
-  font-size: 14px;
-  color: #ddd;
-}
-
-/* ====== Sidebar (Movie Page Only) ====== */
-.sidebar {
-  width: 200px;
-  background: #000;
-  height: 100vh;
-  padding: 20px;
-  position: fixed;
-  top: 0;
-  left: 0;
-}
-
-.sidebar a {
-  display: block;
-  margin: 15px 0;
-  color: white;
-  text-decoration: none;
-  font-size: 18px;
-}
-
-.sidebar a:hover {
-  color: #00c8ff;
-}
-
-/* ====== Movie Info Page ====== */
-.main {
-  margin-left: 220px;
-  padding: 20px;
-}
-
-.movie-info {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.movie-info img {
-  width: 200px;
-  border-radius: 10px;
-}
-
-/* ====== Video Player ====== */
-#videoContainer {
-  position: relative;
-  margin-top: 20px;
-}
-
-#videoContainer video {
-  width: 100%;
-  max-width: 900px;
-  border-radius: 10px;
-  background: black;
-}
-
-#closeBtn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: red;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 18px;
-  z-index: 10;
-}
-
-.hidden {
-  display: none;
-}
-
-/* ====== Login Page ====== */
-.login-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-
-.login-container h1 {
-  color: #00c8ff;
-}
-
-.login-container form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.login-container input {
-  padding: 10px;
-  width: 250px;
-  border-radius: 5px;
-  border: none;
-}
-
-.login-container button {
-  padding: 10px;
-  background: #00c8ff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.login-container button:hover {
-  background: #009ec2;
-}
-
-.error {
-  color: red;
-  margin-top: 10px;
-}
-
-/* ====== Profiles Page ====== */
-.profiles-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-
-.profiles-container h1 {
-  color: #00c8ff;
-}
-
-.profiles {
-  display: flex;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.profiles button {
-  padding: 15px 25px;
-  font-size: 18px;
-  background: #00c8ff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.profiles button:hover {
-  background: #009ec2;
-}
+    window.onload = loadMovies;
+  </script>
+</body>
+</html>
