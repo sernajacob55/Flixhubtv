@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Movie Details</title>
+  <title>Movie Info - FlixHubTV</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,75 +12,70 @@
   </div>
 
   <div class="main">
-    <div id="movieDetails"></div>
+    <div id="movieDetails" class="movie-info"></div>
+    <div id="videoContainer" class="hidden">
+      <button id="closeBtn">✖</button>
+      <video id="moviePlayer" controls></video>
+    </div>
   </div>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const id = parseInt(params.get("id"));
+    // 🔒 Security check: redirect if not logged in
+    if (!localStorage.getItem("flixhubtv_profile")) {
+      window.location.href = "login.html";
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieId = parseInt(urlParams.get("id"));
 
     const movies = [
       {
         id: 1,
         title: "The Matrix",
-        year: 1999,
-        duration: "2h 16m",
         genre: "Sci-Fi",
+        year: 1999,
+        runtime: "2h 16m",
         description: "A computer hacker learns about the true nature of reality and his role in the war against its controllers.",
         cover: "matrix.jpg",
         video: "https://download1351.mediafire.com/3yzrkgjjifhg-kBE2HT1i1X9UAOckBG5zokIOlih39t_HouFQji-qXpatH5FZw4-C20r5fD-Do-cJ7MyM7aRD8Uhz-BWQJcs5amcyCuEtcHjyhO0h9VWx1VfHxjIiSyiHJGpXfJ7VTnSDmR4Snc7RL0MH0eoZtOMVXw0Pr_Jfhb4N3Y/rks796idw5xqo2i/The+Matrix.mp4"
       }
     ];
 
-    const movie = movies.find(m => m.id === id);
-    const container = document.getElementById("movieDetails");
+    const movie = movies.find(m => m.id === movieId);
+    const detailsDiv = document.getElementById("movieDetails");
+    const videoContainer = document.getElementById("videoContainer");
+    const videoPlayer = document.getElementById("moviePlayer");
+    const closeBtn = document.getElementById("closeBtn");
 
-    if (!movie) {
-      container.innerHTML = "<h2>Movie not found</h2>";
-    } else {
-      container.innerHTML = `
-        <div class="movie-info">
-          <img src="${movie.cover}" alt="${movie.title}">
-          <div>
-            <h2>${movie.title}</h2>
-            <p><strong>Year:</strong> ${movie.year}</p>
-            <p><strong>Duration:</strong> ${movie.duration}</p>
-            <p><strong>Genres:</strong> ${movie.genre}</p>
-            <p>${movie.description}</p>
-            <button id="playBtn">▶ Play</button>
-          </div>
-        </div>
-        <div id="videoContainer" class="hidden">
-          <video id="moviePlayer" controls>
-            <source src="${movie.video}" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-          <button id="closeBtn">✖</button>
+    if (movie) {
+      detailsDiv.innerHTML = `
+        <img src="${movie.cover}" alt="${movie.title}">
+        <div>
+          <h2>${movie.title}</h2>
+          <p><strong>Genre:</strong> ${movie.genre}</p>
+          <p><strong>Year:</strong> ${movie.year}</p>
+          <p><strong>Runtime:</strong> ${movie.runtime}</p>
+          <p>${movie.description}</p>
+          <button onclick="playMovie()">▶ Play</button>
         </div>
       `;
-
-      const playBtn = document.getElementById("playBtn");
-      const videoContainer = document.getElementById("videoContainer");
-      const player = document.getElementById("moviePlayer");
-      const closeBtn = document.getElementById("closeBtn");
-
-      playBtn.addEventListener("click", () => {
-        videoContainer.classList.remove("hidden");
-        player.play();
-        if (player.requestFullscreen) {
-          player.requestFullscreen();
-        }
-      });
-
-      closeBtn.addEventListener("click", () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen();
-        }
-        player.pause();
-        player.currentTime = 0;
-        videoContainer.classList.add("hidden");
-      });
+    } else {
+      detailsDiv.innerHTML = "<p>Movie not found.</p>";
     }
+
+    function playMovie() {
+      videoPlayer.src = movie.video;
+      videoContainer.classList.remove("hidden");
+      videoPlayer.requestFullscreen().catch(() => {});
+      videoPlayer.play();
+    }
+
+    closeBtn.onclick = () => {
+      videoPlayer.pause();
+      videoPlayer.src = "";
+      videoContainer.classList.add("hidden");
+      document.exitFullscreen().catch(() => {});
+    };
   </script>
 </body>
 </html>
