@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Movie • FlixHubTV</title>
+  <title>The Matrix • FlixHubTV</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -12,111 +12,73 @@
     <div class="wrapper topbar-inner">
       <h1 id="brand">FlixHubTV</h1>
       <div class="controls">
-        <a href="index.html" class="btn btn-ghost" id="homeBtn">Home</a>
+        <a href="index.html" class="btn btn-ghost">Home</a>
       </div>
     </div>
   </div>
 
+  <!-- Detail Section -->
   <div class="wrapper">
-    <div class="section detail">
-      <!-- Poster -->
-      <img id="poster" class="poster" src="assets/posters/matrix.jpg" alt="Poster" />
-
-      <!-- Meta -->
+    <div class="detail">
+      <img id="poster" class="poster" src="assets/posters/placeholder.jpg" alt="The Matrix Poster" />
       <div class="meta">
         <h2 id="title">The Matrix</h2>
-
         <div class="row">
           <span id="year">Year: 1999</span>
           <span id="duration">Duration: 2h 16m</span>
           <span id="genres">Genres: Sci-Fi</span>
-          <span id="rating" class="muted" style="display:none;"></span>
         </div>
-
         <p id="description" class="desc">
           A computer hacker learns about the true nature of reality and his role in the war against its controllers.
         </p>
-
-        <div id="castBlock" class="muted" style="display:none;">
-          <strong>Cast:</strong> <span id="actors"></span>
+        <div id="castBlock" style="display:none;">
+          <strong>Actors:</strong> <span id="actors"></span>
         </div>
-        <div id="crewBlock" class="muted" style="display:none;">
+        <div id="crewBlock" style="display:none;">
           <strong>Director:</strong> <span id="director"></span>
         </div>
-
-        <div class="actions">
-          <button id="playBtn" class="btn btn-primary" aria-label="Play"
-                  data-video-src="media/matrix.mp4">▶ Play</button>
-        </div>
+        <span id="rating" style="display:none;"></span>
+        <br><br>
+        <button id="playBtn" class="btn btn-primary">▶ Play</button>
       </div>
     </div>
-
-    <div id="legacyPlayerMount" style="display:none;"></div>
   </div>
 
-  <!-- Modal Player -->
-  <div class="modal" id="playerModal" aria-hidden="true" role="dialog">
-    <div class="player-shell" id="playerShell">
-      <button class="player-close" id="closePlayer" aria-label="Close">✕</button>
-      <video id="movieVideo" controls preload="metadata"></video>
+  <!-- Video Modal -->
+  <div id="playerModal" class="modal">
+    <div class="player-shell">
+      <button class="player-close" id="closePlayer">✕</button>
+      <video id="videoPlayer" controls preload="metadata"></video>
     </div>
   </div>
 
   <script>
-    (function () {
-      const qs = new URLSearchParams(location.search);
-      const movieId = qs.get('id');
+    // Matrix MediaFire link
+    const matrixFile = "https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4";
 
-      const modal = document.getElementById('playerModal');
-      const shell = document.getElementById('playerShell');
-      const video = document.getElementById('movieVideo');
-      const playBtn = document.getElementById('playBtn');
-      const closeBtn = document.getElementById('closePlayer');
+    const modal = document.getElementById("playerModal");
+    const video = document.getElementById("videoPlayer");
+    const playBtn = document.getElementById("playBtn");
+    const closeBtn = document.getElementById("closePlayer");
 
-      async function openPlayer() {
-        const src = playBtn?.dataset?.videoSrc || video.getAttribute('src') || '';
-        if (src && video.getAttribute('src') !== src) {
-          video.src = src;
-        }
-
-        modal.classList.add('open');
-        modal.setAttribute('aria-hidden', 'false');
-
-        requestAnimationFrame(async () => {
-          if (shell.requestFullscreen) {
-            try { await shell.requestFullscreen(); } catch (e) {}
-          } else if (shell.webkitRequestFullscreen) {
-            try { shell.webkitRequestFullscreen(); } catch (e) {}
-          }
-          try { await video.play(); } catch (e) {}
-        });
-      }
-
-      async function closePlayer() {
-        if (document.fullscreenElement) {
-          try { await document.exitFullscreen(); } catch (e) {}
-        } else if (document.webkitFullscreenElement) {
-          try { document.webkitExitFullscreen(); } catch (e) {}
-        }
-        modal.classList.remove('open');
-        modal.setAttribute('aria-hidden', 'true');
-        try { video.pause(); } catch (e) {}
-      }
-
-      playBtn?.addEventListener('click', openPlayer);
-      closeBtn?.addEventListener('click', closePlayer);
-      modal.addEventListener('click', (e) => { if (e.target === modal) closePlayer(); });
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closePlayer();
-        if (modal.classList.contains('open') && e.code === 'Space' && !e.repeat) {
-          e.preventDefault();
-          if (video.paused) video.play(); else video.pause();
-        }
+    // Play Matrix
+    playBtn.addEventListener("click", () => {
+      video.src = matrixFile;
+      modal.classList.add("open");
+      video.play().catch(err => {
+        console.log("Autoplay blocked, user must press play:", err);
       });
+    });
 
-      document.body.dataset.movieId = movieId || '';
-    })();
+    // Close player
+    closeBtn.addEventListener("click", () => {
+      video.pause();
+      video.currentTime = 0;
+      modal.classList.remove("open");
+    });
   </script>
+
+  <!-- Metadata fetcher -->
   <script src="movie-metadata.js"></script>
 </body>
 </html>

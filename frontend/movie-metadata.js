@@ -4,7 +4,7 @@
    ========================================================= */
 
 (async function () {
-  const API_KEY = "YOUR_OMDB_API_KEY"; // get one free at http://www.omdbapi.com/apikey.aspx
+  const API_KEY = "ea7569d7"; // ✅ Your OMDb API key
   const API_URL = "https://www.omdbapi.com/";
 
   const els = {

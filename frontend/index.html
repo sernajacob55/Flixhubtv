@@ -23,65 +23,30 @@
     <div class="section">
       <h2>Browse Movies</h2>
       <div class="movie-grid" id="movieGrid">
-        <!-- Movie cards injected here -->
+        <a href="movie.html?id=1" class="card">
+          <img src="assets/posters/placeholder.jpg" alt="The Matrix poster" id="poster-1">
+          <div class="title">The Matrix</div>
+        </a>
       </div>
     </div>
   </div>
 
   <script>
-    // Simple static movie list (extend as you add movies)
-    const movies = [
-      { id: "1", title: "The Matrix" },
-      { id: "2", title: "Inception" },
-      { id: "3", title: "Interstellar" }
-    ];
-
-    const grid = document.getElementById("movieGrid");
-
-    // Build cards dynamically
-    function renderMovies(list) {
-      grid.innerHTML = "";
-      list.forEach(m => {
-        const card = document.createElement("a");
-        card.className = "card";
-        card.href = `movie.html?id=${m.id}`;
-        card.innerHTML = `
-          <img src="assets/posters/placeholder.jpg" alt="${m.title} poster" id="poster-${m.id}">
-          <div class="title">${m.title}</div>
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    // Initial render
-    renderMovies(movies);
-
-    // Search filter
-    const searchInput = document.getElementById("searchInput");
-    searchInput.addEventListener("input", () => {
-      const q = searchInput.value.toLowerCase();
-      const filtered = movies.filter(m => m.title.toLowerCase().includes(q));
-      renderMovies(filtered);
-    });
-
-    // === Step 4 prep: auto metadata fetch for grid posters ===
-    async function fetchPoster(title, id) {
-      const API_KEY = "YOUR_OMDB_API_KEY";
-      const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${API_KEY}`;
+    // Auto-load poster for The Matrix
+    const API_KEY = "ea7569d7"; // your OMDb key
+    async function fetchPoster() {
       try {
+        const url = `https://www.omdbapi.com/?t=${encodeURIComponent("The Matrix")}&apikey=${API_KEY}`;
         const res = await fetch(url);
         const data = await res.json();
         if (data && data.Poster && data.Poster !== "N/A") {
-          const img = document.getElementById(`poster-${id}`);
-          if (img) img.src = data.Poster;
+          document.getElementById("poster-1").src = data.Poster;
         }
       } catch (err) {
-        console.error("Poster fetch failed for", title, err);
+        console.error("Poster fetch failed:", err);
       }
     }
-
-    // Populate posters after render
-    movies.forEach(m => fetchPoster(m.title, m.id));
+    fetchPoster();
   </script>
 </body>
 </html>
