@@ -1,21 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Matrix • FlixHubTV</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Top bar -->
   <div class="topbar">
     <div class="wrapper topbar-inner">
       <h1 id="brand">FlixHubTV</h1>
-      <a href="index.html" class="btn btn-ghost">Home</a>
+
+      <div class="search-container">
+        <input type="text" id="search" placeholder="Search movies or categories...">
+      </div>
+
+      <div class="nav-buttons">
+        <a href="index.html" class="btn btn-ghost">Home</a>
+        <a href="profiles.html" class="btn btn-ghost">Switch</a>
+        <a href="login.html" class="btn btn-ghost">Logout</a>
+      </div>
     </div>
   </div>
 
-  <!-- Movie detail -->
   <div class="wrapper">
     <div class="detail">
       <img id="poster" class="poster" alt="The Matrix Poster">
@@ -32,7 +39,7 @@
     </div>
   </div>
 
-  <!-- Video Player Modal -->
+  <!-- Player Modal -->
   <div id="playerModal" class="modal">
     <div class="player-shell">
       <video id="videoPlayer" preload="metadata">
@@ -53,31 +60,6 @@
     </div>
   </div>
 
-  <!-- Player logic -->
   <script src="player.js"></script>
-
-  <!-- Metadata fetcher -->
-  <script>
-    const API_KEY = "ea7569d7"; // OMDb key
-    async function loadMeta() {
-      try {
-        const url = `https://www.omdbapi.com/?t=${encodeURIComponent("The Matrix")}&apikey=${API_KEY}`;
-        const res = await fetch(url);
-        const data = await res.json();
-
-        if (data.Response === "True") {
-          document.getElementById("poster").src = data.Poster;
-          document.getElementById("title").textContent = data.Title;
-          document.getElementById("year").textContent = `Year: ${data.Year}`;
-          document.getElementById("duration").textContent = `Duration: ${data.Runtime}`;
-          document.getElementById("genre").textContent = `Genres: ${data.Genre}`;
-          document.getElementById("plot").textContent = data.Plot;
-        }
-      } catch (err) {
-        console.error("Metadata fetch failed:", err);
-      }
-    }
-    loadMeta();
-  </script>
 </body>
 </html>

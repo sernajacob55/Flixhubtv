@@ -1,51 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FlixHubTV</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Top bar -->
   <div class="topbar">
     <div class="wrapper topbar-inner">
       <h1 id="brand">FlixHubTV</h1>
-      <div class="controls">
-        <input type="search" id="searchInput" placeholder="Search movies..." />
-        <a href="index.html" class="btn btn-ghost">Home</a>
+
+      <div class="search-container">
+        <input type="text" id="search" placeholder="Search movies or categories...">
+      </div>
+
+      <div class="nav-buttons">
+        <a href="profiles.html" class="btn btn-ghost">Switch</a>
+        <a href="login.html" class="btn btn-ghost">Logout</a>
       </div>
     </div>
   </div>
 
-  <!-- Content -->
   <div class="wrapper">
-    <div class="section">
-      <h2>Browse Movies</h2>
-      <div class="movie-grid" id="movieGrid">
-        <a href="movie.html?id=1" class="card">
-          <img id="poster-1" src="assets/posters/placeholder.jpg" alt="The Matrix poster">
-          <div class="title">The Matrix</div>
-        </a>
-      </div>
+    <h2>Browse Movies</h2>
+    <div class="movies-grid">
+      <a href="movie.html?id=1" class="movie-card">
+        <img src="https://img.omdbapi.com/?t=The+Matrix&apikey=ea7569d7" alt="The Matrix poster">
+        <p>The Matrix</p>
+      </a>
     </div>
   </div>
-
-  <script>
-    const API_KEY = "ea7569d7"; // your OMDb key
-    async function fetchPoster() {
-      try {
-        const url = `https://www.omdbapi.com/?t=${encodeURIComponent("The Matrix")}&apikey=${API_KEY}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data && data.Poster && data.Poster !== "N/A") {
-          document.getElementById("poster-1").src = data.Poster;
-        }
-      } catch (err) {
-        console.error("Poster fetch failed:", err);
-      }
-    }
-    fetchPoster();
-  </script>
 </body>
 </html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profiles - FlixHubTV</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="profiles-container">
+    <h1>Choose Profile</h1>
+    <div class="profiles">
+      <button onclick="selectProfile('Serna')">Serna</button>
+      <button onclick="selectProfile('Whitfield')">Whitfield</button>
+      <button onclick="selectProfile('Brandt')">Brandt</button>
+    </div>
+  </div>
+
+  <script>
+    function selectProfile(name) {
+      localStorage.setItem("flixhubtv_profile", name);
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>

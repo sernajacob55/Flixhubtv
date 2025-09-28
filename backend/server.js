@@ -1,43 +1,92 @@
-const express = require("express");
-const path = require("path");
-const app = express();
-const PORT = process.env.PORT || 3000;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlixHubTV</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1 class="logo">FlixHubTV</h1>
+    <div class="top-bar">
+      <input type="text" id="searchBar" placeholder="Search movies or categories...">
+      <button id="switchProfile">Switch</button>
+      <button id="logout">Logout</button>
+    </div>
+    <div class="categories" id="categoriesBar">
+      <!-- Categories will load dynamically -->
+    </div>
+  </header>
 
-// Serve frontend files
-app.use(express.static(path.join(__dirname, "../frontend")));
+  <main>
+    <section id="all-movies">
+      <h2>All Movies</h2>
+      <div class="movie-grid" id="movieGrid"></div>
+    </section>
+  </main>
 
-// Movie data
-let movies = [
-  {
-    id: 1,
-    title: "The Matrix",
-    year: 1999,
-    duration: "2h 16m",
-    genre: "Sci-Fi",
-    description:
-      "A computer hacker learns about the true nature of reality and his role in the war against its controllers.",
-    cover: "/covers/matrix.jpg", // make sure this exists in frontend/covers/
-    video:
-      "https://download1351.mediafire.com/3yzrkgjjifhg-kBE2HT1i1X9UAOckBG5zokIOlih39t_HouFQji-qXpatH5FZw4-C20r5fD-Do-cJ7MyM7aRD8Uhz-BWQJcs5amcyCuEtcHjyhO0h9VWx1VfHxjIiSyiHJGpXfJ7VTnSDmR4Snc7RL0MH0eoZtOMVXw0Pr_Jfhb4N3Y/rks796idw5xqo2i/The+Matrix.mp4"
-  }
-];
+  <script>
+    let allMovies = [];
 
-// Endpoint to get all movies
-app.get("/api/movies", (req, res) => {
-  res.json(movies);
-});
+    async function fetchMovies() {
+      const res = await fetch("/api/movies");
+      const data = await res.json();
+      allMovies = data;
+      displayMovies(allMovies);
+    }
 
-// Endpoint to get one movie by ID
-app.get("/api/movies/:id", (req, res) => {
-  const movie = movies.find((m) => m.id == req.params.id);
-  if (movie) {
-    res.json(movie);
-  } else {
-    res.status(404).json({ error: "Movie not found" });
-  }
-});
+    async function fetchCategories() {
+      const res = await fetch("/api/categories");
+      const categories = await res.json();
+      const categoriesBar = document.getElementById("categoriesBar");
+      categoriesBar.innerHTML = "";
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+      categories.forEach(cat => {
+        const btn = document.createElement("button");
+        btn.textContent = cat;
+        btn.onclick = () => filterMovies(cat);
+        categoriesBar.appendChild(btn);
+      });
+    }
+
+    function displayMovies(movies) {
+      const grid = document.getElementById("movieGrid");
+      grid.innerHTML = "";
+      movies.forEach(movie => {
+        const tile = document.createElement("div");
+        tile.classList.add("movie-tile");
+        tile.innerHTML = `
+          <img src="${movie.cover}" alt="${movie.title}">
+          <p>${movie.title}</p>
+        `;
+        tile.onclick = () => {
+          window.location.href = `movie.html?id=${movie.id}`;
+        };
+        grid.appendChild(tile);
+      });
+    }
+
+    function filterMovies(category) {
+      if (category === "All") {
+        displayMovies(allMovies);
+      } else {
+        const filtered = allMovies.filter(movie => movie.genre.includes(category));
+        displayMovies(filtered);
+      }
+    }
+
+    document.getElementById("searchBar").addEventListener("input", (e) => {
+      const query = e.target.value.toLowerCase();
+      const filtered = allMovies.filter(movie =>
+        movie.title.toLowerCase().includes(query) ||
+        movie.genre.toLowerCase().includes(query)
+      );
+      displayMovies(filtered);
+    });
+
+    fetchMovies();
+    fetchCategories();
+  </script>
+</body>
+</html>
