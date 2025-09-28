@@ -1,12 +1,17 @@
 {
-  "name": "sernajacob55",
+  "name": "flixhubtv",
   "version": "1.0.0",
-  "description": "Personal streaming service",
+  "description": "Netflix/Plex-style streaming frontend with backend server",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js"
   },
   "dependencies": {
-    "express": "^4.21.0"
-  }
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "author": "Jacob Serna",
+  "license": "MIT"
 }
