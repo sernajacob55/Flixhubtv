@@ -1,157 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Movie Details - FlixhubTV</title>
-  <link rel="icon" type="image/png" href="/favicon.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlixHubTV - Movie</title>
+  <link rel="stylesheet" href="styles.css">
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #0b0b0b;
-      color: white;
-      display: flex;
-      min-height: 100vh;
+      background-color: #111;
+      color: #fff;
     }
-
-    /* Sidebar */
+    .container {
+      display: flex;
+    }
     .sidebar {
       width: 200px;
-      background: #111;
+      background: #000;
+      height: 100vh;
       padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+      box-sizing: border-box;
     }
-    .logo {
-      font-size: 28px;
-      font-weight: bold;
-      color: #26c6da;
-      margin-bottom: 30px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
+    .sidebar h1 {
+      font-size: 22px;
+      color: #00bcd4;
+      margin-bottom: 40px;
     }
-    .back-btn {
-      background: #26c6da;
-      color: #000;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: bold;
-      margin-bottom: 20px;
-      transition: background 0.2s ease;
+    .sidebar a {
+      display: block;
+      margin: 15px 0;
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
     }
-    .back-btn:hover {
-      background: #1fa1b6;
+    .sidebar a:hover {
+      color: #00bcd4;
     }
-
-    /* Main content */
-    .container {
+    .main {
       flex: 1;
-      display: flex;
-      gap: 40px;
       padding: 40px;
     }
-    .cover img {
-      width: 300px;
-      border-radius: 10px;
-      box-shadow: 0px 0px 20px rgba(0,0,0,0.7);
+    .movie-details {
+      display: flex;
+      align-items: flex-start;
     }
-    .info {
-      flex: 1;
-      max-width: 600px;
+    .movie-details img {
+      width: 250px;
+      border-radius: 8px;
+      margin-right: 20px;
     }
-    .info h1 {
-      margin: 0;
-      font-size: 2.2em;
+    .movie-info h2 {
+      margin: 0 0 10px;
     }
-    .meta {
-      margin: 10px 0;
-      color: #bbb;
-    }
-    .description {
-      margin: 20px 0;
-      line-height: 1.5em;
+    .movie-info p {
+      margin: 6px 0;
     }
     .play-btn {
-      padding: 12px 24px;
-      background: #e50914;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #00bcd4;
       border: none;
       border-radius: 5px;
-      color: white;
-      font-size: 1.1em;
       cursor: pointer;
-      transition: background 0.2s ease;
+      font-size: 16px;
+      color: #000;
     }
     .play-btn:hover {
-      background: #b00610;
+      background: #0097a7;
     }
     video {
-      width: 100%;
       margin-top: 20px;
-      border-radius: 10px;
+      width: 100%;
+      max-width: 1000px;
+      border-radius: 8px;
+      background: black;
     }
   </style>
 </head>
 <body>
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="logo">FlixHubTV</div>
-    <button class="back-btn" onclick="window.location.href='index.html'">← Back to Home</button>
-  </div>
-
-  <!-- Main content -->
   <div class="container">
-    <div class="cover">
-      <img id="movieCover" src="" alt="Movie Cover">
+    <div class="sidebar">
+      <h1>FlixHubTV</h1>
+      <a href="index.html">🏠 Home</a>
     </div>
-    <div class="info">
-      <h1 id="movieTitle"></h1>
-      <div class="meta" id="movieMeta"></div>
-      <div class="description" id="movieDescription"></div>
-      <button class="play-btn" id="playBtn">▶ Play</button>
-      <video id="moviePlayer" controls style="display:none;"></video>
+    <div class="main">
+      <div id="movie-container"></div>
     </div>
   </div>
 
   <script>
-    // Get movie ID from URL (?id=matrix)
-    const params = new URLSearchParams(window.location.search);
-    const movieId = params.get("id");
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieId = urlParams.get("id");
 
-    // Fetch movies from backend
-    fetch("/api/movies")
-      .then(res => res.json())
-      .then(movies => {
-        const movie = movies.find(m => m.id === movieId);
-        if (!movie) {
-          document.body.innerHTML = "<h1>Movie not found</h1>";
-          return;
+    function setupVideoEndHandler(videoElement, redirectUrl) {
+      videoElement.addEventListener("ended", () => {
+        // Exit fullscreen smoothly
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        } else if (document.webkitFullscreenElement) {
+          document.webkitExitFullscreen();
+        } else if (document.msFullscreenElement) {
+          document.msExitFullscreen();
         }
-
-        // Fill in details
-        document.getElementById("movieCover").src = movie.cover;
-        document.getElementById("movieTitle").textContent = movie.title;
-        document.getElementById("movieMeta").textContent =
-          `${movie.year} • ${movie.duration} • ${movie.rating}`;
-        document.getElementById("movieDescription").textContent = movie.description;
-
-        // Play button handler
-        const playBtn = document.getElementById("playBtn");
-        const player = document.getElementById("moviePlayer");
-
-        playBtn.onclick = () => {
-          playBtn.style.display = "none";
-          player.style.display = "block";
-          player.src = movie.url;
-          player.play();
-          player.requestFullscreen();
-        };
+        // Redirect back to details
+        window.location.href = redirectUrl;
       });
+    }
+
+    // === CASE 1: Direct Play Mode ===
+    if (movieId === "play") {
+      const videoSrc = urlParams.get("src");
+      document.getElementById("movie-container").innerHTML = `
+        <video id="autoVideo" controls autoplay>
+          <source src="${videoSrc}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      `;
+
+      const videoElement = document.getElementById("autoVideo");
+      videoElement.addEventListener("canplay", () => {
+        setTimeout(() => {
+          if (videoElement.requestFullscreen) {
+            videoElement.requestFullscreen().catch(() => {});
+          } else if (videoElement.webkitRequestFullscreen) {
+            videoElement.webkitRequestFullscreen();
+          } else if (videoElement.msRequestFullscreen) {
+            videoElement.msRequestFullscreen();
+          }
+        }, 500);
+      });
+
+      // When video ends, go back to home
+      setupVideoEndHandler(videoElement, "index.html");
+    }
+    // === CASE 2: Normal Details Page ===
+    else {
+      fetch(`/api/movies/${movieId}`)
+        .then(res => res.json())
+        .then(movie => {
+          if (movie.error) {
+            document.getElementById("movie-container").innerHTML = "<h1>Movie not found</h1>";
+          } else {
+            const genres = Array.isArray(movie.genre) ? movie.genre.join(", ") : movie.genre;
+            document.getElementById("movie-container").innerHTML = `
+              <div class="movie-details">
+                <img src="${movie.cover}" alt="${movie.title}">
+                <div class="movie-info">
+                  <h2>${movie.title}</h2>
+                  <p><strong>Year:</strong> ${movie.year}</p>
+                  <p><strong>Duration:</strong> ${movie.duration}</p>
+                  <p><strong>Genres:</strong> ${genres}</p>
+                  <p>${movie.description}</p>
+                  <button class="play-btn" onclick="playMovie('${movie.video}', ${movie.id})">▶ Play</button>
+                </div>
+              </div>
+              <div id="video-player"></div>
+            `;
+          }
+        });
+    }
+
+    function playMovie(videoUrl, movieId) {
+      document.getElementById("video-player").innerHTML = `
+        <video id="manualVideo" controls autoplay>
+          <source src="${videoUrl}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      `;
+
+      const videoElement = document.getElementById("manualVideo");
+
+      // Enter fullscreen
+      if (videoElement.requestFullscreen) {
+        videoElement.requestFullscreen().catch(() => {});
+      } else if (videoElement.webkitRequestFullscreen) {
+        videoElement.webkitRequestFullscreen();
+      } else if (videoElement.msRequestFullscreen) {
+        videoElement.msRequestFullscreen();
+      }
+
+      // Redirect back to movie details when finished
+      setupVideoEndHandler(videoElement, `movie.html?id=${movieId}`);
+    }
   </script>
 </body>
 </html>
