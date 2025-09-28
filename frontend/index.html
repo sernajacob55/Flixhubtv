@@ -1,127 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FlixHubTV</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Header -->
-  <header>
-    <h1>FlixHubTV</h1>
-  </header>
-
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <input type="text" id="searchBar" placeholder="Search movies or categories..." onkeyup="searchMovies()">
-    <button id="switchProfile" onclick="switchProfile()">Switch</button>
-    <button id="logoutBtn" onclick="logout()">Logout</button>
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="wrapper topbar-inner">
+      <h1 id="brand">FlixHubTV</h1>
+      <div class="controls">
+        <input type="search" id="searchInput" placeholder="Search movies..." />
+        <a href="index.html" class="btn btn-ghost">Home</a>
+      </div>
+    </div>
   </div>
 
-  <!-- Categories -->
-  <div class="categories">
-    <button onclick="filterCategory('all')">All</button>
-    <button onclick="filterCategory('Action')">Action</button>
-    <button onclick="filterCategory('Comedy')">Comedy</button>
-    <button onclick="filterCategory('Drama')">Drama</button>
-    <button onclick="filterCategory('Horror')">Horror</button>
-    <button onclick="filterCategory('Romance')">Romance</button>
-    <button onclick="filterCategory('Sci-Fi')">Sci-Fi</button>
-    <button onclick="filterCategory('Thriller')">Thriller</button>
-    <button onclick="filterCategory('Animation')">Animation</button>
-    <button onclick="filterCategory('Documentary')">Documentary</button>
+  <!-- Content -->
+  <div class="wrapper">
+    <div class="section">
+      <h2>Browse Movies</h2>
+      <div class="movie-grid" id="movieGrid">
+        <!-- Movie cards injected here -->
+      </div>
+    </div>
   </div>
-
-  <!-- Movies Container -->
-  <div id="moviesContainer"></div>
 
   <script>
-    // Example movies
+    // Simple static movie list (extend as you add movies)
     const movies = [
-      {
-        id: 1,
-        title: "The Matrix",
-        year: "1999",
-        duration: "2h 16m",
-        genre: "Sci-Fi",
-        description: "A computer hacker learns about the true nature of reality and his role in the war against its controllers.",
-        cover: "covers/matrix.jpg",
-        video: "https://download1351.mediafire.com/3yzrkgjjifhg-kBE2HT1i1X9UAOckBG5zokIOlih39t_HouFQji-qXpatH5FZw4-C20r5fD-Do-cJ7MyM7aRD8Uhz-BWQJcs5amcyCuEtcHjyhO0h9VWx1VfHxjIiSyiHJGpXfJ7VTnSDmR4Snc7RL0MH0eoZtOMVXw0Pr_Jfhb4N3Y/rks796idw5xqo2i/The+Matrix.mp4"
-      }
+      { id: "1", title: "The Matrix" },
+      { id: "2", title: "Inception" },
+      { id: "3", title: "Interstellar" }
     ];
 
-    // Load movies
-    function loadMovies() {
-      const container = document.getElementById('moviesContainer');
-      container.innerHTML = '';
-      movies.forEach(movie => {
-        const tile = document.createElement('div');
-        tile.classList.add('movie-tile');
-        tile.innerHTML = `
-          <img src="${movie.cover}" alt="${movie.title}">
-          <p>${movie.title}</p>
+    const grid = document.getElementById("movieGrid");
+
+    // Build cards dynamically
+    function renderMovies(list) {
+      grid.innerHTML = "";
+      list.forEach(m => {
+        const card = document.createElement("a");
+        card.className = "card";
+        card.href = `movie.html?id=${m.id}`;
+        card.innerHTML = `
+          <img src="assets/posters/placeholder.jpg" alt="${m.title} poster" id="poster-${m.id}">
+          <div class="title">${m.title}</div>
         `;
-        tile.onclick = () => {
-          window.location.href = `movie.html?id=${movie.id}`;
-        };
-        container.appendChild(tile);
+        grid.appendChild(card);
       });
     }
 
-    // Filter by category
-    function filterCategory(category) {
-      const container = document.getElementById('moviesContainer');
-      container.innerHTML = '';
-      const filtered = category === 'all' ? movies : movies.filter(m => m.genre === category);
-      filtered.forEach(movie => {
-        const tile = document.createElement('div');
-        tile.classList.add('movie-tile');
-        tile.innerHTML = `
-          <img src="${movie.cover}" alt="${movie.title}">
-          <p>${movie.title}</p>
-        `;
-        tile.onclick = () => {
-          window.location.href = `movie.html?id=${movie.id}`;
-        };
-        container.appendChild(tile);
-      });
+    // Initial render
+    renderMovies(movies);
+
+    // Search filter
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("input", () => {
+      const q = searchInput.value.toLowerCase();
+      const filtered = movies.filter(m => m.title.toLowerCase().includes(q));
+      renderMovies(filtered);
+    });
+
+    // === Step 4 prep: auto metadata fetch for grid posters ===
+    async function fetchPoster(title, id) {
+      const API_KEY = "YOUR_OMDB_API_KEY";
+      const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${API_KEY}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data && data.Poster && data.Poster !== "N/A") {
+          const img = document.getElementById(`poster-${id}`);
+          if (img) img.src = data.Poster;
+        }
+      } catch (err) {
+        console.error("Poster fetch failed for", title, err);
+      }
     }
 
-    // Search function
-    function searchMovies() {
-      const query = document.getElementById('searchBar').value.toLowerCase();
-      const container = document.getElementById('moviesContainer');
-      container.innerHTML = '';
-      const filtered = movies.filter(movie =>
-        movie.title.toLowerCase().includes(query) ||
-        movie.genre.toLowerCase().includes(query)
-      );
-      filtered.forEach(movie => {
-        const tile = document.createElement('div');
-        tile.classList.add('movie-tile');
-        tile.innerHTML = `
-          <img src="${movie.cover}" alt="${movie.title}">
-          <p>${movie.title}</p>
-        `;
-        tile.onclick = () => {
-          window.location.href = `movie.html?id=${movie.id}`;
-        };
-        container.appendChild(tile);
-      });
-    }
-
-    // Switch profile
-    function switchProfile() {
-      window.location.href = "profiles.html";
-    }
-
-    // Logout
-    function logout() {
-      window.location.href = "login.html";
-    }
-
-    window.onload = loadMovies;
+    // Populate posters after render
+    movies.forEach(m => fetchPoster(m.title, m.id));
   </script>
 </body>
 </html>
