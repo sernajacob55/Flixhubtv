@@ -24,7 +24,7 @@
       <h2>Browse Movies</h2>
       <div class="movie-grid" id="movieGrid">
         <a href="movie.html?id=1" class="card">
-          <img src="assets/posters/placeholder.jpg" alt="The Matrix poster" id="poster-1">
+          <img id="poster-1" src="assets/posters/placeholder.jpg" alt="The Matrix poster">
           <div class="title">The Matrix</div>
         </a>
       </div>
@@ -32,7 +32,6 @@
   </div>
 
   <script>
-    // Auto-load poster for The Matrix
     const API_KEY = "ea7569d7"; // your OMDb key
     async function fetchPoster() {
       try {
