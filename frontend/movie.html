@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Header -->
   <header>
     <h1>Flix<span>HubTV</span></h1>
     <div class="nav-buttons">
@@ -16,85 +17,189 @@
     </div>
   </header>
 
-  <main class="main-content">
-    <div id="movieInfo"></div>
-    <button class="watchlist-btn" id="watchlistBtn">+ Add to Watchlist</button>
-    <button class="continue-btn" id="playBtn">▶ Play</button>
-  </main>
+  <!-- Page wrapper -->
+  <div class="page">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="leftSidebar" aria-label="Genres">
+      <h3>Genres</h3>
+      <ul>
+        <li data-filter="all">All</li>
+        <li data-filter="Action">Action</li>
+        <li data-filter="Sci-Fi">Sci-Fi</li>
+      </ul>
+    </aside>
 
+    <!-- Main content -->
+    <main class="main-content" id="movieContent">
+      <section id="movieDetails">
+        <img id="moviePoster" alt="Movie Poster"/>
+        <div>
+          <h2 id="movieTitle"></h2>
+          <p><strong>Genre:</strong> <span id="movieGenre"></span></p>
+          <p><strong>Runtime:</strong> <span id="movieRuntime"></span></p>
+          <p id="moviePlot"></p>
+
+          <button id="watchlistBtn">+ Add to Watchlist</button>
+          <button id="playBtn">▶ Play</button>
+        </div>
+      </section>
+
+      <!-- Cast -->
+      <section id="castSection">
+        <h3>Cast</h3>
+        <div id="castGrid"></div>
+      </section>
+
+      <!-- Recommended Movies -->
+      <section id="recommendations">
+        <h3>Recommended</h3>
+        <div id="recommendGrid"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Footer -->
   <footer>
-    <p>&copy; 2025 FlixHubTV. All rights reserved.</p>
+    © 2025 FlixHubTV. All rights reserved.
   </footer>
 
-  <div id="playerContainer" class="video-player" style="display:none;">
-    <button class="close-btn" onclick="closePlayer()">✕</button>
-    <video id="videoPlayer" controls></video>
+  <!-- Fullscreen Player -->
+  <div id="videoPlayer" class="fullscreen" style="display: none;">
+    <button id="exitFullscreen" class="exit-fullscreen">X</button>
+    <video id="movieVideo" controls autoplay></video>
   </div>
 
   <script>
-    const OMDB_KEY = "ea7569d7";
-    const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f";
+    /**************
+     * API KEYS
+     **************/
+    const OMDB_KEY = "ea7569d7"; // OMDb
+    const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f"; // TMDb
 
+    /**************
+     * URL PARAMS
+     **************/
     const urlParams = new URLSearchParams(window.location.search);
     const imdbID = urlParams.get("id");
 
-    const movieInfo = document.getElementById("movieInfo");
-    const videoPlayer = document.getElementById("videoPlayer");
-
-    // Map imdbID to MediaFire links
-    const mediaLinks = {
-      "tt0133093": "https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4",
-      "tt0118928": "https://download1324.mediafire.com/cd5ev8gxoajggy5dbp_1pagixal-14NXp2krW0s3WdxiRxacbt_tmKEN5wBSXGhBxaHmQRL6a_oqit-_4Uqm6r7Th8gd02jAsy_iWXSiGUZejYG1i7-rTMQrhWr5Q8OQan-9adl7oEEEJK7mmWiPIvTIT_iyRk3hboxiQfNDUHmnI0Q/jtd07wddlls76o2/Dantes+Peak.mp4"
-    };
-
-    // Load metadata
-    fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`)
-      .then(r => r.json())
-      .then(data => {
-        movieInfo.innerHTML = `
-          <h2>${data.Title} (${data.Year})</h2>
-          <p><strong>Genre:</strong> ${data.Genre}</p>
-          <p><strong>Runtime:</strong> ${data.Runtime}</p>
-          <p>${data.Plot}</p>
-          <img src="${data.Poster}" alt="${data.Title} poster">
-        `;
+    /**************
+     * Sidebar Hover
+     **************/
+    (function setupSidebarShift() {
+      const sidebar = document.getElementById('leftSidebar');
+      if (!sidebar) return;
+      sidebar.addEventListener('mouseenter', () => {
+        document.body.classList.add('sidebar-open');
       });
+      sidebar.addEventListener('mouseleave', () => {
+        document.body.classList.remove('sidebar-open');
+      });
+    })();
 
-    // Watchlist button
+    /**************
+     * Load Movie Metadata (OMDb)
+     **************/
+    async function loadMovieDetails() {
+      if (!imdbID) return;
+
+      const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
+      const data = await res.json();
+
+      document.getElementById("moviePoster").src = data.Poster !== "N/A" ? data.Poster : "placeholder.jpg";
+      document.getElementById("movieTitle").textContent = `${data.Title} (${data.Year})`;
+      document.getElementById("movieGenre").textContent = data.Genre;
+      document.getElementById("movieRuntime").textContent = data.Runtime;
+      document.getElementById("moviePlot").textContent = data.Plot;
+    }
+
+    /**************
+     * Load Cast (TMDb)
+     **************/
+    async function loadCast() {
+      if (!imdbID) return;
+
+      const tmdbRes = await fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_KEY}&external_source=imdb_id`);
+      const tmdbData = await tmdbRes.json();
+      if (!tmdbData.movie_results.length) return;
+
+      const movieId = tmdbData.movie_results[0].id;
+      const creditsRes = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${TMDB_KEY}`);
+      const creditsData = await creditsRes.json();
+
+      const castGrid = document.getElementById("castGrid");
+      creditsData.cast.slice(0, 6).forEach(actor => {
+        const div = document.createElement("div");
+        div.className = "actor-card";
+        div.innerHTML = `
+          <img src="https://image.tmdb.org/t/p/w200${actor.profile_path}" alt="${actor.name}" />
+          <p>${actor.name}</p>
+        `;
+        castGrid.appendChild(div);
+      });
+    }
+
+    /**************
+     * Load Recommendations (TMDb)
+     **************/
+    async function loadRecommendations() {
+      if (!imdbID) return;
+
+      const tmdbRes = await fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_KEY}&external_source=imdb_id`);
+      const tmdbData = await tmdbRes.json();
+      if (!tmdbData.movie_results.length) return;
+
+      const movieId = tmdbData.movie_results[0].id;
+      const recRes = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/recommendations?api_key=${TMDB_KEY}`);
+      const recData = await recRes.json();
+
+      const recGrid = document.getElementById("recommendGrid");
+      recData.results.slice(0, 6).forEach(rec => {
+        const div = document.createElement("div");
+        div.className = "movie-card";
+        div.innerHTML = `
+          <a href="movie.html?id=${rec.id}">
+            <img src="https://image.tmdb.org/t/p/w200${rec.poster_path}" alt="${rec.title}" />
+            <h3>${rec.title}</h3>
+          </a>
+        `;
+        recGrid.appendChild(div);
+      });
+    }
+
+    /**************
+     * Watchlist
+     **************/
     const watchlistBtn = document.getElementById("watchlistBtn");
     watchlistBtn.addEventListener("click", () => {
-      let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
-      if (watchlist.includes(imdbID)) {
-        watchlist = watchlist.filter(id => id !== imdbID);
-        watchlistBtn.textContent = "+ Add to Watchlist";
-      } else {
-        watchlist.push(imdbID);
-        watchlistBtn.textContent = "✓ In Watchlist";
-      }
-      localStorage.setItem("watchlist", JSON.stringify(watchlist));
+      watchlistBtn.textContent = watchlistBtn.textContent.includes("Add")
+        ? "✓ Added to Watchlist"
+        : "+ Add to Watchlist";
     });
 
-    // Play button
+    /**************
+     * Fullscreen Player
+     **************/
     document.getElementById("playBtn").addEventListener("click", () => {
-      const link = mediaLinks[imdbID];
-      if (link) {
-        document.getElementById("playerContainer").style.display = "flex";
-        videoPlayer.src = link;
-        videoPlayer.play();
-        videoPlayer.requestFullscreen();
-      }
+      const player = document.getElementById("videoPlayer");
+      const video = document.getElementById("movieVideo");
+      video.src = imdbID === "tt0133093"
+        ? "https://download1324.mediafire.com/.../TheMatrix.mp4"
+        : "https://download1324.mediafire.com/.../DantesPeak.mp4";
+      player.style.display = "block";
+      video.play();
     });
 
-    // Close player
-    function closePlayer() {
-      const container = document.getElementById("playerContainer");
-      container.style.display = "none";
-      videoPlayer.pause();
-      videoPlayer.src = "";
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      }
-    }
+    document.getElementById("exitFullscreen").addEventListener("click", () => {
+      document.getElementById("videoPlayer").style.display = "none";
+      document.getElementById("movieVideo").pause();
+    });
+
+    /**************
+     * Init
+     **************/
+    loadMovieDetails();
+    loadCast();
+    loadRecommendations();
   </script>
 </body>
 </html>
