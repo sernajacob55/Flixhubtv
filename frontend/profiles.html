@@ -1,43 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profiles - FlixHubTV</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Navbar -->
-  <div class="navbar">
-    <div class="logo">Flix<span>HubTV</span></div>
-    <div class="nav-actions">
-      <button onclick="window.location.href='login.html'" class="nav-btn">Logout</button>
-    </div>
-  </div>
+  <header>
+    <div class="logo">Flix<span>Hub</span>TV</div>
+    <nav>
+      <button onclick="window.location.href='login.html'">Logout</button>
+    </nav>
+  </header>
 
-  <!-- Profiles Section -->
-  <main class="profile-container">
+  <main class="profiles-container">
     <h2>Choose Your Profile</h2>
-    <div class="profiles-container">
-      <div class="profile-card" onclick="selectProfile('Serna')">
-        <img src="https://via.placeholder.com/150/00e5ff/000000?text=S" alt="Serna" />
-        <h3>Serna</h3>
+    <div class="profile-grid">
+      <div class="profile-box" onclick="selectProfile('Serna')">
+        <span>Serna</span>
       </div>
-      <div class="profile-card" onclick="selectProfile('Whitfield')">
-        <img src="https://via.placeholder.com/150/00e5ff/000000?text=W" alt="Whitfield" />
-        <h3>Whitfield</h3>
+      <div class="profile-box" onclick="selectProfile('Whitfield')">
+        <span>Whitfield</span>
       </div>
-      <div class="profile-card" onclick="selectProfile('Brandt')">
-        <img src="https://via.placeholder.com/150/00e5ff/000000?text=B" alt="Brandt" />
-        <h3>Brandt</h3>
+      <div class="profile-box" onclick="selectProfile('Brandt')">
+        <span>Brandt</span>
       </div>
     </div>
   </main>
 
   <script>
-    function selectProfile(profile) {
-      localStorage.setItem("activeProfile", profile);
-      // ✅ Redirect straight to Browse after selection
+    function selectProfile(name) {
+      localStorage.setItem("activeProfile", name);
       window.location.href = "index.html";
     }
   </script>

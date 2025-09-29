@@ -2,90 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FlixHubTV</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="sidebar">
+    <h3>Genres</h3>
+    <ul>
+      <li><a href="#">All</a></li>
+      <li><a href="#">Action</a></li>
+      <li><a href="#">Sci-Fi</a></li>
+    </ul>
+  </div>
+
   <header>
-    <h1 class="logo">FlixHubTV</h1>
+    <div class="logo">Flix<span>Hub</span>TV</div>
     <nav>
-      <input type="text" id="searchInput" placeholder="Search movies...">
+      <input type="text" placeholder="Search movies...">
       <button onclick="window.location.href='profiles.html'">Switch Profile</button>
-      <button onclick="logout()">Logout</button>
+      <button onclick="window.location.href='login.html'">Logout</button>
       <button onclick="window.location.href='index.html'">Home</button>
     </nav>
   </header>
 
-  <main>
+  <main class="main-content">
     <h2 id="welcome"></h2>
-    <section id="movie-list" class="movie-grid"></section>
+    <div class="movies-grid">
+      <div class="movie-card">
+        <a href="movie.html?id=tt0133093">
+          <img src="https://m.media-amazon.com/images/M/MV5BNzQzOTk3NjAtNDQ0ZC00ZGVlLTlmNjYtY2Q5YzBiYjE3MzNkXkEyXkFqcGc@._V1_SX300.jpg" alt="The Matrix">
+          <p>The Matrix</p>
+        </a>
+      </div>
+    </div>
   </main>
 
   <script>
-    const omdbKey = "ea7569d7";  // ✅ OMDb key
-    const tmdbKey = "a2942c822ee97bc0df2dba1a65cf2d0f"; // ✅ TMDb key
-
-    // Show welcome message
-    const profile = localStorage.getItem("currentProfile");
-    if (profile) {
-      document.getElementById("welcome").innerText = `Welcome, ${profile}`;
-    }
-
-    // Starter movies
-    const starterMovies = ["The Matrix", "Inception", "Interstellar"];
-
-    async function loadMovies() {
-      const movieList = document.getElementById("movie-list");
-      movieList.innerHTML = "";
-
-      for (let title of starterMovies) {
-        const res = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${omdbKey}`);
-        const movie = await res.json();
-
-        if (movie.Response === "True") {
-          movieList.innerHTML += `
-            <div class="movie-card" onclick="window.location.href='movie.html?id=${movie.imdbID}'">
-              <img src="${movie.Poster}" alt="${movie.Title}">
-              <p>${movie.Title}</p>
-            </div>
-          `;
-        }
-      }
-    }
-
-    // Search via OMDb
-    document.getElementById("searchInput").addEventListener("keyup", async (e) => {
-      if (e.key === "Enter") {
-        const query = e.target.value.trim();
-        if (!query) return;
-
-        const res = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(query)}&apikey=${omdbKey}`);
-        const data = await res.json();
-
-        const movieList = document.getElementById("movie-list");
-        movieList.innerHTML = "";
-
-        if (data.Response === "True") {
-          data.Search.forEach(movie => {
-            movieList.innerHTML += `
-              <div class="movie-card" onclick="window.location.href='movie.html?id=${movie.imdbID}'">
-                <img src="${movie.Poster !== "N/A" ? movie.Poster : "placeholder.jpg"}" alt="${movie.Title}">
-                <p>${movie.Title}</p>
-              </div>
-            `;
-          });
-        } else {
-          movieList.innerHTML = `<p>No results found.</p>`;
-        }
-      }
-    });
-
-    function logout() {
-      localStorage.removeItem("currentProfile");
-      window.location.href = "login.html";
-    }
-
-    loadMovies();
+    document.getElementById("welcome").innerText =
+      "Welcome, " + (localStorage.getItem("activeProfile") || "Guest");
   </script>
 </body>
 </html>

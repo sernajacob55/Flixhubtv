@@ -1,154 +1,60 @@
-\# FlixHubTV 🎬
+# 📺 FlixHubTV
 
-
-
-A lightweight Plex/Netflix-style streaming interface built with HTML, CSS, and JavaScript.  
-
-Supports fullscreen video playback and auto-pulls movie metadata (actors, director, rating, poster, plot) from the OMDb API.
-
-
+A Plex/Netflix-style movie streaming interface built with **HTML, CSS, and JavaScript**.  
+Supports **user profiles, watchlist, full-screen video player, cast details, and recommendations**.
 
 ---
 
-
-
-\## 🚀 Features
-
-\- Netflix/Plex-inspired \*\*UI with gradient background\*\*
-
-\- \*\*Movie grid\*\* with search filtering
-
-\- \*\*Fullscreen video modal\*\* (close button stays visible)
-
-\- \*\*Auto metadata fetch\*\* via OMDb API (actors, director, plot, rating, poster)
-
-\- Easy to extend: add new movies with just one line
-
-
+## ✨ Features
+- 🔑 Login & Profiles — choose your profile and manage watchlist per user  
+- 🎬 Dynamic Movies — posters, descriptions, genres, runtime pulled from OMDb API  
+- ⭐ Cast Section — actor photos and names pulled from TMDb API  
+- 🎯 Recommendations — suggested movies via TMDb recommendations endpoint  
+- 📂 Sidebar — autohide sidebar with genre filters  
+- 📝 Watchlist — add/remove movies (stored in localStorage)  
+- ▶ Video Player — plays your MediaFire-hosted MP4s in full true fullscreen  
+- 🎨 Style — Netflix-inspired dark gradient theme with neon cyan scrub bar  
 
 ---
 
+## 🔑 API Keys
+- OMDb → `ea7569d7` (for title, poster, runtime, genre, plot)  
+- TMDb → `a2942c822ee97bc0df2dba1a65cf2d0f` (for cast photos & recommendations)  
 
-
-\## 📂 Folder Structure
-
-frontend/
-
-├── index.html            # Main movie grid  
-
-├── movie.html            # Individual movie detail/player page  
-
-├── style.css             # Unified Netflix/Plex-inspired theme  
-
-├── movie-metadata.js     # Metadata fetcher script  
-
-└── assets/  
-
-&nbsp;   └── posters/          # Local poster placeholders  
-
-
+Keys are already hardcoded in `index.html` and `movie.html`.
 
 ---
 
+## 🚀 Usage
+1. Clone the repo and install dependencies:  
+   $ git clone <your-repo-url>  
+   $ cd FlixHubTV  
+   $ npm install  
 
+2. Start the server:  
+   $ npm start  
 
-\## 🔑 Setup
-
-
-
-1\. Clone the repository:
-
-&nbsp;  git clone https://github.com/yourusername/flixhubtv.git  
-
-&nbsp;  cd flixhubtv  
-
-
-
-2\. Place your video files in `frontend/media/`.
-
-
-
-3\. Get a free OMDb API key:
-
-&nbsp;  - Go to http://www.omdbapi.com/apikey.aspx  
-
-&nbsp;  - Sign up for the free plan  
-
-&nbsp;  - Copy your API key  
-
-
-
-4\. Add your API key into:
-
-&nbsp;  - `frontend/movie-metadata.js`
-
-&nbsp;  - `frontend/index.html`
-
-&nbsp;  Example line:  
-
-&nbsp;  const API\_KEY = "YOUR\_OMDB\_API\_KEY";
-
-
+3. Open in browser:  
+   http://localhost:5000  
 
 ---
 
-
-
-\## ➕ Adding New Movies
-
-1\. Add your video file to `frontend/media/`.  
-
-2\. Add a new entry in the `movies` array inside `index.html`:  
-
-&nbsp;  const movies = \[  
-
-&nbsp;    { id: "1", title: "The Matrix" },  
-
-&nbsp;    { id: "2", title: "Inception" },  
-
-&nbsp;    { id: "3", title: "Interstellar" },  
-
-&nbsp;    { id: "4", title: "Your New Movie" }   // <--- add here  
-
-&nbsp;  ];  
-
-
-
-3\. That’s it! Posters + metadata will auto-pull from OMDb using the title.
-
-
+## 📂 File Structure
+FlixHubTV/  
+├── index.html          # Home page (movie list + search)  
+├── movie.html          # Movie details page (metadata, cast, recommendations)  
+├── login.html          # Login screen  
+├── profiles.html       # Profile selection  
+├── player.js           # Handles sidebar, video player, watchlist  
+├── style.css           # Full site styling (Netflix/Plex inspired)  
+├── server.js           # Node.js backend  
+├── package.json        # Project config  
+├── README.md           # Documentation  
+└── .gitignore  
 
 ---
 
-
-
-\## 🖥️ Running
-
-Just open `frontend/index.html` in your browser.  
-
-No backend required (all client-side).
-
-
-
----
-
-
-
-\## 📌 Notes
-
-\- Free OMDb API has a 1,000 requests/day limit.  
-
-\- If you need more, upgrade to a paid plan.  
-
-\- Works best in Chrome/Firefox/Edge. Safari may need tweaks for fullscreen API.
-
-
-
----
-
-
-
-\## 📜 License
-
-MIT License – use and modify freely.
-
+## 🎥 Notes
+- Movies are streamed from MediaFire MP4 links configured inside `player.js`  
+- Metadata (poster, runtime, plot, genre) is pulled from OMDb  
+- Actor photos and recommended movies are pulled from TMDb  
