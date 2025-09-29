@@ -1,103 +1,48 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0f0f1a, #1b1b2f, #2a0f1c);
-  color: #fff;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profiles • FlixHubTV</title>
+  <link rel="stylesheet" href="style.css" /> <!-- ✅ Ensure CSS loads correctly -->
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <h1>Flix<span>Hub</span>TV</h1>
+    <div class="nav-buttons">
+      <button id="logoutBtn" onclick="location.href='login.html'">Logout</button>
+    </div>
+  </header>
 
-/* Header */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 30px;
-  background: #0d0d0d;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-header .logo {
-  font-size: 1.8em;
-  font-weight: bold;
-  margin-left: 60px;
-  color: #00bfff;
-}
-header .logo span { color: #fff; }
-header .nav-buttons { display: flex; gap: 10px; }
-header input { padding: 8px; border-radius: 4px; border: none; }
-header button {
-  background: #111; color: #fff;
-  border: none; padding: 8px 12px;
-  border-radius: 6px; cursor: pointer;
-  transition: background 0.3s;
-}
-header button:hover { background: #00bfff; }
+  <!-- Main content -->
+  <main class="main-content">
+    <div class="welcome">Choose Your Profile</div>
 
-/* Sidebar */
-.sidebar {
-  position: fixed;
-  top: 60px; left: -200px;
-  width: 200px; height: calc(100% - 60px);
-  background: #111;
-  padding: 20px;
-  box-shadow: 4px 0 10px rgba(0,0,0,0.6);
-  transition: left 0.3s ease;
-  z-index: 900;
-}
-.sidebar h3 { margin: 0 0 15px; color: #00bfff; }
-.sidebar ul { list-style: none; margin: 0; padding: 0; }
-.sidebar ul li { padding: 10px 0; cursor: pointer; }
-.sidebar ul li:hover { color: #00bfff; }
-body.sidebar-open .sidebar { left: 0; }
+    <section class="profiles-grid">
+      <!-- Profile boxes (kept intact, only styling fixed) -->
+      <div class="profile-card" onclick="selectProfile('Serna')">
+        <img src="profile1.png" alt="Serna" />
+        <h3>Serna</h3>
+      </div>
 
-/* Page + Main Content */
-.page { display: flex; }
-.main-content { flex-grow: 1; padding: 30px; margin-left: 60px; transition: margin-left 0.3s; }
-body.sidebar-open .main-content { margin-left: 220px; }
-.welcome { font-size: 1.4em; margin-bottom: 20px; color: #00bfff; text-shadow: 0 0 6px #00bfff; }
+      <div class="profile-card" onclick="selectProfile('Whitfield')">
+        <img src="profile2.png" alt="Whitfield" />
+        <h3>Whitfield</h3>
+      </div>
 
-/* Movie Grid */
-.movie-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 20px;
-}
-.movie-card {
-  background: #111;
-  border-radius: 10px;
-  overflow: hidden;
-  text-decoration: none;
-  color: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-.movie-card:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.8); }
-.movie-card img { width: 100%; height: 240px; object-fit: cover; }
-.movie-card h3 { text-align: center; padding: 10px; }
+      <div class="profile-card" onclick="selectProfile('Brandt')">
+        <img src="profile3.png" alt="Brandt" />
+        <h3>Brandt</h3>
+      </div>
+    </section>
+  </main>
 
-/* Watchlist + Continue Watching */
-.watchlist, .continue-watching { margin-top: 40px; }
-.watchlist h2, .continue-watching h2 { margin-bottom: 20px; color: #00bfff; }
-.watchlist-item, .continue-item { display: inline-block; margin-right: 15px; text-align: center; }
-.watchlist-item img, .continue-item img {
-  width: 120px; height: 180px;
-  border-radius: 6px; object-fit: cover;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-}
-.watchlist-item p, .continue-item p { margin-top: 8px; font-size: 0.9em; }
-
-/* Video Player */
-video { width: 100%; height: auto; background: black; }
-.fullscreen {
-  position: fixed; top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  z-index: 2000; background: black;
-}
-.exit-fullscreen {
-  position: absolute; top: 15px; right: 20px;
-  font-size: 28px; font-weight: bold;
-  color: red; cursor: pointer; z-index: 2100;
-}
+  <script>
+    function selectProfile(name) {
+      localStorage.setItem("flixhubtvProfile", name);
+      window.location.href = "index.html"; // ✅ Goes to movie browser
+    }
+  </script>
+</body>
+</html>

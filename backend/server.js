@@ -1,40 +1,47 @@
 const express = require("express");
 const path = require("path");
-const bodyParser = require("body-parser");
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Middleware to serve static files (CSS, JS, images, etc.)
+app.use(express.static(path.join(__dirname, "frontend")));
 
-// Serve frontend
-app.use(express.static(path.join(__dirname, "../frontend")));
-
-// ✅ Hardcoded login credentials
-const USERS = {
-  Streamme69420: "Xenomorph69420!"
-};
-
-// Login route
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-
-  if (USERS[username] && USERS[username] === password) {
-    // ✅ Redirect to profiles page after successful login
-    return res.redirect("/profiles.html");
-  } else {
-    // ✅ Reload login page with error flag
-    return res.redirect("/login.html?error=1");
-  }
+// Root route -> Login page
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "login.html"));
 });
 
-// Default route (catch-all)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+// Profiles page
+app.get("/profiles", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "profiles.html"));
 });
 
+// Index (main movie browser)
+app.get("/index", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "index.html"));
+});
+
+// Movie page
+app.get("/movie", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "movie.html"));
+});
+
+// Player page
+app.get("/player", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "player.html"));
+});
+
+// Watchlist & Continue Watching JSON
+app.get("/movie-metadata", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "movie-metadata.json"));
+});
+
+// Catch-all fallback (404 handler for unknown routes)
+app.use((req, res) => {
+  res.status(404).send("404 - Page not found");
+});
+
+// Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`✅ FlixHubTV server running at http://localhost:${PORT}`);
 });
