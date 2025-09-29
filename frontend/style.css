@@ -1,15 +1,8 @@
-/* Global Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Body */
 body {
+  margin: 0;
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0a0a0f, #1c1c24);
-  color: white;
+  background: linear-gradient(135deg, #0f0f1a, #1b1b2f, #2a0f1c);
+  color: #fff;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -19,127 +12,52 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(10, 10, 15, 0.95);
   padding: 15px 30px;
-  border-bottom: 2px solid #00ffff;
-  transition: margin-left 0.3s ease;
-}
-
-header h1 {
-  font-size: 28px;
-  font-weight: bold;
-  transition: margin-left 0.3s ease;
-}
-
-header .logo-flix {
-  color: #00ffff;
-}
-
-header span {
-  color: white;
-}
-
-/* Navbar Buttons */
-.nav-buttons {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.nav-buttons input {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: none;
-  outline: none;
-}
-
-.nav-buttons button {
-  background: #222;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.nav-buttons button:hover {
-  background: #00aaff;
-}
-
-/* Page wrapper */
-.page {
-  display: flex;
-  transition: margin-left 0.3s ease;
-}
-
-/* Sidebar wrapper zone */
-.sidebar-wrapper {
-  position: fixed;
+  background: #0d0d0d;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+  position: sticky;
   top: 0;
-  left: 0;
-  bottom: 0;
-  width: 20px; /* edge hover zone only */
   z-index: 1000;
 }
+header .logo {
+  font-size: 1.8em;
+  font-weight: bold;
+  margin-left: 60px;
+  color: #00bfff;
+}
+header .logo span { color: #fff; }
+header .nav-buttons { display: flex; gap: 10px; }
+header input { padding: 8px; border-radius: 4px; border: none; }
+header button {
+  background: #111; color: #fff;
+  border: none; padding: 8px 12px;
+  border-radius: 6px; cursor: pointer;
+  transition: background 0.3s;
+}
+header button:hover { background: #00bfff; }
 
 /* Sidebar */
 .sidebar {
-  width: 200px;
-  height: 100%;
-  background: rgba(15, 15, 20, 0.98);
+  position: fixed;
+  top: 60px; left: -200px;
+  width: 200px; height: calc(100% - 60px);
+  background: #111;
   padding: 20px;
-  position: absolute;
-  left: -200px; /* hidden */
-  top: 0;
-  bottom: 0;
-  overflow-y: auto;
+  box-shadow: 4px 0 10px rgba(0,0,0,0.6);
   transition: left 0.3s ease;
+  z-index: 900;
 }
+.sidebar h3 { margin: 0 0 15px; color: #00bfff; }
+.sidebar ul { list-style: none; margin: 0; padding: 0; }
+.sidebar ul li { padding: 10px 0; cursor: pointer; }
+.sidebar ul li:hover { color: #00bfff; }
+body.sidebar-open .sidebar { left: 0; }
 
-.sidebar h3 {
-  margin-bottom: 15px;
-}
-
-.sidebar ul {
-  list-style: none;
-}
-
-.sidebar ul li {
-  padding: 10px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.sidebar ul li:hover {
-  background: #00aaff;
-}
-
-/* Show sidebar on hover */
-.sidebar-wrapper:hover .sidebar {
-  left: 0;
-}
-
-/* Push content and header when sidebar is visible */
-.sidebar-wrapper:hover ~ .main-content,
-.sidebar-wrapper:hover ~ header,
-.sidebar-wrapper:hover ~ header h1 {
-  margin-left: 200px;
-}
-
-/* Main Content */
-.main-content {
-  margin-left: 20px;
-  padding: 20px;
-  flex: 1;
-  transition: margin-left 0.3s ease;
-}
-
-/* Welcome Text */
-.welcome {
-  font-size: 22px;
-  margin-bottom: 20px;
-}
+/* Page + Main Content */
+.page { display: flex; }
+.main-content { flex-grow: 1; padding: 30px; margin-left: 60px; transition: margin-left 0.3s; }
+body.sidebar-open .main-content { margin-left: 220px; }
+.welcome { font-size: 1.4em; margin-bottom: 20px; color: #00bfff; text-shadow: 0 0 6px #00bfff; }
 
 /* Movie Grid */
 .movie-grid {
@@ -147,217 +65,39 @@ header span {
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 20px;
 }
-
 .movie-card {
   background: #111;
   border-radius: 10px;
   overflow: hidden;
-  text-align: center;
-  padding: 10px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
-}
-
-.movie-card img {
-  width: 100%;
-  border-radius: 10px;
-}
-
-.movie-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px #00ffff;
-}
-
-.movie-card h3 {
-  margin-top: 8px;
-  font-size: 16px;
-}
-
-/* Sections */
-#continueWatchingSection,
-#watchlistSection {
-  margin-bottom: 40px;
-}
-
-#continueWatchingSection h2,
-#watchlistSection h2 {
-  margin-bottom: 15px;
-  font-size: 20px;
-  border-left: 4px solid #00ffff;
-  padding-left: 10px;
-}
-
-/* Profile Container */
-.profile-container {
-  text-align: center;
-  margin-top: 50px;
-}
-
-.profile-title {
-  font-size: 24px;
-  margin-bottom: 30px;
-}
-
-.profile-grid {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-}
-
-.profile-box {
-  background: #111;
-  border-radius: 15px;
-  padding: 20px;
-  width: 160px;
-  height: 180px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.profile-box:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px #00ffff;
-}
-
-.profile-box img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: gray;
-  margin-bottom: 15px;
-}
-
-.profile-box span {
-  font-size: 18px;
-  font-weight: bold;
-  text-transform: capitalize;
-}
-
-/* Movie Details */
-.movie-details {
-  display: flex;
-  gap: 20px;
-  margin: 20px 0;
-}
-
-.movie-details img {
-  width: 250px;
-  border-radius: 10px;
-}
-
-.movie-info {
-  flex: 1;
-}
-
-.movie-info h1 {
-  font-size: 28px;
-  margin-bottom: 10px;
-}
-
-.movie-info p {
-  margin: 5px 0;
-}
-
-.movie-info .buttons {
-  margin-top: 15px;
-}
-
-.movie-info button {
-  background: #222;
+  text-decoration: none;
   color: white;
-  border: none;
-  padding: 10px 16px;
-  margin-right: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
+.movie-card:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.8); }
+.movie-card img { width: 100%; height: 240px; object-fit: cover; }
+.movie-card h3 { text-align: center; padding: 10px; }
 
-.movie-info button:hover {
-  background: #00aaff;
+/* Watchlist + Continue Watching */
+.watchlist, .continue-watching { margin-top: 40px; }
+.watchlist h2, .continue-watching h2 { margin-bottom: 20px; color: #00bfff; }
+.watchlist-item, .continue-item { display: inline-block; margin-right: 15px; text-align: center; }
+.watchlist-item img, .continue-item img {
+  width: 120px; height: 180px;
+  border-radius: 6px; object-fit: cover;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.6);
 }
+.watchlist-item p, .continue-item p { margin-top: 8px; font-size: 0.9em; }
 
 /* Video Player */
-.video-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.95);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
+video { width: 100%; height: auto; background: black; }
+.fullscreen {
+  position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 2000; background: black;
 }
-
-.video-container.hidden {
-  display: none;
-}
-
-#fullscreenWrapper {
-  position: relative;
-  width: 90%;
-  height: 90%;
-}
-
-#flixVideo {
-  width: 100%;
-  height: 100%;
-  border: 3px solid #00ffff;
-  border-radius: 10px;
-}
-
-/* Neon Scrub Bar */
-#flixVideo::-webkit-media-controls-timeline {
-  background: #00ffff;
-  box-shadow: 0 0 10px #00ffff;
-}
-
-#closePlayer {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: rgba(0,0,0,0.8);
-  color: white;
-  border: none;
-  font-size: 22px;
-  border-radius: 50%;
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-#closePlayer:hover {
-  background: #00aaff;
-}
-
-/* Cast & Recommended */
-.cast, .recommended {
-  margin: 30px 0;
-}
-
-.cast-list, .recommended-list {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.cast-member, .recommended-card {
-  text-align: center;
-  width: 120px;
-}
-
-.cast-member img, .recommended-card img {
-  width: 100%;
-  border-radius: 10px;
-}
-
-.cast-member p, .recommended-card p {
-  margin-top: 5px;
-  font-size: 14px;
+.exit-fullscreen {
+  position: absolute; top: 15px; right: 20px;
+  font-size: 28px; font-weight: bold;
+  color: red; cursor: pointer; z-index: 2100;
 }

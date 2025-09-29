@@ -9,203 +9,147 @@
 <body>
   <!-- Header / Navbar -->
   <header>
-    <h1><span class="logo-flix">Flix</span>HubTV</h1>
-
+    <h1 class="logo">Flix<span>HubTV</span></h1>
     <div class="nav-buttons">
       <input id="searchInput" type="text" placeholder="Search movies..." aria-label="Search movies"/>
       <button id="switchProfileBtn" onclick="location.href='profiles.html'">Switch Profile</button>
-      <button id="logoutBtn" onclick="logout()">Logout</button>
+      <button id="logoutBtn" onclick="location.href='login.html'">Logout</button>
       <button id="homeBtn" onclick="location.href='index.html'">Home</button>
     </div>
   </header>
 
-  <!-- Page wrapper -->
   <div class="page">
-    <!-- Sidebar wrapper -->
-    <div class="sidebar-wrapper">
-      <aside class="sidebar" aria-label="Genres">
-        <h3>Genres</h3>
-        <ul>
-          <li data-filter="all">All</li>
-          <li data-filter="Action">Action</li>
-          <li data-filter="Sci-Fi">Sci-Fi</li>
-          <li data-filter="Thriller">Thriller</li>
-        </ul>
-      </aside>
-    </div>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="leftSidebar" aria-label="Genres">
+      <h3>Genres</h3>
+      <ul>
+        <li data-filter="all">All</li>
+        <li data-filter="Action">Action</li>
+        <li data-filter="Sci-Fi">Sci-Fi</li>
+        <li data-filter="Thriller">Thriller</li>
+      </ul>
+    </aside>
 
     <!-- Main Content -->
     <main class="main-content" id="content">
-      <div class="welcome" id="welcomeText">Welcome</div>
+      <div class="welcome" id="welcomeText">Welcome, Serna</div>
 
-      <!-- Continue Watching -->
-      <section id="continueWatchingSection" style="display:none;">
-        <h2>Continue Watching</h2>
-        <div id="continueWatching" class="movie-grid"></div>
-      </section>
-
-      <!-- Watchlist -->
-      <section id="watchlistSection" style="display:none;">
-        <h2>My Watchlist</h2>
-        <div id="watchlist" class="movie-grid"></div>
-      </section>
-
-      <!-- Movies -->
+      <!-- Movie Grid -->
       <section class="movie-grid" id="movieGrid">
         <!-- The Matrix -->
         <a class="movie-card" href="movie.html?id=tt0133093" data-genres="Action,Sci-Fi">
-          <img id="poster-matrix" src="" alt="The Matrix poster" />
+          <img id="poster-matrix" src="placeholder.jpg" alt="The Matrix poster" />
           <h3>The Matrix</h3>
         </a>
 
-        <!-- Dante's Peak -->
-        <a class="movie-card" href="movie.html?id=tt0118928" data-genres="Action,Thriller">
-          <img id="poster-dantes" src="" alt="Dante's Peak poster" />
-          <h3>Dante's Peak</h3>
+        <!-- Dante’s Peak -->
+        <a class="movie-card" href="movie.html?id=tt0118928" data-genres="Thriller,Action">
+          <img id="poster-dante" src="placeholder.jpg" alt="Dante's Peak poster" />
+          <h3>Dante’s Peak</h3>
         </a>
+      </section>
+
+      <!-- Continue Watching -->
+      <section class="continue-watching" id="continueWatching">
+        <h2>Continue Watching</h2>
+        <div id="continueList"></div>
+      </section>
+
+      <!-- Watchlist -->
+      <section class="watchlist" id="watchlist">
+        <h2>Your Watchlist</h2>
+        <div id="watchlistItems"></div>
       </section>
     </main>
   </div>
 
   <!-- Scripts -->
   <script>
-    /**************
-     * API KEYS   *
-     **************/
-    const OMDB_KEY = "ea7569d7"; // OMDb
+    /***************
+     * API KEYS
+     ***************/
+    const OMDB_KEY = "ea7569d7"; 
+    const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f";
 
-    /*********************
-     * AUTH CHECK        *
-     *********************/
-    if (!localStorage.getItem("loggedIn")) {
-      window.location.href = "login.html";
-    }
-
-    /*********************
-     * LOGOUT FUNCTION   *
-     *********************/
-    function logout() {
-      localStorage.removeItem("loggedIn");
-      window.location.href = "login.html";
-    }
-
-    /*********************
-     * ACTIVE PROFILE    *
-     *********************/
-    const activeProfile = localStorage.getItem("activeProfile") || "Guest";
-    document.getElementById("welcomeText").textContent = `Welcome, ${activeProfile}`;
-
-    /**************************************
-     * FETCH POSTER FOR THE MATRIX (OMDb) *
-     **************************************/
-    (function loadMatrixPoster() {
-      const img = document.getElementById('poster-matrix');
-      if (!img) return;
-      fetch(`https://www.omdbapi.com/?i=tt0133093&apikey=${OMDB_KEY}`)
-        .then(r => r.json())
-        .then(data => {
-          if (data && data.Poster && data.Poster !== "N/A") {
-            img.src = data.Poster;
-          } else {
-            img.src = "placeholder.jpg";
-          }
-        })
-        .catch(() => {
-          img.src = "placeholder.jpg";
-        });
+    /***************
+     * SIDEBAR
+     ***************/
+    (function setupSidebarShift() {
+      const sidebar = document.getElementById('leftSidebar');
+      if (!sidebar) return;
+      sidebar.addEventListener('mouseenter', () => {
+        document.body.classList.add('sidebar-open');
+      });
+      sidebar.addEventListener('mouseleave', () => {
+        document.body.classList.remove('sidebar-open');
+      });
     })();
 
-    /*****************************************
-     * FETCH POSTER FOR DANTE'S PEAK (OMDb) *
-     *****************************************/
-    (function loadDantesPoster() {
-      const img = document.getElementById('poster-dantes');
+    /***************
+     * POSTERS
+     ***************/
+    function loadPoster(imdbID, elementId) {
+      const img = document.getElementById(elementId);
       if (!img) return;
-      fetch(`https://www.omdbapi.com/?i=tt0118928&apikey=${OMDB_KEY}`)
+      fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`)
         .then(r => r.json())
-        .then(data => {
-          if (data && data.Poster && data.Poster !== "N/A") {
-            img.src = data.Poster;
-          } else {
-            img.src = "placeholder.jpg";
-          }
-        })
-        .catch(() => {
-          img.src = "placeholder.jpg";
-        });
-    })();
+        .then(data => { if (data && data.Poster && data.Poster !== "N/A") img.src = data.Poster; })
+        .catch(() => {});
+    }
+    loadPoster("tt0133093", "poster-matrix"); // Matrix
+    loadPoster("tt0118928", "poster-dante");  // Dante’s Peak
 
-    /****************************************
-     * GENRE FILTER (CLIENT-SIDE)           *
-     ****************************************/
+    /***************
+     * GENRE FILTER
+     ***************/
     (function setupGenreFilter() {
       const list = document.querySelector('.sidebar ul');
       const cards = document.querySelectorAll('.movie-card');
       if (!list || !cards.length) return;
       list.addEventListener('click', (e) => {
-        const li = e.target.closest('li');
-        if (!li) return;
+        const li = e.target.closest('li'); if (!li) return;
         const filter = li.getAttribute('data-filter');
         cards.forEach(card => {
           const genres = (card.getAttribute('data-genres') || "").split(',');
-          if (filter === 'all' || genres.includes(filter)) {
-            card.style.display = '';
-          } else {
-            card.style.display = 'none';
-          }
+          card.style.display = (filter === 'all' || genres.includes(filter)) ? '' : 'none';
         });
       });
     })();
 
-    /****************************************
-     * CONTINUE WATCHING SECTION            *
-     ****************************************/
-    (function loadContinueWatching() {
-      const contData = JSON.parse(localStorage.getItem("continueWatching_" + activeProfile) || "null");
-      if (!contData) return;
-      const section = document.getElementById("continueWatchingSection");
-      const container = document.getElementById("continueWatching");
-      fetch(`https://www.omdbapi.com/?i=${contData.imdbID}&apikey=${OMDB_KEY}`)
-        .then(r => r.json())
-        .then(data => {
-          if (data && data.Title) {
-            section.style.display = "block";
-            container.innerHTML = `
-              <a class="movie-card" href="movie.html?id=${contData.imdbID}">
-                <img src="${data.Poster}" alt="${data.Title}" />
-                <h3>${data.Title}</h3>
-              </a>`;
-          }
-        });
-    })();
-
-    /****************************************
-     * WATCHLIST SECTION                    *
-     ****************************************/
-    (function loadWatchlist() {
-      const watchlist = JSON.parse(localStorage.getItem("watchlist_" + activeProfile) || "[]");
-      if (!watchlist.length) return;
-      const section = document.getElementById("watchlistSection");
-      const container = document.getElementById("watchlist");
-      section.style.display = "block";
+    /***************
+     * WATCHLIST
+     ***************/
+    const watchlist = JSON.parse(localStorage.getItem("watchlist") || "[]");
+    function toggleWatchlist(imdbID, title, poster) {
+      const index = watchlist.findIndex(m => m.id === imdbID);
+      if (index >= 0) watchlist.splice(index, 1);
+      else watchlist.push({ id: imdbID, title, poster });
+      localStorage.setItem("watchlist", JSON.stringify(watchlist));
+      renderWatchlist();
+    }
+    function renderWatchlist() {
+      const container = document.getElementById("watchlistItems");
+      if (!container) return;
       container.innerHTML = "";
-      watchlist.forEach(imdbID => {
-        fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`)
-          .then(r => r.json())
-          .then(data => {
-            if (data && data.Title) {
-              const card = document.createElement("a");
-              card.className = "movie-card";
-              card.href = `movie.html?id=${imdbID}`;
-              card.innerHTML = `
-                <img src="${data.Poster}" alt="${data.Title}" />
-                <h3>${data.Title}</h3>
-              `;
-              container.appendChild(card);
-            }
-          });
+      watchlist.forEach(m => {
+        container.innerHTML += `<div class="watchlist-item"><img src="${m.poster}" alt="${m.title}" /><p>${m.title}</p></div>`;
       });
-    })();
+    }
+    renderWatchlist();
+
+    /***************
+     * CONTINUE WATCHING
+     ***************/
+    const continueWatching = JSON.parse(localStorage.getItem("continueWatching") || "[]");
+    function renderContinueWatching() {
+      const container = document.getElementById("continueList");
+      if (!container) return;
+      container.innerHTML = "";
+      continueWatching.forEach(m => {
+        container.innerHTML += `<div class="continue-item"><img src="${m.poster}" alt="${m.title}" /><p>${m.title}</p></div>`;
+      });
+    }
+    renderContinueWatching();
   </script>
 </body>
 </html>
