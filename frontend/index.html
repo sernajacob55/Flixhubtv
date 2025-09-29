@@ -158,20 +158,27 @@
   });
 
   function renderWatchlist() {
-    const grid = document.getElementById("watchlistGrid");
-    grid.innerHTML = "";
-    watchlist.forEach(id => {
-      const posterId = id === "tt0133093" ? "poster-matrix" : "poster-dantes";
-      const img = document.getElementById(posterId);
-      const div = document.createElement("div");
-      div.className = "watchlist-item";
-      div.innerHTML = `<img src="${img.src}" alt="Poster for ${id}" />`;
-      grid.appendChild(div);
-    });
-  }
+  const grid = document.getElementById("watchlistGrid");
+  grid.innerHTML = "";
 
-  renderWatchlist();
-})();
+  watchlist.forEach(id => {
+    let posterSrc = "placeholder.jpg";
+    let title = "";
+
+    if (id === "tt0133093") {
+      posterSrc = document.getElementById("poster-matrix").src || "placeholder.jpg";
+      title = "The Matrix";
+    } else if (id === "tt0118928") {
+      posterSrc = document.getElementById("poster-dantes").src || "placeholder.jpg";
+      title = "Dante's Peak";
+    }
+
+    const div = document.createElement("div");
+    div.className = "watchlist-item";
+    div.innerHTML = `<img src="${posterSrc}" alt="Poster for ${title}" />`;
+    grid.appendChild(div);
+  });
+}
 
     // Continue Watching (fixed [object Object])
     (function setupContinueWatching() {
