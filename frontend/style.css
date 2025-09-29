@@ -77,7 +77,7 @@ header span {
   background: rgba(15, 15, 20, 0.98);
   padding: 20px;
   position: fixed;
-  left: -200px;
+  left: -200px; /* hidden by default */
   top: 0;
   bottom: 0;
   z-index: 1000;
@@ -103,11 +103,13 @@ header span {
   background: #00aaff;
 }
 
-body.sidebar-open .sidebar {
+/* Show sidebar when hovered */
+.sidebar:hover {
   left: 0;
 }
 
-body.sidebar-open .page {
+/* Push page content when sidebar is visible */
+.sidebar:hover ~ .main-content {
   margin-left: 200px;
 }
 
