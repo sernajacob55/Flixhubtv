@@ -287,7 +287,7 @@ header input {
 }
 
 /* ================================
-   Profile Page (Fixed Boxes + Avatars)
+   Profile Page
 ================================ */
 .profile-container {
   text-align: center;
@@ -332,14 +332,6 @@ header input {
   border-radius: 50%;
   margin-bottom: 10px;
   object-fit: cover;
-}
-
-/* Fallback placeholder avatar */
-.profile-box img[src=""], 
-.profile-box img:not([src]) {
-  background: linear-gradient(135deg, #222, #444);
-  display: inline-block;
-  content: "";
 }
 
 .profile-box span {
@@ -399,6 +391,31 @@ header input {
 /* ================================
    Player Styles
 ================================ */
+.video-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: black;
+}
+
+#closePlayer {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-shadow: 0px 0px 5px black;
+  z-index: 1001;
+}
+
+#closePlayer:hover {
+  color: cyan;
+}
+
 video {
   width: 100%;
   height: 100%;
