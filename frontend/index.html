@@ -179,7 +179,7 @@
           const img = document.getElementById(posterId);
           const div = document.createElement("div");
           div.className = "watchlist-item";
-          div.innerHTML = `<img src="${img.src}" alt="${id}" />`;
+          div.innerHTML = `<img src="${img.src}" alt="Poster for ${id}" />`;
           grid.appendChild(div);
         });
       }
@@ -188,16 +188,19 @@
     })();
 
     /**************
-     * Continue Watching (no timestamp text)
+     * Continue Watching (safe text, no [object Object])
      **************/
     (function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
       const continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
       list.innerHTML = "";
       continued.forEach(item => {
+        if (!item.poster || !item.title) return;
         const div = document.createElement("div");
         div.className = "continue-item";
-        div.innerHTML = `<img src="${item.poster}" alt="${item.title}" />`;
+        div.innerHTML = `
+          <img src="${item.poster}" alt="Poster for ${item.title}" />
+        `;
         list.appendChild(div);
       });
     })();

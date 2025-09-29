@@ -97,13 +97,14 @@
     async function loadCast() {
       const tmdbRes = await fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_KEY}&external_source=imdb_id`);
       const tmdbData = await tmdbRes.json();
-      if(!tmdbData.movie_results.length) return;
+      if (!tmdbData.movie_results.length) return;
       const movieId = tmdbData.movie_results[0].id;
       const creditsRes = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${TMDB_KEY}`);
       const creditsData = await creditsRes.json();
       const castGrid = document.getElementById("castGrid");
       castGrid.innerHTML = "";
       creditsData.cast.slice(0,6).forEach(actor => {
+        if (!actor.name) return;
         const div = document.createElement("div");
         div.className = "actor-card";
         div.innerHTML = `
@@ -118,13 +119,14 @@
     async function loadRecommendations() {
       const tmdbRes = await fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_KEY}&external_source=imdb_id`);
       const tmdbData = await tmdbRes.json();
-      if(!tmdbData.movie_results.length) return;
+      if (!tmdbData.movie_results.length) return;
       const movieId = tmdbData.movie_results[0].id;
       const recRes = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/recommendations?api_key=${TMDB_KEY}`);
       const recData = await recRes.json();
       const recGrid = document.getElementById("recommendGrid");
       recGrid.innerHTML = "";
       recData.results.slice(0,6).forEach(rec => {
+        if (!rec.title) return;
         const div = document.createElement("div");
         div.className = "movie-card";
         div.innerHTML = `
@@ -157,7 +159,6 @@
       const player = document.getElementById("videoPlayer");
       const video = document.getElementById("movieVideo");
 
-      // MediaFire links for known movies
       let movieSrc = "";
       if (imdbID === "tt0133093") { // The Matrix
         movieSrc = "https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4";
