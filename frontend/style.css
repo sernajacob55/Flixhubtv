@@ -22,11 +22,13 @@ header {
   background: rgba(10, 10, 15, 0.95);
   padding: 15px 30px;
   border-bottom: 2px solid #00ffff;
+  transition: margin-left 0.3s ease;
 }
 
 header h1 {
   font-size: 28px;
   font-weight: bold;
+  transition: margin-left 0.3s ease;
 }
 
 header .logo-flix {
@@ -77,7 +79,7 @@ header span {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 220px; /* hover zone width */
+  width: 20px; /* edge hover zone only */
   z-index: 1000;
 }
 
@@ -118,8 +120,10 @@ header span {
   left: 0;
 }
 
-/* Push content when sidebar visible */
-.sidebar-wrapper:hover ~ .main-content {
+/* Push content and header when sidebar is visible */
+.sidebar-wrapper:hover ~ .main-content,
+.sidebar-wrapper:hover ~ header,
+.sidebar-wrapper:hover ~ header h1 {
   margin-left: 200px;
 }
 
@@ -128,6 +132,7 @@ header span {
   margin-left: 20px;
   padding: 20px;
   flex: 1;
+  transition: margin-left 0.3s ease;
 }
 
 /* Welcome Text */
@@ -300,7 +305,7 @@ header span {
   height: 90%;
 }
 
-#matrixVideo {
+#flixVideo {
   width: 100%;
   height: 100%;
   border: 3px solid #00ffff;
@@ -308,7 +313,7 @@ header span {
 }
 
 /* Neon Scrub Bar */
-#matrixVideo::-webkit-media-controls-timeline {
+#flixVideo::-webkit-media-controls-timeline {
   background: #00ffff;
   box-shadow: 0 0 10px #00ffff;
 }

@@ -10,6 +10,7 @@
   <!-- Header / Navbar -->
   <header>
     <h1><span class="logo-flix">Flix</span>HubTV</h1>
+
     <div class="nav-buttons">
       <input id="searchInput" type="text" placeholder="Search movies..." aria-label="Search movies"/>
       <button id="switchProfileBtn" onclick="location.href='profiles.html'">Switch Profile</button>
@@ -28,6 +29,7 @@
           <li data-filter="all">All</li>
           <li data-filter="Action">Action</li>
           <li data-filter="Sci-Fi">Sci-Fi</li>
+          <li data-filter="Thriller">Thriller</li>
         </ul>
       </aside>
     </div>
@@ -50,9 +52,16 @@
 
       <!-- Movies -->
       <section class="movie-grid" id="movieGrid">
+        <!-- The Matrix -->
         <a class="movie-card" href="movie.html?id=tt0133093" data-genres="Action,Sci-Fi">
           <img id="poster-matrix" src="" alt="The Matrix poster" />
           <h3>The Matrix</h3>
+        </a>
+
+        <!-- Dante's Peak -->
+        <a class="movie-card" href="movie.html?id=tt0118928" data-genres="Action,Thriller">
+          <img id="poster-dantes" src="" alt="Dante's Peak poster" />
+          <h3>Dante's Peak</h3>
         </a>
       </section>
     </main>
@@ -60,21 +69,35 @@
 
   <!-- Scripts -->
   <script>
-    const OMDB_KEY = "ea7569d7";
+    /**************
+     * API KEYS   *
+     **************/
+    const OMDB_KEY = "ea7569d7"; // OMDb
 
+    /*********************
+     * AUTH CHECK        *
+     *********************/
     if (!localStorage.getItem("loggedIn")) {
       window.location.href = "login.html";
     }
 
+    /*********************
+     * LOGOUT FUNCTION   *
+     *********************/
     function logout() {
       localStorage.removeItem("loggedIn");
       window.location.href = "login.html";
     }
 
+    /*********************
+     * ACTIVE PROFILE    *
+     *********************/
     const activeProfile = localStorage.getItem("activeProfile") || "Guest";
     document.getElementById("welcomeText").textContent = `Welcome, ${activeProfile}`;
 
-    /* Matrix Poster */
+    /**************************************
+     * FETCH POSTER FOR THE MATRIX (OMDb) *
+     **************************************/
     (function loadMatrixPoster() {
       const img = document.getElementById('poster-matrix');
       if (!img) return;
@@ -87,10 +110,34 @@
             img.src = "placeholder.jpg";
           }
         })
-        .catch(() => { img.src = "placeholder.jpg"; });
+        .catch(() => {
+          img.src = "placeholder.jpg";
+        });
     })();
 
-    /* Genre Filter */
+    /*****************************************
+     * FETCH POSTER FOR DANTE'S PEAK (OMDb) *
+     *****************************************/
+    (function loadDantesPoster() {
+      const img = document.getElementById('poster-dantes');
+      if (!img) return;
+      fetch(`https://www.omdbapi.com/?i=tt0118928&apikey=${OMDB_KEY}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.Poster && data.Poster !== "N/A") {
+            img.src = data.Poster;
+          } else {
+            img.src = "placeholder.jpg";
+          }
+        })
+        .catch(() => {
+          img.src = "placeholder.jpg";
+        });
+    })();
+
+    /****************************************
+     * GENRE FILTER (CLIENT-SIDE)           *
+     ****************************************/
     (function setupGenreFilter() {
       const list = document.querySelector('.sidebar ul');
       const cards = document.querySelectorAll('.movie-card');
@@ -101,12 +148,18 @@
         const filter = li.getAttribute('data-filter');
         cards.forEach(card => {
           const genres = (card.getAttribute('data-genres') || "").split(',');
-          card.style.display = (filter === 'all' || genres.includes(filter)) ? '' : 'none';
+          if (filter === 'all' || genres.includes(filter)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
         });
       });
     })();
 
-    /* Continue Watching */
+    /****************************************
+     * CONTINUE WATCHING SECTION            *
+     ****************************************/
     (function loadContinueWatching() {
       const contData = JSON.parse(localStorage.getItem("continueWatching_" + activeProfile) || "null");
       if (!contData) return;
@@ -121,13 +174,14 @@
               <a class="movie-card" href="movie.html?id=${contData.imdbID}">
                 <img src="${data.Poster}" alt="${data.Title}" />
                 <h3>${data.Title}</h3>
-                <p style="color:cyan; font-size:14px;">Resume at ${Math.floor(contData.currentTime/60)}m</p>
               </a>`;
           }
         });
     })();
 
-    /* Watchlist */
+    /****************************************
+     * WATCHLIST SECTION                    *
+     ****************************************/
     (function loadWatchlist() {
       const watchlist = JSON.parse(localStorage.getItem("watchlist_" + activeProfile) || "[]");
       if (!watchlist.length) return;
@@ -143,7 +197,10 @@
               const card = document.createElement("a");
               card.className = "movie-card";
               card.href = `movie.html?id=${imdbID}`;
-              card.innerHTML = `<img src="${data.Poster}" alt="${data.Title}" /><h3>${data.Title}</h3>`;
+              card.innerHTML = `
+                <img src="${data.Poster}" alt="${data.Title}" />
+                <h3>${data.Title}</h3>
+              `;
               container.appendChild(card);
             }
           });

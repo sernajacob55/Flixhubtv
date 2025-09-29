@@ -3,257 +3,137 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>The Matrix • FlixHubTV</title>
+  <title>Movie • FlixHubTV</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    /* Page-specific overrides */
-    .movie-details {
-      display: flex;
-      gap: 20px;
-      margin: 30px 0;
-    }
-
-    .movie-details img {
-      width: 260px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px #00ffff55;
-    }
-
-    .movie-info h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .movie-info p {
-      margin: 5px 0;
-    }
-
-    .movie-info .buttons {
-      margin-top: 15px;
-    }
-
-    .movie-info button {
-      background: #222;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      margin-right: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s, box-shadow 0.3s;
-    }
-
-    .movie-info button:hover {
-      background: #00aaff;
-      box-shadow: 0 0 15px #00ffff;
-    }
-  </style>
 </head>
 <body>
-  <!-- Header / Navbar -->
+  <!-- Header -->
   <header>
     <h1><span class="logo-flix">Flix</span>HubTV</h1>
     <div class="nav-buttons">
-      <button onclick="location.href='profiles.html'">Switch Profile</button>
-      <button onclick="logout()">Logout</button>
       <button onclick="location.href='index.html'">Home</button>
+      <button onclick="logout()">Logout</button>
     </div>
   </header>
 
-  <!-- Page wrapper -->
-  <div class="page">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="leftSidebar" aria-label="Genres">
-      <h3>Genres</h3>
-      <ul>
-        <li data-filter="all">All</li>
-        <li data-filter="Action">Action</li>
-        <li data-filter="Sci-Fi">Sci-Fi</li>
-      </ul>
-    </aside>
+  <!-- Movie Container -->
+  <main id="movieDetails" class="main-content"></main>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <div class="movie-details">
-        <img id="movie-poster" src="" alt="Movie Poster" />
-        <div class="movie-info">
-          <h1 id="movie-title">Loading...</h1>
-          <p id="movie-meta"></p>
-          <p id="movie-plot"></p>
-          <div class="buttons">
-            <button id="playButton">► Play</button>
-            <button id="watchlistButton">+ Add to Watchlist</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Video Player (Fullscreen Container) -->
-      <div id="videoPlayer" class="video-container hidden">
-        <div id="fullscreenWrapper">
-          <video id="matrixVideo" controls>
-            <source src="https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-          <button id="closePlayer">✕</button>
-        </div>
-      </div>
-
-      <!-- Cast Section -->
-      <section class="cast">
-        <h3>Cast</h3>
-        <div id="cast" class="cast-list"></div>
-      </section>
-
-      <!-- Recommended Section -->
-      <section class="recommended">
-        <h3>Recommended</h3>
-        <div id="recommended" class="recommended-list"></div>
-      </section>
-    </main>
+  <!-- Video Player -->
+  <div id="videoPlayer" class="video-container hidden">
+    <div id="fullscreenWrapper">
+      <video id="flixVideo" controls></video>
+      <button id="closePlayer">X</button>
+    </div>
   </div>
 
   <!-- Scripts -->
   <script>
-    /***************
-     * CONFIG KEYS *
-     ***************/
+    /**************
+     * API KEYS   *
+     **************/
     const OMDB_KEY = "ea7569d7"; // OMDb
-    const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f"; // TMDb
-    const imdbID = "tt0133093"; // The Matrix
 
-    /***************************
-     * LOGIN ENFORCEMENT LOGIC *
-     ***************************/
+    /*********************
+     * MOVIE SOURCES     *
+     *********************/
+    const movieSources = {
+      "tt0133093": "https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4",
+      "tt0118928": "https://download1324.mediafire.com/cd5ev8gxoajggy5dbp_1pagixal-14NXp2krW0s3WdxiRxacbt_tmKEN5wBSXGhBxaHmQRL6a_oqit-_4Uqm6r7Th8gd02jAsy_iWXSiGUZejYG1i7-rTMQrhWr5Q8OQan-9adl7oEEEJK7mmWiPIvTIT_iyRk3hboxiQfNDUHmnI0Q/jtd07wddlls76o2/Dantes+Peak.mp4"
+    };
+
+    /*********************
+     * AUTH CHECK        *
+     *********************/
     if (!localStorage.getItem("loggedIn")) {
       window.location.href = "login.html";
     }
 
+    /*********************
+     * LOGOUT FUNCTION   *
+     *********************/
     function logout() {
       localStorage.removeItem("loggedIn");
       window.location.href = "login.html";
     }
 
-    /****************************
-     * ACTIVE PROFILE HANDLER   *
-     ****************************/
-    const activeProfile = localStorage.getItem("activeProfile") || "default";
+    /*********************
+     * GET MOVIE ID      *
+     *********************/
+    const urlParams = new URLSearchParams(window.location.search);
+    const imdbID = urlParams.get("id");
 
-    /***************************************
-     * FETCH METADATA FROM OMDb (Title, etc)
-     ***************************************/
-    async function loadOMDb() {
-      const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
-      const data = await res.json();
-
-      if (data) {
-        document.getElementById("movie-poster").src = data.Poster;
-        document.getElementById("movie-title").textContent = data.Title;
-        document.getElementById("movie-meta").textContent =
-          `Year: ${data.Year} | Runtime: ${data.Runtime} | Genre: ${data.Genre}`;
-        document.getElementById("movie-plot").textContent = data.Plot;
-      }
-    }
-
-    /*********************************************
-     * FETCH CAST + RECOMMENDATIONS FROM TMDb API *
-     *********************************************/
-    async function loadTMDb() {
-      const res = await fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_KEY}&external_source=imdb_id`);
-      const data = await res.json();
-
-      if (data.movie_results.length > 0) {
-        const tmdbId = data.movie_results[0].id;
-
-        // Cast
-        const castRes = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/credits?api_key=${TMDB_KEY}`);
-        const castData = await castRes.json();
-        document.getElementById("cast").innerHTML =
-          castData.cast.slice(0, 6).map(actor => `
-            <div class="cast-member">
-              <img src="https://image.tmdb.org/t/p/w200${actor.profile_path}" alt="${actor.name}" />
-              <p>${actor.name}</p>
+    /*********************
+     * LOAD METADATA     *
+     *********************/
+    fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`)
+      .then(r => r.json())
+      .then(data => {
+        if (!data || data.Response === "False") return;
+        document.title = `${data.Title} • FlixHubTV`;
+        document.getElementById("movieDetails").innerHTML = `
+          <div class="movie-details">
+            <img src="${data.Poster}" alt="${data.Title}" />
+            <div class="movie-info">
+              <h1>${data.Title}</h1>
+              <p><strong>Released:</strong> ${data.Released}</p>
+              <p><strong>Genre:</strong> ${data.Genre}</p>
+              <p><strong>Actors:</strong> ${data.Actors}</p>
+              <p>${data.Plot}</p>
+              <div class="buttons">
+                <button onclick="playMovie('${imdbID}')">▶ Play</button>
+                <button onclick="toggleWatchlist('${imdbID}')">+ Watchlist</button>
+              </div>
             </div>
-          `).join("");
+          </div>
+        `;
+      });
 
-        // Recommended
-        const recRes = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/recommendations?api_key=${TMDB_KEY}`);
-        const recData = await recRes.json();
-        document.getElementById("recommended").innerHTML =
-          recData.results.slice(0, 6).map(movie => `
-            <div class="recommended-card" onclick="location.href='movie.html?id=${movie.id}'">
-              <img src="https://image.tmdb.org/t/p/w200${movie.poster_path}" alt="${movie.title}" />
-              <p>${movie.title}</p>
-            </div>
-          `).join("");
-      }
-    }
-
-    /************************
-     * VIDEO PLAYER BEHAVIOR *
-     ************************/
-    const playBtn = document.getElementById("playButton");
-    const closeBtn = document.getElementById("closePlayer");
-    const videoContainer = document.getElementById("videoPlayer");
-    const video = document.getElementById("matrixVideo");
-    const fullscreenWrapper = document.getElementById("fullscreenWrapper");
-
-    playBtn.addEventListener("click", () => {
-      videoContainer.classList.remove("hidden");
+    /*********************
+     * PLAY MOVIE        *
+     *********************/
+    function playMovie(id) {
+      const player = document.getElementById("videoPlayer");
+      const video = document.getElementById("flixVideo");
+      const source = movieSources[id];
+      if (!source) return alert("Movie source not available");
+      video.src = source;
+      player.classList.remove("hidden");
       video.play();
-      if (fullscreenWrapper.requestFullscreen) {
-        fullscreenWrapper.requestFullscreen();
-      }
-    });
-
-    closeBtn.addEventListener("click", () => {
-      video.pause();
-      videoContainer.classList.add("hidden");
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      }
-    });
-
-    /************************
-     * WATCHLIST HANDLER     *
-     ************************/
-    const watchlistBtn = document.getElementById("watchlistButton");
-
-    function updateWatchlistButton() {
-      let watchlist = JSON.parse(localStorage.getItem("watchlist_" + activeProfile) || "[]");
-      if (watchlist.includes(imdbID)) {
-        watchlistBtn.textContent = "✓ Remove from Watchlist";
-      } else {
-        watchlistBtn.textContent = "+ Add to Watchlist";
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+      } else if (video.webkitRequestFullscreen) {
+        video.webkitRequestFullscreen();
+      } else if (video.msRequestFullscreen) {
+        video.msRequestFullscreen();
       }
     }
 
-    watchlistBtn.addEventListener("click", () => {
-      let watchlist = JSON.parse(localStorage.getItem("watchlist_" + activeProfile) || "[]");
-      if (watchlist.includes(imdbID)) {
-        watchlist = watchlist.filter(id => id !== imdbID);
+    /*********************
+     * CLOSE PLAYER      *
+     *********************/
+    document.getElementById("closePlayer").addEventListener("click", () => {
+      const player = document.getElementById("videoPlayer");
+      const video = document.getElementById("flixVideo");
+      video.pause();
+      video.src = "";
+      player.classList.add("hidden");
+    });
+
+    /*********************
+     * WATCHLIST TOGGLE  *
+     *********************/
+    function toggleWatchlist(id) {
+      const profile = localStorage.getItem("activeProfile") || "Guest";
+      let watchlist = JSON.parse(localStorage.getItem("watchlist_" + profile) || "[]");
+      if (watchlist.includes(id)) {
+        watchlist = watchlist.filter(m => m !== id);
       } else {
-        watchlist.push(imdbID);
+        watchlist.push(id);
       }
-      localStorage.setItem("watchlist_" + activeProfile, JSON.stringify(watchlist));
-      updateWatchlistButton();
-    });
-
-    /*****************************
-     * CONTINUE WATCHING HANDLER *
-     *****************************/
-    video.addEventListener("timeupdate", () => {
-      localStorage.setItem("continueWatching_" + activeProfile, JSON.stringify({
-        imdbID,
-        currentTime: video.currentTime
-      }));
-    });
-
-    /***************
-     * INIT CALLS  *
-     ***************/
-    loadOMDb();
-    loadTMDb();
-    updateWatchlistButton();
+      localStorage.setItem("watchlist_" + profile, JSON.stringify(watchlist));
+      alert("Watchlist updated!");
+    }
   </script>
 </body>
 </html>
