@@ -75,18 +75,19 @@ header h1 .hub {
 }
 
 /* =====================
-   Sidebar
+   Sidebar (Slide-Out)
    ===================== */
 .sidebar {
   position: fixed;
-  top: 60px;
-  left: -200px;
-  width: 200px;
+  top: 60px; /* sits just below header/title */
+  left: -220px; /* hidden by default */
+  width: 220px;
   height: calc(100% - 60px);
   background: #111;
   padding: 20px;
-  transition: left 0.3s ease, transform 0.3s ease;
+  transition: left 0.3s ease;
   z-index: 900;
+  overflow-y: auto;
 }
 
 .sidebar h3 {
@@ -110,19 +111,12 @@ header h1 .hub {
   color: #00bfff;
 }
 
+/* Sidebar Open State */
 body.sidebar-open .sidebar {
   left: 0;
-  transform: translateX(0);
 }
 
-/* =====================
-   Page & Main Content
-   ===================== */
-.page {
-  display: flex;
-  flex: 1;
-}
-
+/* Push Main Content Smoothly */
 .main-content {
   flex-grow: 1;
   padding: 30px;
@@ -131,7 +125,7 @@ body.sidebar-open .sidebar {
 }
 
 body.sidebar-open .main-content {
-  margin-left: 200px;
+  margin-left: 220px;
 }
 
 .welcome {

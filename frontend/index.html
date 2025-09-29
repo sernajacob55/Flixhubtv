@@ -24,12 +24,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="leftSidebar" aria-label="Genres">
       <h3>Genres</h3>
-      <ul>
-        <li data-filter="all">All</li>
-        <li data-filter="Action">Action</li>
-        <li data-filter="Sci-Fi">Sci-Fi</li>
-        <li data-filter="Thriller">Thriller</li>
-      </ul>
+      <ul></ul> <!-- ✅ Now auto-populated -->
     </aside>
 
     <!-- Main Content -->
@@ -77,18 +72,6 @@
     const OMDB_KEY = "ea7569d7"; // OMDb
     const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f"; // TMDb
 
-    // Sidebar Hover
-    (function setupSidebarShift() {
-      const sidebar = document.getElementById('leftSidebar');
-      if (!sidebar) return;
-      sidebar.addEventListener('mouseenter', () => {
-        document.body.classList.add('sidebar-open');
-      });
-      sidebar.addEventListener('mouseleave', () => {
-        document.body.classList.remove('sidebar-open');
-      });
-    })();
-
     // Posters (OMDb)
     function loadPoster(imdbID, elementId) {
       const img = document.getElementById(elementId);
@@ -110,27 +93,6 @@
     loadPoster("tt0133093", "poster-matrix"); // The Matrix
     loadPoster("tt0118928", "poster-dantes"); // Dante's Peak
 
-    // Genre Filter
-    (function setupGenreFilter() {
-      const list = document.querySelector('.sidebar ul');
-      const cards = document.querySelectorAll('.movie-card');
-      if (!list || !cards.length) return;
-
-      list.addEventListener('click', (e) => {
-        const li = e.target.closest('li');
-        if (!li) return;
-        const filter = li.getAttribute('data-filter');
-        cards.forEach(card => {
-          const genres = (card.getAttribute('data-genres') || "").split(',');
-          if (filter === 'all' || genres.includes(filter)) {
-            card.style.display = '';
-          } else {
-            card.style.display = 'none';
-          }
-        });
-      });
-    })();
-
     // ✅ Live Search
     (function setupLiveSearch() {
       const searchInput = document.getElementById("searchInput");
@@ -143,6 +105,56 @@
           const title = card.querySelector("h3").textContent.toLowerCase();
           card.style.display = title.includes(query) ? "" : "none";
         });
+      });
+    })();
+
+    // ✅ Auto-Populate Genres Sidebar
+    (function setupDynamicSidebar() {
+      const sidebar = document.getElementById("leftSidebar");
+      const genreList = sidebar.querySelector("ul");
+      const cards = document.querySelectorAll(".movie-card");
+
+      if (!sidebar || !genreList || !cards.length) return;
+
+      // Collect all unique genres
+      let genres = new Set();
+      cards.forEach(card => {
+        const g = (card.getAttribute("data-genres") || "").split(",");
+        g.forEach(x => {
+          if (x.trim()) genres.add(x.trim());
+        });
+      });
+
+      // Populate sidebar
+      genreList.innerHTML = `<li data-filter="all">All</li>`;
+      genres.forEach(g => {
+        const li = document.createElement("li");
+        li.textContent = g;
+        li.setAttribute("data-filter", g);
+        genreList.appendChild(li);
+      });
+
+      // Filter logic
+      genreList.addEventListener("click", (e) => {
+        const li = e.target.closest("li");
+        if (!li) return;
+        const filter = li.getAttribute("data-filter");
+        cards.forEach(card => {
+          const cardGenres = (card.getAttribute("data-genres") || "").split(",");
+          if (filter === "all" || cardGenres.includes(filter)) {
+            card.style.display = "";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      });
+
+      // Sidebar toggle (hover)
+      sidebar.addEventListener("mouseenter", () => {
+        document.body.classList.add("sidebar-open");
+      });
+      sidebar.addEventListener("mouseleave", () => {
+        document.body.classList.remove("sidebar-open");
       });
     })();
 
@@ -159,7 +171,7 @@
       buttons.forEach(btn => {
         updateButton(btn);
         btn.addEventListener("click", (e) => {
-          e.stopPropagation(); // ✅ Prevents click from bubbling up to movie card
+          e.stopPropagation();
           const id = btn.getAttribute("data-id");
           if (watchlist.includes(id)) {
             watchlist = watchlist.filter(x => x !== id);
@@ -189,7 +201,6 @@
             title = "Dante's Peak";
           }
 
-          // ✅ Only append if poster is valid
           if (posterSrc && !posterSrc.includes("placeholder.jpg")) {
             const div = document.createElement("div");
             div.className = "watchlist-item";
@@ -198,15 +209,13 @@
           }
         });
 
-        // ✅ Hide section if empty
         section.style.display = grid.children.length > 0 ? "block" : "none";
       }
 
-      // ✅ Render once on page load
       renderWatchlist();
     })();
 
-    // Continue Watching (fixed [object Object])
+    // Continue Watching
     (function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
       const section = document.querySelector(".continue-watching");
@@ -227,7 +236,6 @@
         list.appendChild(div);
       });
 
-      // ✅ Hide section if empty
       section.style.display = list.children.length > 0 ? "block" : "none";
     })();
   </script>
