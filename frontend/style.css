@@ -51,6 +51,7 @@ header h1 .hub {
 .nav-buttons {
   display: flex;
   gap: 10px;
+  align-items: center; /* ✅ keep buttons/input vertically centered */
 }
 
 .nav-buttons input {
@@ -116,16 +117,23 @@ body.sidebar-open .sidebar {
   left: 0;
 }
 
-/* Push Main Content Smoothly */
+/* =====================
+   Page & Main Content
+   ===================== */
+.page {
+  display: flex;
+  flex: 1;            /* ✅ ensures main fills remaining height */
+}
+
 .main-content {
   flex-grow: 1;
   padding: 30px;
   margin-left: 0;
-  transition: margin-left 0.3s ease;
+  transition: margin-left 0.3s ease; /* ✅ smooth push when sidebar opens */
 }
 
 body.sidebar-open .main-content {
-  margin-left: 220px;
+  margin-left: 220px; /* ✅ content slides right; header/title stays put */
 }
 
 .welcome {

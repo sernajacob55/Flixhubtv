@@ -12,6 +12,7 @@
     <h1><span class="flix">FLIX</span><span class="hub">HubTV</span></h1>
 
     <div class="nav-buttons">
+      <button id="menuToggle">☰</button> <!-- ✅ Sidebar toggle button -->
       <input id="searchInput" type="text" placeholder="Search movies..." aria-label="Search movies"/>
       <button id="switchProfileBtn" onclick="location.href='profiles.html'">Switch Profile</button>
       <button id="logoutBtn" onclick="location.href='login.html'">Logout</button>
@@ -24,7 +25,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="leftSidebar" aria-label="Genres">
       <h3>Genres</h3>
-      <ul></ul> <!-- ✅ Now auto-populated -->
+      <ul></ul> <!-- ✅ Auto-populated -->
     </aside>
 
     <!-- Main Content -->
@@ -69,8 +70,13 @@
 
   <!-- Inline scripts -->
   <script>
-    const OMDB_KEY = "ea7569d7"; // OMDb
-    const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f"; // TMDb
+    const OMDB_KEY = "ea7569d7";
+    const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f";
+
+    // ✅ Sidebar Toggle
+    document.getElementById("menuToggle").addEventListener("click", () => {
+      document.body.classList.toggle("sidebar-open");
+    });
 
     // Posters (OMDb)
     function loadPoster(imdbID, elementId) {
@@ -79,26 +85,18 @@
       fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`)
         .then(r => r.json())
         .then(data => {
-          if (data && data.Poster && data.Poster !== "N/A") {
-            img.src = data.Poster;
-          } else {
-            img.src = "placeholder.jpg";
-          }
+          img.src = (data && data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg";
         })
-        .catch(() => {
-          img.src = "placeholder.jpg";
-        });
+        .catch(() => img.src = "placeholder.jpg");
     }
-
-    loadPoster("tt0133093", "poster-matrix"); // The Matrix
-    loadPoster("tt0118928", "poster-dantes"); // Dante's Peak
+    loadPoster("tt0133093", "poster-matrix");
+    loadPoster("tt0118928", "poster-dantes");
 
     // ✅ Live Search
     (function setupLiveSearch() {
       const searchInput = document.getElementById("searchInput");
       const cards = document.querySelectorAll(".movie-card");
       if (!searchInput || !cards.length) return;
-
       searchInput.addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase();
         cards.forEach(card => {
@@ -113,19 +111,14 @@
       const sidebar = document.getElementById("leftSidebar");
       const genreList = sidebar.querySelector("ul");
       const cards = document.querySelectorAll(".movie-card");
-
       if (!sidebar || !genreList || !cards.length) return;
 
-      // Collect all unique genres
       let genres = new Set();
       cards.forEach(card => {
         const g = (card.getAttribute("data-genres") || "").split(",");
-        g.forEach(x => {
-          if (x.trim()) genres.add(x.trim());
-        });
+        g.forEach(x => { if (x.trim()) genres.add(x.trim()); });
       });
 
-      // Populate sidebar
       genreList.innerHTML = `<li data-filter="all">All</li>`;
       genres.forEach(g => {
         const li = document.createElement("li");
@@ -134,27 +127,14 @@
         genreList.appendChild(li);
       });
 
-      // Filter logic
       genreList.addEventListener("click", (e) => {
         const li = e.target.closest("li");
         if (!li) return;
         const filter = li.getAttribute("data-filter");
         cards.forEach(card => {
           const cardGenres = (card.getAttribute("data-genres") || "").split(",");
-          if (filter === "all" || cardGenres.includes(filter)) {
-            card.style.display = "";
-          } else {
-            card.style.display = "none";
-          }
+          card.style.display = (filter === "all" || cardGenres.includes(filter)) ? "" : "none";
         });
-      });
-
-      // Sidebar toggle (hover)
-      sidebar.addEventListener("mouseenter", () => {
-        document.body.classList.add("sidebar-open");
-      });
-      sidebar.addEventListener("mouseleave", () => {
-        document.body.classList.remove("sidebar-open");
       });
     })();
 
@@ -192,7 +172,6 @@
         watchlist.forEach(id => {
           let posterSrc = "";
           let title = "";
-
           if (id === "tt0133093") {
             posterSrc = document.getElementById("poster-matrix").src;
             title = "The Matrix";
@@ -200,7 +179,6 @@
             posterSrc = document.getElementById("poster-dantes").src;
             title = "Dante's Peak";
           }
-
           if (posterSrc && !posterSrc.includes("placeholder.jpg")) {
             const div = document.createElement("div");
             div.className = "watchlist-item";
@@ -211,7 +189,6 @@
 
         section.style.display = grid.children.length > 0 ? "block" : "none";
       }
-
       renderWatchlist();
     })();
 
@@ -220,11 +197,8 @@
       const list = document.getElementById("continueWatchingList");
       const section = document.querySelector(".continue-watching");
       let continued = [];
-      try {
-        continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
-      } catch (e) {
-        continued = [];
-      }
+      try { continued = JSON.parse(localStorage.getItem("continueWatching")) || []; }
+      catch (e) { continued = []; }
       list.innerHTML = "";
       continued.forEach(item => {
         if (!item || typeof item !== "object") return;
@@ -235,7 +209,6 @@
         div.innerHTML = `<img src="${poster}" alt="Poster for ${title}" />`;
         list.appendChild(div);
       });
-
       section.style.display = list.children.length > 0 ? "block" : "none";
     })();
   </script>
