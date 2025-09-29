@@ -159,6 +159,7 @@
 
       function renderWatchlist() {
         const grid = document.getElementById("watchlistGrid");
+        const section = document.querySelector(".watchlist");
         grid.innerHTML = "";
 
         watchlist.forEach(id => {
@@ -181,6 +182,9 @@
             grid.appendChild(div);
           }
         });
+
+        // ✅ Hide section if empty
+        section.style.display = grid.children.length > 0 ? "block" : "none";
       }
 
       // ✅ Render once on page load
@@ -190,6 +194,7 @@
     // Continue Watching (fixed [object Object])
     (function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
+      const section = document.querySelector(".continue-watching");
       let continued = [];
       try {
         continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
@@ -206,6 +211,9 @@
         div.innerHTML = `<img src="${poster}" alt="Poster for ${title}" />`;
         list.appendChild(div);
       });
+
+      // ✅ Hide section if empty
+      section.style.display = list.children.length > 0 ? "block" : "none";
     })();
   </script>
 </body>
