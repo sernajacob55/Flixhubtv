@@ -9,7 +9,7 @@
 <body>
   <!-- Header -->
   <header>
-    <h1>Flix<span>HubTV</span></h1>
+    <h1><span class="flix">FLIX</span><span class="hub">HubTV</span></h1>
     <div class="nav-buttons">
       <button id="logoutBtn" onclick="location.href='login.html'">Logout</button>
     </div>
@@ -20,7 +20,6 @@
     <div class="welcome">Choose Your Profile</div>
 
     <section class="profiles-grid">
-      <!-- Profile boxes -->
       <div class="profile-card" onclick="selectProfile('Serna')">
         <img src="profile1.png" alt="Serna" />
         <h3>Serna</h3>
@@ -45,15 +44,9 @@
 
   <script>
     function selectProfile(name) {
-      // Save profile in localStorage
       localStorage.setItem("flixhubtvProfile", name);
-
-      // Update welcome message when user returns to index
       window.location.href = "index.html";
     }
-
-    // Centering fix: ensure body fills viewport
-    document.body.style.minHeight = "100vh";
   </script>
 </body>
 </html>

@@ -39,12 +39,13 @@ header h1 {
   margin-left: 60px;
 }
 
-header h1 span {
-  color: #fff;
+/* ✅ Fix for FLIX cyan + HubTV white */
+header h1 .flix {
+  color: #00bfff;
 }
 
-header h1::first-letter {
-  color: #00bfff;
+header h1 .hub {
+  color: #fff;
 }
 
 .nav-buttons {

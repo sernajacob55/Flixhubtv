@@ -9,7 +9,7 @@
 <body>
   <!-- Header -->
   <header>
-    <h1>Flix<span>HubTV</span></h1>
+    <h1><span class="flix">FLIX</span><span class="hub">HubTV</span></h1>
     <div class="nav-buttons">
       <button onclick="location.href='index.html'">Home</button>
       <button onclick="location.href='profiles.html'">Switch Profile</button>
@@ -124,7 +124,7 @@
       }
     }
 
-    // Load recommendations (fixed link IDs)
+    // Load recommendations
     async function loadRecommendations() {
       try {
         const tmdbRes = await fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_KEY}&external_source=imdb_id`);
@@ -174,9 +174,9 @@
 
       let movieSrc = "";
       if (imdbID === "tt0133093") { // The Matrix
-        movieSrc = "https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4";
+        movieSrc = "https://download1351.mediafire.com/.../The+Matrix.mp4";
       } else if (imdbID === "tt0118928") { // Dante's Peak
-        movieSrc = "https://download1324.mediafire.com/cd5ev8gxoajggy5dbp_1pagixal-14NXp2krW0s3WdxiRxacbt_tmKEN5wBSXGhBxaHmQRL6a_oqit-_4Uqm6r7Th8gd02jAsy_iWXSiGUZejYG1i7-rTMQrhWr5Q8OQan-9adl7oEEEJK7mmWiPIvTIT_iyRk3hboxiQfNDUHmnI0Q/jtd07wddlls76o2/Dantes+Peak.mp4";
+        movieSrc = "https://download1324.mediafire.com/.../Dantes+Peak.mp4";
       }
 
       if (movieSrc) {
