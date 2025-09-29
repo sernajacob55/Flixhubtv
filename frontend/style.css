@@ -71,16 +71,26 @@ header span {
   transition: margin-left 0.3s ease;
 }
 
+/* Sidebar wrapper zone */
+.sidebar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 220px; /* hover zone width */
+  z-index: 1000;
+}
+
 /* Sidebar */
 .sidebar {
   width: 200px;
+  height: 100%;
   background: rgba(15, 15, 20, 0.98);
   padding: 20px;
-  position: fixed;
-  left: -200px;
+  position: absolute;
+  left: -200px; /* hidden */
   top: 0;
   bottom: 0;
-  z-index: 1000;
   overflow-y: auto;
   transition: left 0.3s ease;
 }
@@ -103,13 +113,13 @@ header span {
   background: #00aaff;
 }
 
-/* Sidebar visible */
-body.sidebar-open .sidebar {
+/* Show sidebar on hover */
+.sidebar-wrapper:hover .sidebar {
   left: 0;
 }
 
-/* Push page content when sidebar is visible */
-body.sidebar-open .page {
+/* Push content when sidebar visible */
+.sidebar-wrapper:hover ~ .main-content {
   margin-left: 200px;
 }
 

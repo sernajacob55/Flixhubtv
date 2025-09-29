@@ -10,7 +10,6 @@
   <!-- Header / Navbar -->
   <header>
     <h1><span class="logo-flix">Flix</span>HubTV</h1>
-
     <div class="nav-buttons">
       <input id="searchInput" type="text" placeholder="Search movies..." aria-label="Search movies"/>
       <button id="switchProfileBtn" onclick="location.href='profiles.html'">Switch Profile</button>
@@ -19,17 +18,19 @@
     </div>
   </header>
 
-  <!-- Page wrapper to keep sidebar and main content siblings -->
+  <!-- Page wrapper -->
   <div class="page">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="leftSidebar" aria-label="Genres">
-      <h3>Genres</h3>
-      <ul>
-        <li data-filter="all">All</li>
-        <li data-filter="Action">Action</li>
-        <li data-filter="Sci-Fi">Sci-Fi</li>
-      </ul>
-    </aside>
+    <!-- Sidebar wrapper -->
+    <div class="sidebar-wrapper">
+      <aside class="sidebar" aria-label="Genres">
+        <h3>Genres</h3>
+        <ul>
+          <li data-filter="all">All</li>
+          <li data-filter="Action">Action</li>
+          <li data-filter="Sci-Fi">Sci-Fi</li>
+        </ul>
+      </aside>
+    </div>
 
     <!-- Main Content -->
     <main class="main-content" id="content">
@@ -57,7 +58,7 @@
     </main>
   </div>
 
-  <!-- Inline scripts -->
+  <!-- Scripts -->
   <script>
     const OMDB_KEY = "ea7569d7";
 
@@ -72,18 +73,6 @@
 
     const activeProfile = localStorage.getItem("activeProfile") || "Guest";
     document.getElementById("welcomeText").textContent = `Welcome, ${activeProfile}`;
-
-    /* Sidebar hover behavior (toggle body class) */
-    (function setupSidebarShift() {
-      const sidebar = document.getElementById('leftSidebar');
-      if (!sidebar) return;
-      sidebar.addEventListener('mouseenter', () => {
-        document.body.classList.add('sidebar-open');
-      });
-      sidebar.addEventListener('mouseleave', () => {
-        document.body.classList.remove('sidebar-open');
-      });
-    })();
 
     /* Matrix Poster */
     (function loadMatrixPoster() {
