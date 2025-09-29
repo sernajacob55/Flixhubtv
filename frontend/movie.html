@@ -16,7 +16,6 @@
     </div>
   </header>
 
-  <!-- Page wrapper -->
   <div class="page">
     <!-- Sidebar -->
     <aside class="sidebar" id="leftSidebar" aria-label="Genres">
@@ -56,34 +55,41 @@
     /***************
      * API KEYS
      ***************/
-    const OMDB_KEY = "ea7569d7"; // OMDb metadata
-    const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f"; // TMDb actor images & recommendations
+    const OMDB_KEY = "ea7569d7"; 
+    const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f"; 
 
     /***************
-     * SIDEBAR HOVER
+     * SIDEBAR
      ***************/
     (function setupSidebarShift() {
       const sidebar = document.getElementById('leftSidebar');
       if (!sidebar) return;
-      sidebar.addEventListener('mouseenter', () => {
-        document.body.classList.add('sidebar-open');
-      });
-      sidebar.addEventListener('mouseleave', () => {
-        document.body.classList.remove('sidebar-open');
-      });
+      sidebar.addEventListener('mouseenter', () => document.body.classList.add('sidebar-open'));
+      sidebar.addEventListener('mouseleave', () => document.body.classList.remove('sidebar-open'));
     })();
 
     /***************
      * MOVIE DETAILS
      ***************/
     const params = new URLSearchParams(window.location.search);
-    const imdbID = params.get("id") || "tt0133093"; // Default: The Matrix
+    const imdbID = params.get("id") || "tt0133093"; 
 
     async function loadMovieDetails() {
       const details = document.getElementById("movieDetails");
       try {
-        const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
-        const data = await res.json();
+        // Poster caching
+        let poster = localStorage.getItem(`poster_${imdbID}`);
+        let data;
+
+        if (!poster) {
+          const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
+          data = await res.json();
+          poster = (data && data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg";
+          localStorage.setItem(`poster_${imdbID}`, poster);
+        } else {
+          const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
+          data = await res.json();
+        }
 
         if (!data || data.Response === "False") {
           details.innerHTML = "<p>Movie not found.</p>";
@@ -92,7 +98,7 @@
 
         details.innerHTML = `
           <div class="movie-header">
-            <img src="${data.Poster !== "N/A" ? data.Poster : "placeholder.jpg"}" alt="${data.Title} poster" />
+            <img src="${poster}" alt="${data.Title} poster" />
             <div>
               <h2>${data.Title}</h2>
               <p>${data.Year} | Runtime: ${data.Runtime} | Genre: ${data.Genre}</p>
@@ -107,80 +113,10 @@
           <div id="recommended" class="recommended"></div>
         `;
 
-        // Load Cast
-        loadCast(data.Actors);
-
-        // Buttons
         document.getElementById("playBtn").addEventListener("click", () => playMovie(data.Title));
         document.getElementById("watchlistBtn").addEventListener("click", () => toggleWatchlist(data));
-
-        // Recommendations
-        loadRecommended(data.Title);
       } catch (err) {
         details.innerHTML = "<p>Error loading movie details.</p>";
-      }
-    }
-
-    /***************
-     * CAST (TMDb)
-     ***************/
-    async function loadCast(actorList) {
-      const castDiv = document.getElementById("cast");
-      if (!actorList || !castDiv) return;
-      const actors = actorList.split(",").map(a => a.trim());
-
-      castDiv.innerHTML = "";
-      for (const actor of actors) {
-        try {
-          const res = await fetch(`https://api.themoviedb.org/3/search/person?api_key=${TMDB_KEY}&query=${encodeURIComponent(actor)}`);
-          const data = await res.json();
-          const actorData = data.results && data.results[0];
-          const img = actorData && actorData.profile_path 
-            ? `https://image.tmdb.org/t/p/w200${actorData.profile_path}`
-            : "placeholder.jpg";
-
-          castDiv.innerHTML += `
-            <div class="actor-card">
-              <img src="${img}" alt="${actor}" />
-              <p>${actor}</p>
-            </div>
-          `;
-        } catch (e) {
-          castDiv.innerHTML += `
-            <div class="actor-card">
-              <img src="placeholder.jpg" alt="${actor}" />
-              <p>${actor}</p>
-            </div>
-          `;
-        }
-      }
-    }
-
-    /***************
-     * RECOMMENDED (TMDb)
-     ***************/
-    async function loadRecommended(title) {
-      const recDiv = document.getElementById("recommended");
-      if (!recDiv) return;
-      try {
-        const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(title)}`);
-        const data = await res.json();
-
-        recDiv.innerHTML = "";
-        data.results.slice(0, 5).forEach(movie => {
-          const poster = movie.poster_path 
-            ? `https://image.tmdb.org/t/p/w200${movie.poster_path}` 
-            : "placeholder.jpg";
-
-          recDiv.innerHTML += `
-            <a href="movie.html?id=${movie.id}" class="movie-card">
-              <img src="${poster}" alt="${movie.title}" />
-              <h3>${movie.title}</h3>
-            </a>
-          `;
-        });
-      } catch (err) {
-        recDiv.innerHTML = "<p>Could not load recommendations.</p>";
       }
     }
 
@@ -256,12 +192,25 @@
 
       video.src = src;
       player.style.display = "block";
+
+      // True fullscreen request
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+      } else if (video.webkitRequestFullscreen) {
+        video.webkitRequestFullscreen();
+      } else if (video.msRequestFullscreen) {
+        video.msRequestFullscreen();
+      }
+
       video.play();
 
       video.ontimeupdate = () => saveProgress(title, video.currentTime);
       close.onclick = () => {
         player.style.display = "none";
         video.pause();
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        }
       };
     }
 

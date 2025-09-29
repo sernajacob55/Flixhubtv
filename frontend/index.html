@@ -77,25 +77,31 @@
     (function setupSidebarShift() {
       const sidebar = document.getElementById('leftSidebar');
       if (!sidebar) return;
-      sidebar.addEventListener('mouseenter', () => {
-        document.body.classList.add('sidebar-open');
-      });
-      sidebar.addEventListener('mouseleave', () => {
-        document.body.classList.remove('sidebar-open');
-      });
+      sidebar.addEventListener('mouseenter', () => document.body.classList.add('sidebar-open'));
+      sidebar.addEventListener('mouseleave', () => document.body.classList.remove('sidebar-open'));
     })();
 
     /***************
-     * POSTERS
+     * POSTERS (with caching)
      ***************/
-    function loadPoster(imdbID, elementId) {
+    async function loadPoster(imdbID, elementId) {
       const img = document.getElementById(elementId);
       if (!img) return;
-      fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`)
-        .then(r => r.json())
-        .then(data => { if (data && data.Poster && data.Poster !== "N/A") img.src = data.Poster; })
-        .catch(() => {});
+
+      let poster = localStorage.getItem(`poster_${imdbID}`);
+      if (!poster) {
+        try {
+          const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
+          const data = await res.json();
+          poster = (data && data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg";
+          localStorage.setItem(`poster_${imdbID}`, poster);
+        } catch {
+          poster = "placeholder.jpg";
+        }
+      }
+      img.src = poster;
     }
+
     loadPoster("tt0133093", "poster-matrix"); // Matrix
     loadPoster("tt0118928", "poster-dante");  // Dante’s Peak
 
