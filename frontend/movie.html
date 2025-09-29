@@ -1,146 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Movie • FlixHubTV</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Matrix • FlixHubTV</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Header / Navbar -->
   <header>
-    <h1 class="logo">FlixHubTV</h1>
-    <nav>
-      <button onclick="window.location.href='profiles.html'">Switch Profile</button>
+    <h1>Flix<span>Hub</span>TV</h1>
+    <div class="nav-buttons">
+      <button onclick="location.href='profiles.html'">Switch Profile</button>
       <button onclick="logout()">Logout</button>
-      <button onclick="window.location.href='index.html'">Home</button>
-    </nav>
+      <button onclick="location.href='index.html'">Home</button>
+    </div>
   </header>
 
-  <main class="movie-container">
-    <div id="movie-details"></div>
+  <!-- Page wrapper -->
+  <div class="page">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="leftSidebar" aria-label="Genres">
+      <h3>Genres</h3>
+      <ul>
+        <li data-filter="all">All</li>
+        <li data-filter="Action">Action</li>
+        <li data-filter="Sci-Fi">Sci-Fi</li>
+      </ul>
+    </aside>
 
-    <section>
-      <h2>Cast</h2>
-      <div id="cast" class="cast-grid"></div>
-    </section>
-
-    <section>
-      <h2>Recommended</h2>
-      <div id="recommended" class="recommended-grid"></div>
-    </section>
-  </main>
-
-  <script>
-    const omdbKey = "ea7569d7";  // ✅ OMDb
-    const tmdbKey = "a2942c822ee97bc0df2dba1a65cf2d0f"; // ✅ TMDb
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const imdbID = urlParams.get("id");
-
-    async function loadMovie() {
-      const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${omdbKey}&plot=full`);
-      const movie = await res.json();
-
-      if (movie.Response === "False") {
-        document.getElementById("movie-details").innerHTML = `<p>Movie not found</p>`;
-        return;
-      }
-
-      document.getElementById("movie-details").innerHTML = `
-        <div class="movie-meta">
-          <img src="${movie.Poster}" alt="${movie.Title}">
-          <div>
-            <h2>${movie.Title}</h2>
-            <p><strong>Year:</strong> ${movie.Year} | <strong>Runtime:</strong> ${movie.Runtime} | <strong>Genre:</strong> ${movie.Genre}</p>
-            <p>${movie.Plot}</p>
-            <button onclick="playMovie('${imdbID}')">▶ Play</button>
-            <button id="watchlist-btn" onclick="toggleWatchlist('${imdbID}', '${movie.Title}')">+ Add to Watchlist</button>
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="movie-details">
+        <img id="movie-poster" src="" alt="Movie Poster" />
+        <div class="movie-info">
+          <h1 id="movie-title">Loading...</h1>
+          <p id="movie-meta"></p>
+          <p id="movie-plot"></p>
+          <div class="buttons">
+            <button id="playButton">► Play</button>
+            <button id="watchlistButton">+ Add to Watchlist</button>
           </div>
         </div>
-      `;
+      </div>
 
-      loadCast(movie.Title);  // Use TMDb for actors
-      loadRecommended(movie.Title); // Use TMDb recommendations
-    }
+      <!-- Video Player -->
+      <div id="videoPlayer" class="video-container hidden">
+        <video id="matrixVideo" controls>
+          <source src="https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <button id="closePlayer">✕</button>
+      </div>
 
-    // TMDb cast lookup
-    async function loadCast(title) {
-      const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${tmdbKey}&query=${encodeURIComponent(title)}`);
-      const data = await res.json();
+      <!-- Cast Section -->
+      <section class="cast">
+        <h3>Cast</h3>
+        <div id="cast" class="cast-list"></div>
+      </section>
 
-      if (data.results.length > 0) {
-        const movieId = data.results[0].id;
-        const creditsRes = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${tmdbKey}`);
-        const credits = await creditsRes.json();
+      <!-- Recommended Section -->
+      <section class="recommended">
+        <h3>Recommended</h3>
+        <div id="recommended" class="recommended-list"></div>
+      </section>
+    </main>
+  </div>
 
-        const castDiv = document.getElementById("cast");
-        credits.cast.slice(0, 6).forEach(actor => {
-          const img = actor.profile_path
-            ? `https://image.tmdb.org/t/p/w200${actor.profile_path}`
-            : "https://via.placeholder.com/100x150";
+  <!-- Scripts -->
+  <script>
+    /***************
+     * CONFIG KEYS *
+     ***************/
+    const OMDB_KEY = "ea7569d7"; // OMDb
+    const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f"; // TMDb
+    const imdbID = "tt0133093"; // The Matrix
 
-          castDiv.innerHTML += `
-            <div class="cast-card">
-              <img src="${img}" alt="${actor.name}">
-              <p>${actor.name}</p>
-            </div>
-          `;
-        });
-      }
-    }
-
-    // TMDb recommended movies
-    async function loadRecommended(title) {
-      const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${tmdbKey}&query=${encodeURIComponent(title)}`);
-      const data = await res.json();
-
-      if (data.results.length > 0) {
-        const movieId = data.results[0].id;
-        const recRes = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/recommendations?api_key=${tmdbKey}`);
-        const recData = await recRes.json();
-
-        const recDiv = document.getElementById("recommended");
-        recDiv.innerHTML = "";
-
-        recData.results.slice(0, 6).forEach(rec => {
-          const img = rec.poster_path
-            ? `https://image.tmdb.org/t/p/w200${rec.poster_path}`
-            : "https://via.placeholder.com/150";
-
-          recDiv.innerHTML += `
-            <div class="rec-card" onclick="window.location.href='movie.html?id=${rec.id}'>
-              <img src="${img}" alt="${rec.title}">
-              <p>${rec.title}</p>
-            </div>
-          `;
-        });
-      }
-    }
-
-    function playMovie(id) {
-      alert("Play movie with ID: " + id);
-    }
-
-    function toggleWatchlist(id, title) {
-      let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
-      const exists = watchlist.find(m => m.id === id);
-
-      if (exists) {
-        watchlist = watchlist.filter(m => m.id !== id);
-        document.getElementById("watchlist-btn").innerText = "+ Add to Watchlist";
-      } else {
-        watchlist.push({ id, title });
-        document.getElementById("watchlist-btn").innerText = "✔ Remove from Watchlist";
-      }
-
-      localStorage.setItem("watchlist", JSON.stringify(watchlist));
-    }
-
-    function logout() {
-      localStorage.removeItem("currentProfile");
+    /***************************
+     * LOGIN ENFORCEMENT LOGIC *
+     ***************************/
+    if (!localStorage.getItem("loggedIn")) {
       window.location.href = "login.html";
     }
 
-    loadMovie();
+    function logout() {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "login.html";
+    }
+
+    /***************************************
+     * FETCH METADATA FROM OMDb (Title, etc)
+     ***************************************/
+    async function loadOMDb() {
+      const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
+      const data = await res.json();
+
+      if (data) {
+        document.getElementById("movie-poster").src = data.Poster;
+        document.getElementById("movie-title").textContent = data.Title;
+        document.getElementById("movie-meta").textContent =
+          `Year: ${data.Year} | Runtime: ${data.Runtime} | Genre: ${data.Genre}`;
+        document.getElementById("movie-plot").textContent = data.Plot;
+      }
+    }
+
+    /*********************************************
+     * FETCH CAST + RECOMMENDATIONS FROM TMDb API *
+     *********************************************/
+    async function loadTMDb() {
+      const res = await fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_KEY}&external_source=imdb_id`);
+      const data = await res.json();
+
+      if (data.movie_results.length > 0) {
+        const tmdbId = data.movie_results[0].id;
+
+        // Cast
+        const castRes = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/credits?api_key=${TMDB_KEY}`);
+        const castData = await castRes.json();
+        document.getElementById("cast").innerHTML =
+          castData.cast.slice(0, 6).map(actor => `
+            <div class="cast-member">
+              <img src="https://image.tmdb.org/t/p/w200${actor.profile_path}" alt="${actor.name}" />
+              <p>${actor.name}</p>
+            </div>
+          `).join("");
+
+        // Recommended
+        const recRes = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/recommendations?api_key=${TMDB_KEY}`);
+        const recData = await recRes.json();
+        document.getElementById("recommended").innerHTML =
+          recData.results.slice(0, 6).map(movie => `
+            <div class="recommended-card" onclick="location.href='movie.html?id=${movie.id}'">
+              <img src="https://image.tmdb.org/t/p/w200${movie.poster_path}" alt="${movie.title}" />
+              <p>${movie.title}</p>
+            </div>
+          `).join("");
+      }
+    }
+
+    /************************
+     * VIDEO PLAYER BEHAVIOR *
+     ************************/
+    const playBtn = document.getElementById("playButton");
+    const closeBtn = document.getElementById("closePlayer");
+    const videoContainer = document.getElementById("videoPlayer");
+    const video = document.getElementById("matrixVideo");
+
+    playBtn.addEventListener("click", () => {
+      videoContainer.classList.remove("hidden");
+      video.play();
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+      }
+    });
+
+    closeBtn.addEventListener("click", () => {
+      video.pause();
+      videoContainer.classList.add("hidden");
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    });
+
+    /***************
+     * INIT CALLS  *
+     ***************/
+    loadOMDb();
+    loadTMDb();
   </script>
 </body>
 </html>

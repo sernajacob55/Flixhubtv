@@ -1,37 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profiles - FlixHubTV</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profiles • FlixHubTV</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Header / Navbar -->
   <header>
-    <div class="logo">Flix<span>Hub</span>TV</div>
-    <nav>
-      <button onclick="window.location.href='login.html'">Logout</button>
-    </nav>
+    <h1>Flix<span>Hub</span>TV</h1>
+    <div class="nav-buttons">
+      <button onclick="logout()">Logout</button>
+      <button onclick="location.href='index.html'">Home</button>
+    </div>
   </header>
 
-  <main class="profiles-container">
-    <h2>Choose Your Profile</h2>
+  <!-- Profile Selection -->
+  <main class="profile-container">
+    <h2 class="profile-title">Who's Watching?</h2>
     <div class="profile-grid">
       <div class="profile-box" onclick="selectProfile('Serna')">
+        <img src="" alt="Serna Avatar" />
         <span>Serna</span>
       </div>
       <div class="profile-box" onclick="selectProfile('Whitfield')">
+        <img src="" alt="Whitfield Avatar" />
         <span>Whitfield</span>
       </div>
       <div class="profile-box" onclick="selectProfile('Brandt')">
+        <img src="" alt="Brandt Avatar" />
         <span>Brandt</span>
       </div>
     </div>
   </main>
 
+  <!-- Scripts -->
   <script>
-    function selectProfile(name) {
-      localStorage.setItem("activeProfile", name);
+    /***************************
+     * LOGIN ENFORCEMENT LOGIC *
+     ***************************/
+    if (!localStorage.getItem("loggedIn")) {
+      window.location.href = "login.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "login.html";
+    }
+
+    /****************************
+     * PROFILE SELECTION HANDLER *
+     ****************************/
+    function selectProfile(profile) {
+      localStorage.setItem("activeProfile", profile);
       window.location.href = "index.html";
     }
   </script>

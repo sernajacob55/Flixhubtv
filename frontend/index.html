@@ -1,46 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FlixHubTV</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Browse • FlixHubTV</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="sidebar">
-    <h3>Genres</h3>
-    <ul>
-      <li><a href="#">All</a></li>
-      <li><a href="#">Action</a></li>
-      <li><a href="#">Sci-Fi</a></li>
-    </ul>
-  </div>
-
+  <!-- Header / Navbar -->
   <header>
-    <div class="logo">Flix<span>Hub</span>TV</div>
-    <nav>
-      <input type="text" placeholder="Search movies...">
-      <button onclick="window.location.href='profiles.html'">Switch Profile</button>
-      <button onclick="window.location.href='login.html'">Logout</button>
-      <button onclick="window.location.href='index.html'">Home</button>
-    </nav>
+    <h1>Flix<span>Hub</span>TV</h1>
+
+    <div class="nav-buttons">
+      <input id="searchInput" type="text" placeholder="Search movies..." aria-label="Search movies"/>
+      <button id="switchProfileBtn" onclick="location.href='profiles.html'">Switch Profile</button>
+      <button id="logoutBtn" onclick="logout()">Logout</button>
+      <button id="homeBtn" onclick="location.href='index.html'">Home</button>
+    </div>
   </header>
 
-  <main class="main-content">
-    <h2 id="welcome"></h2>
-    <div class="movies-grid">
-      <div class="movie-card">
-        <a href="movie.html?id=tt0133093">
-          <img src="https://m.media-amazon.com/images/M/MV5BNzQzOTk3NjAtNDQ0ZC00ZGVlLTlmNjYtY2Q5YzBiYjE3MzNkXkEyXkFqcGc@._V1_SX300.jpg" alt="The Matrix">
-          <p>The Matrix</p>
-        </a>
-      </div>
-    </div>
-  </main>
+  <!-- Page wrapper to keep sidebar and main content siblings -->
+  <div class="page">
+    <!-- Slide-out Sidebar (autohide) -->
+    <aside class="sidebar" id="leftSidebar" aria-label="Genres">
+      <h3>Genres</h3>
+      <ul>
+        <li data-filter="all">All</li>
+        <li data-filter="Action">Action</li>
+        <li data-filter="Sci-Fi">Sci-Fi</li>
+      </ul>
+    </aside>
 
+    <!-- Main Content -->
+    <main class="main-content" id="content">
+      <div class="welcome" id="welcomeText">Welcome, Serna</div>
+
+      <section class="movie-grid" id="movieGrid">
+        <!-- Only The Matrix (links to movie page with imdbID) -->
+        <a class="movie-card" href="movie.html?id=tt0133093" data-genres="Action,Sci-Fi">
+          <img id="poster-matrix" src="" alt="The Matrix poster" />
+          <h3>The Matrix</h3>
+        </a>
+      </section>
+    </main>
+  </div>
+
+  <!-- Inline scripts (no external script.js) -->
   <script>
-    document.getElementById("welcome").innerText =
-      "Welcome, " + (localStorage.getItem("activeProfile") || "Guest");
+    /***************
+     * CONFIG KEYS *
+     ***************/
+    const OMDB_KEY = "ea7569d7"; // OMDb (posters/metadata)
+    // const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f"; // TMDb (not needed here)
+
+    /***************************
+     * LOGIN ENFORCEMENT LOGIC *
+     ***************************/
+    if (!localStorage.getItem("loggedIn")) {
+      window.location.href = "login.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "login.html";
+    }
+
+    /****************************
+     * SIDEBAR HOVER BEHAVIOR   *
+     * Push content only while  *
+     * the sidebar is hovered.  *
+     ****************************/
+    (function setupSidebarShift() {
+      const sidebar = document.getElementById('leftSidebar');
+      const page = document.querySelector('.page');
+      if (!sidebar || !page) return;
+
+      sidebar.addEventListener('mouseenter', () => {
+        document.body.classList.add('sidebar-open');
+      });
+      sidebar.addEventListener('mouseleave', () => {
+        document.body.classList.remove('sidebar-open');
+      });
+    })();
+
+    /***************************************
+     * FETCH POSTER FOR "THE MATRIX" (OMDb)
+     ***************************************/
+    (function loadMatrixPoster() {
+      const img = document.getElementById('poster-matrix');
+      if (!img) return;
+      const imdbID = "tt0133093";
+      fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.Poster && data.Poster !== "N/A") {
+            img.src = data.Poster;
+          } else {
+            // Fallback if OMDb Poster not available
+            img.src = "placeholder.jpg";
+          }
+        })
+        .catch(() => {
+          img.src = "placeholder.jpg";
+        });
+    })();
+
+    /*****************************************
+     * SIMPLE CLIENT-SIDE GENRE FILTER (Grid)
+     * Works for future movies you add.
+     *****************************************/
+    (function setupGenreFilter() {
+      const list = document.querySelector('.sidebar ul');
+      const cards = document.querySelectorAll('.movie-card');
+      if (!list || !cards.length) return;
+
+      list.addEventListener('click', (e) => {
+        const li = e.target.closest('li');
+        if (!li) return;
+        const filter = li.getAttribute('data-filter');
+        cards.forEach(card => {
+          const genres = (card.getAttribute('data-genres') || "").split(',');
+          if (filter === 'all' || genres.includes(filter)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    })();
   </script>
 </body>
 </html>
