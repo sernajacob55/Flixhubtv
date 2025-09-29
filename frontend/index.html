@@ -132,54 +132,60 @@
     })();
 
     // Watchlist Toggle
-(function setupWatchlist() {
-  const buttons = document.querySelectorAll('.watchlist-toggle');
-  let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+    (function setupWatchlist() {
+      const buttons = document.querySelectorAll('.watchlist-toggle');
+      let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
 
-  function updateButton(btn) {
-    const id = btn.getAttribute("data-id");
-    btn.textContent = watchlist.includes(id) ? "✓ Added" : "+ Add to Watchlist";
-  }
-
-  buttons.forEach(btn => {
-    updateButton(btn);
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation(); // ✅ Prevents click from bubbling up to movie card
-      const id = btn.getAttribute("data-id");
-      if (watchlist.includes(id)) {
-        watchlist = watchlist.filter(x => x !== id);
-      } else {
-        watchlist.push(id);
+      function updateButton(btn) {
+        const id = btn.getAttribute("data-id");
+        btn.textContent = watchlist.includes(id) ? "✓ Added" : "+ Add to Watchlist";
       }
-      localStorage.setItem("watchlist", JSON.stringify(watchlist));
-      updateButton(btn);
+
+      buttons.forEach(btn => {
+        updateButton(btn);
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation(); // ✅ Prevents click from bubbling up to movie card
+          const id = btn.getAttribute("data-id");
+          if (watchlist.includes(id)) {
+            watchlist = watchlist.filter(x => x !== id);
+          } else {
+            watchlist.push(id);
+          }
+          localStorage.setItem("watchlist", JSON.stringify(watchlist));
+          updateButton(btn);
+          renderWatchlist();
+        });
+      });
+
+      function renderWatchlist() {
+        const grid = document.getElementById("watchlistGrid");
+        grid.innerHTML = "";
+
+        watchlist.forEach(id => {
+          let posterSrc = "";
+          let title = "";
+
+          if (id === "tt0133093") {
+            posterSrc = document.getElementById("poster-matrix").src;
+            title = "The Matrix";
+          } else if (id === "tt0118928") {
+            posterSrc = document.getElementById("poster-dantes").src;
+            title = "Dante's Peak";
+          }
+
+          // ✅ Only append if poster is valid
+          if (posterSrc && !posterSrc.includes("placeholder.jpg")) {
+            const div = document.createElement("div");
+            div.className = "watchlist-item";
+            div.innerHTML = `<img src="${posterSrc}" alt="Poster for ${title}" />`;
+            grid.appendChild(div);
+          }
+        });
+      }
+
+      // ✅ Render once on page load
       renderWatchlist();
-    });
-  });
-
-  function renderWatchlist() {
-  const grid = document.getElementById("watchlistGrid");
-  grid.innerHTML = "";
-
-  watchlist.forEach(id => {
-    let posterSrc = "placeholder.jpg";
-    let title = "";
-
-    if (id === "tt0133093") {
-      posterSrc = document.getElementById("poster-matrix").src || "placeholder.jpg";
-      title = "The Matrix";
-    } else if (id === "tt0118928") {
-      posterSrc = document.getElementById("poster-dantes").src || "placeholder.jpg";
-      title = "Dante's Peak";
-    }
-
-    const div = document.createElement("div");
-    div.className = "watchlist-item";
-    div.innerHTML = `<img src="${posterSrc}" alt="Poster for ${title}" />`;
-    grid.appendChild(div);
-  });
-}
-})();
+    })();
 
     // Continue Watching (fixed [object Object])
     (function setupContinueWatching() {
