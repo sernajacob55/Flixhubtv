@@ -137,8 +137,9 @@ body.sidebar-open .main-content {
 .welcome {
   font-size: 1.4em;
   margin-bottom: 20px;
-  color: #fff;
-  text-shadow: 0 0 6px #00bfff;
+  color: #00bfff;   /* ✅ Matches site accent */
+  font-weight: bold; /* ✅ Stronger emphasis */
+  text-shadow: none; /* ✅ Clean look */
 }
 
 /* =====================
