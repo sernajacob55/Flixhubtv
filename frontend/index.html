@@ -9,7 +9,7 @@
 <body>
   <!-- Header / Navbar -->
   <header>
-    <h1>Flix<span>Hub</span>TV</h1>
+    <h1><span class="logo-flix">Flix</span>HubTV</h1>
 
     <div class="nav-buttons">
       <input id="searchInput" type="text" placeholder="Search movies..." aria-label="Search movies"/>
@@ -33,8 +33,21 @@
 
     <!-- Main Content -->
     <main class="main-content" id="content">
-      <div class="welcome" id="welcomeText">Welcome, Serna</div>
+      <div class="welcome" id="welcomeText">Welcome</div>
 
+      <!-- Continue Watching -->
+      <section id="continueWatchingSection" style="display:none;">
+        <h2>Continue Watching</h2>
+        <div id="continueWatching" class="movie-grid"></div>
+      </section>
+
+      <!-- Watchlist -->
+      <section id="watchlistSection" style="display:none;">
+        <h2>My Watchlist</h2>
+        <div id="watchlist" class="movie-grid"></div>
+      </section>
+
+      <!-- Movies -->
       <section class="movie-grid" id="movieGrid">
         <!-- Only The Matrix (links to movie page with imdbID) -->
         <a class="movie-card" href="movie.html?id=tt0133093" data-genres="Action,Sci-Fi">
@@ -45,13 +58,12 @@
     </main>
   </div>
 
-  <!-- Inline scripts (no external script.js) -->
+  <!-- Inline scripts -->
   <script>
     /***************
      * CONFIG KEYS *
      ***************/
     const OMDB_KEY = "ea7569d7"; // OMDb (posters/metadata)
-    // const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f"; // TMDb (not needed here)
 
     /***************************
      * LOGIN ENFORCEMENT LOGIC *
@@ -66,14 +78,17 @@
     }
 
     /****************************
+     * ACTIVE PROFILE HANDLER   *
+     ****************************/
+    const activeProfile = localStorage.getItem("activeProfile") || "Guest";
+    document.getElementById("welcomeText").textContent = `Welcome, ${activeProfile}`;
+
+    /****************************
      * SIDEBAR HOVER BEHAVIOR   *
-     * Push content only while  *
-     * the sidebar is hovered.  *
      ****************************/
     (function setupSidebarShift() {
       const sidebar = document.getElementById('leftSidebar');
-      const page = document.querySelector('.page');
-      if (!sidebar || !page) return;
+      if (!sidebar) return;
 
       sidebar.addEventListener('mouseenter', () => {
         document.body.classList.add('sidebar-open');
@@ -96,7 +111,6 @@
           if (data && data.Poster && data.Poster !== "N/A") {
             img.src = data.Poster;
           } else {
-            // Fallback if OMDb Poster not available
             img.src = "placeholder.jpg";
           }
         })
@@ -107,7 +121,6 @@
 
     /*****************************************
      * SIMPLE CLIENT-SIDE GENRE FILTER (Grid)
-     * Works for future movies you add.
      *****************************************/
     (function setupGenreFilter() {
       const list = document.querySelector('.sidebar ul');
@@ -126,6 +139,63 @@
             card.style.display = 'none';
           }
         });
+      });
+    })();
+
+    /********************************
+     * CONTINUE WATCHING (Profile-Specific)
+     ********************************/
+    (function loadContinueWatching() {
+      const contData = JSON.parse(localStorage.getItem("continueWatching_" + activeProfile) || "null");
+      if (!contData) return;
+
+      const section = document.getElementById("continueWatchingSection");
+      const container = document.getElementById("continueWatching");
+
+      fetch(`https://www.omdbapi.com/?i=${contData.imdbID}&apikey=${OMDB_KEY}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.Title) {
+            section.style.display = "block";
+            container.innerHTML = `
+              <a class="movie-card" href="movie.html?id=${contData.imdbID}">
+                <img src="${data.Poster}" alt="${data.Title}" />
+                <h3>${data.Title}</h3>
+                <p style="color:cyan; font-size:14px;">Resume at ${Math.floor(contData.currentTime/60)}m</p>
+              </a>
+            `;
+          }
+        });
+    })();
+
+    /********************************
+     * WATCHLIST (Profile-Specific)
+     ********************************/
+    (function loadWatchlist() {
+      const watchlist = JSON.parse(localStorage.getItem("watchlist_" + activeProfile) || "[]");
+      if (!watchlist.length) return;
+
+      const section = document.getElementById("watchlistSection");
+      const container = document.getElementById("watchlist");
+      section.style.display = "block";
+
+      container.innerHTML = ""; // clear before appending
+
+      watchlist.forEach(imdbID => {
+        fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`)
+          .then(r => r.json())
+          .then(data => {
+            if (data && data.Title) {
+              const card = document.createElement("a");
+              card.className = "movie-card";
+              card.href = `movie.html?id=${imdbID}`;
+              card.innerHTML = `
+                <img src="${data.Poster}" alt="${data.Title}" />
+                <h3>${data.Title}</h3>
+              `;
+              container.appendChild(card);
+            }
+          });
       });
     })();
   </script>

@@ -5,11 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profiles • FlixHubTV</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Page-specific overrides */
+    .profile-container {
+      text-align: center;
+      margin-top: 80px;
+    }
+
+    .profile-title {
+      font-size: 26px;
+      margin-bottom: 40px;
+    }
+
+    .profile-grid {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .profile-box {
+      background: #111;
+      border-radius: 15px;
+      padding: 20px;
+      width: 160px;
+      height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 0 15px #00ffff33;
+    }
+
+    .profile-box:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #00ffff;
+    }
+
+    .profile-box img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: gray;
+      margin-bottom: 15px;
+    }
+
+    .profile-box span {
+      font-size: 18px;
+      font-weight: bold;
+      text-transform: capitalize;
+    }
+  </style>
 </head>
 <body>
   <!-- Header / Navbar -->
   <header>
-    <h1>Flix<span>Hub</span>TV</h1>
+    <h1><span class="logo-flix">Flix</span>HubTV</h1>
     <div class="nav-buttons">
       <button onclick="logout()">Logout</button>
       <button onclick="location.href='index.html'">Home</button>
