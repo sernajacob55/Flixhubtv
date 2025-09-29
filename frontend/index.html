@@ -43,7 +43,7 @@
   <!-- Header -->
   <header>
     <h1><span>Flix</span>HubTV</h1>
-    <div class="nav-actions">
+    <div class="actions">
       <input type="text" class="search-bar" placeholder="Search movies...">
       <button onclick="window.location.href='profiles.html'">Switch Profile</button>
       <button onclick="window.location.href='login.html'">Logout</button>
@@ -70,7 +70,7 @@
     </div>
 
     <!-- Movies -->
-    <section class="movie-grid" id="moviesContainer"></section>
+    <section class="movies-grid" id="moviesContainer"></section>
   </main>
 
   <!-- Scripts -->
@@ -78,7 +78,7 @@
     const apiKey = "ea7569d7";
     const movies = [
       { id: "tt0133093" } // The Matrix
-      // Add more movies here later...
+      // Add more OMDb IDs here later
     ];
 
     // Show profile welcome
@@ -124,12 +124,11 @@
           card.classList.add("movie-card");
           card.setAttribute("data-genres", data.Genre);
           card.innerHTML = `
-            <img src="${data.Poster}" alt="${data.Title}">
-            <h3>${data.Title}</h3>
+            <a href="movie.html?id=${data.imdbID}">
+              <img src="${data.Poster}" alt="${data.Title}">
+              <h3>${data.Title}</h3>
+            </a>
           `;
-          card.onclick = () => {
-            window.location.href = `movie.html?id=${movie.id}`;
-          };
           moviesContainer.appendChild(card);
 
           // Collect genres across all movies
