@@ -1,31 +1,40 @@
-/* Reset and body */
-body {
+/* =====================
+   Global Reset & Layout
+   ===================== */
+* {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0f0f1a, #1b1b2f, #2a0f1c);
-  color: #fff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Header */
+html, body {
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0d0d0d, #1a1a1a, #0f2027);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* =====================
+   Header
+   ===================== */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px 30px;
-  background: #0d0d0d;
-  box-shadow: 0px 10px rgba(0, 0, 0, 0.6);
+  background: rgba(0,0,0,0.9);
   position: sticky;
   top: 0;
   z-index: 1000;
 }
 
 header h1 {
-  font-size: 1.8em;
+  font-size: 2em;
   font-weight: bold;
-  margin: 0;
   margin-left: 60px;
 }
 
@@ -34,22 +43,22 @@ header h1 span {
 }
 
 header h1::first-letter {
-  color: #00bfff; /* Flix in blue */
+  color: #00bfff;
 }
 
-header .nav-buttons {
+.nav-buttons {
   display: flex;
   gap: 10px;
 }
 
-header input {
+.nav-buttons input {
   padding: 8px;
   border-radius: 4px;
   border: none;
   outline: none;
 }
 
-header button {
+.nav-buttons button {
   background: #111;
   color: #fff;
   border: none;
@@ -59,11 +68,13 @@ header button {
   transition: background 0.3s;
 }
 
-header button:hover {
+.nav-buttons button:hover {
   background: #00bfff;
 }
 
-/* Sidebar */
+/* =====================
+   Sidebar
+   ===================== */
 .sidebar {
   position: fixed;
   top: 60px;
@@ -101,7 +112,9 @@ body.sidebar-open .sidebar {
   left: 0;
 }
 
-/* Page & Main Content */
+/* =====================
+   Page & Main Content
+   ===================== */
 .page {
   display: flex;
   flex: 1;
@@ -110,6 +123,7 @@ body.sidebar-open .sidebar {
 .main-content {
   flex-grow: 1;
   padding: 30px;
+  margin-left: 0; /* fixed content not cut by sidebar */
   transition: margin-left 0.3s ease;
 }
 
@@ -124,7 +138,9 @@ body.sidebar-open .main-content {
   text-shadow: 0 0 6px #00bfff;
 }
 
-/* Movie Grid */
+/* =====================
+   Movie Grid
+   ===================== */
 .movie-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -158,11 +174,42 @@ body.sidebar-open .main-content {
   font-size: 1em;
   font-weight: normal;
   color: #fff;
-  text-decoration: none; /* Ensure titles don’t look clickable */
-  pointer-events: none; /* No click event on title */
+  text-decoration: none;
+  pointer-events: none;
 }
 
-/* Watchlist & Continue Watching */
+/* =====================
+   Cast Grid
+   ===================== */
+#castGrid {
+  display: flex;
+  flex-wrap: wrap; /* actors next to each other */
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.actor-card {
+  flex: 0 1 120px;
+  text-align: center;
+}
+
+.actor-card img {
+  width: 100px;
+  height: 140px;
+  border-radius: 6px;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
+}
+
+.actor-card p {
+  margin-top: 5px;
+  font-size: 0.9em;
+}
+
+/* =====================
+   Watchlist & Continue Watching
+   ===================== */
 .watchlist,
 .continue-watching {
   margin-top: 40px;
@@ -190,11 +237,143 @@ body.sidebar-open .main-content {
   box-shadow: 0px 10px rgba(0, 0, 0, 0.6);
 }
 
-/* Footer */
+.watchlist-item span,
+.continue-item span {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.85em;
+  color: #ccc;
+}
+
+/* =====================
+   Action Buttons (Play & Watchlist)
+   ===================== */
+.action-btn {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin: 5px 0;
+  font-size: 1em;
+}
+
+.action-btn:hover {
+  background: #00bfff;
+}
+
+/* =====================
+   Recommended Movies
+   ===================== */
+#recommendGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+#recommendGrid img {
+  width: 100%;
+  border-radius: 6px;
+}
+
+/* =====================
+   Login Page
+   ===================== */
+.login-container {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 30px;
+  background: #111;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+  text-align: center;
+}
+
+.login-container h2 {
+  margin-bottom: 20px;
+  color: #00bfff;
+}
+
+.login-container input {
+  display: block;
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 10px;
+  background: #00bfff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.login-container button:hover {
+  background: #009acd;
+}
+
+/* =====================
+   Footer
+   ===================== */
 footer {
   text-align: center;
   padding: 10px;
   background: #000;
   font-size: 0.9em;
-  margin-top: auto; /* push footer to bottom */
+  margin-top: auto;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  color: white;
+  z-index: 100;
+}
+
+/* =====================
+   Video Player Fullscreen
+   ===================== */
+.video-player {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.video-player video {
+  width: 100%;
+  height: 100%;
+  background: black;
+}
+
+.video-player .close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(0,191,255,0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5em;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -28,6 +28,7 @@
         <li data-filter="all">All</li>
         <li data-filter="Action">Action</li>
         <li data-filter="Sci-Fi">Sci-Fi</li>
+        <li data-filter="Thriller">Thriller</li>
       </ul>
     </aside>
 
@@ -50,16 +51,18 @@
       <!-- Movie Grid -->
       <section class="movie-grid" id="movieGrid">
         <!-- The Matrix -->
-        <a class="movie-card" href="movie.html?id=tt0133093" data-genres="Action,Sci-Fi">
+        <div class="movie-card" data-id="tt0133093" data-genres="Action,Sci-Fi">
           <img id="poster-matrix" src="" alt="The Matrix poster" />
           <h3>The Matrix</h3>
-        </a>
+          <button class="action-btn watchlist-toggle" data-id="tt0133093">+ Add to Watchlist</button>
+        </div>
 
         <!-- Dante’s Peak -->
-        <a class="movie-card" href="movie.html?id=tt0118928" data-genres="Action,Thriller">
+        <div class="movie-card" data-id="tt0118928" data-genres="Action,Thriller">
           <img id="poster-dantes" src="" alt="Dante's Peak poster" />
           <h3>Dante's Peak</h3>
-        </a>
+          <button class="action-btn watchlist-toggle" data-id="tt0118928">+ Add to Watchlist</button>
+        </div>
       </section>
     </main>
   </div>
@@ -134,6 +137,68 @@
             card.style.display = 'none';
           }
         });
+      });
+    })();
+
+    /**************
+     * Watchlist Toggle
+     **************/
+    (function setupWatchlist() {
+      const buttons = document.querySelectorAll('.watchlist-toggle');
+      let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+
+      function updateButton(btn) {
+        const id = btn.getAttribute("data-id");
+        if (watchlist.includes(id)) {
+          btn.textContent = "✓ Added";
+        } else {
+          btn.textContent = "+ Add to Watchlist";
+        }
+      }
+
+      buttons.forEach(btn => {
+        updateButton(btn);
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-id");
+          if (watchlist.includes(id)) {
+            watchlist = watchlist.filter(x => x !== id);
+          } else {
+            watchlist.push(id);
+          }
+          localStorage.setItem("watchlist", JSON.stringify(watchlist));
+          updateButton(btn);
+          renderWatchlist();
+        });
+      });
+
+      function renderWatchlist() {
+        const grid = document.getElementById("watchlistGrid");
+        grid.innerHTML = "";
+        watchlist.forEach(id => {
+          const posterId = id === "tt0133093" ? "poster-matrix" : "poster-dantes";
+          const img = document.getElementById(posterId);
+          const div = document.createElement("div");
+          div.className = "watchlist-item";
+          div.innerHTML = `<img src="${img.src}" alt="${id}" />`;
+          grid.appendChild(div);
+        });
+      }
+
+      renderWatchlist();
+    })();
+
+    /**************
+     * Continue Watching (no timestamp text)
+     **************/
+    (function setupContinueWatching() {
+      const list = document.getElementById("continueWatchingList");
+      const continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
+      list.innerHTML = "";
+      continued.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "continue-item";
+        div.innerHTML = `<img src="${item.poster}" alt="${item.title}" />`;
+        list.appendChild(div);
       });
     })();
   </script>
