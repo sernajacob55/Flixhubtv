@@ -36,7 +36,7 @@ header {
 header h1 {
   font-size: 2em;
   font-weight: bold;
-  margin-left: 60px;
+  margin-left: 0; /* ✅ Flush with left edge */
 }
 
 /* ✅ Fix for FLIX cyan + HubTV white */
