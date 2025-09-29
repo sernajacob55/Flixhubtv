@@ -7,35 +7,38 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Header -->
   <header>
-    <h1>Flix<span>Hub</span>TV</h1>
+    <h1>Flix<span>HubTV</span></h1>
   </header>
 
+  <!-- Main content -->
   <main class="main-content">
-    <div class="welcome">Login to FlixHubTV</div>
-
-    <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
-      <div>
+    <div class="login-container">
+      <h2>Login</h2>
+      <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
         <input type="text" id="username" placeholder="Username" required />
-      </div>
-      <div>
         <input type="password" id="password" placeholder="Password" required />
-      </div>
-      <button type="submit">Login</button>
-    </form>
+        <button type="submit">Login</button>
+      </form>
+      <p id="errorMsg" style="color: red; display: none;">Invalid username or password</p>
+    </div>
   </main>
+
+  <footer>
+    <p>&copy; 2025 FlixHubTV. All rights reserved.</p>
+  </footer>
 
   <script>
     function handleLogin() {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
 
-      // ✅ Replace with your real login validation if needed
       if (username === "Streamme69420" && password === "Xenomorph69420!") {
         localStorage.setItem("flixhubtvUser", username);
-        window.location.href = "profiles.html"; // ✅ Correct redirect
+        window.location.href = "profiles.html";
       } else {
-        alert("Invalid username or password.");
+        document.getElementById("errorMsg").style.display = "block";
       }
     }
   </script>

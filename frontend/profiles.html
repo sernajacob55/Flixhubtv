@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Profiles • FlixHubTV</title>
-  <link rel="stylesheet" href="style.css" /> <!-- ✅ Ensure CSS loads correctly -->
+  <title>Select Profile • FlixHubTV</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <!-- Header -->
   <header>
-    <h1>Flix<span>Hub</span>TV</h1>
+    <h1>Flix<span>HubTV</span></h1>
     <div class="nav-buttons">
       <button id="logoutBtn" onclick="location.href='login.html'">Logout</button>
     </div>
@@ -20,7 +20,7 @@
     <div class="welcome">Choose Your Profile</div>
 
     <section class="profiles-grid">
-      <!-- Profile boxes (kept intact, only styling fixed) -->
+      <!-- Profile boxes -->
       <div class="profile-card" onclick="selectProfile('Serna')">
         <img src="profile1.png" alt="Serna" />
         <h3>Serna</h3>
@@ -38,10 +38,14 @@
     </section>
   </main>
 
+  <footer>
+    <p>&copy; 2025 FlixHubTV. All rights reserved.</p>
+  </footer>
+
   <script>
     function selectProfile(name) {
       localStorage.setItem("flixhubtvProfile", name);
-      window.location.href = "index.html"; // ✅ Goes to movie browser
+      window.location.href = "index.html";
     }
   </script>
 </body>

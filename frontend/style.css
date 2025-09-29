@@ -1,103 +1,333 @@
-body {
+/* =====================
+   Global Reset & Layout
+   ===================== */
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0f0f1a, #1b1b2f, #2a0f1c);
-  color: #fff;
-  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d0d, #1a1a1a, #0f2027);
+  color: #ffffff;
   overflow-x: hidden;
 }
 
-/* Header */
+/* =====================
+   Header
+   ===================== */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 30px;
-  background: #0d0d0d;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+  padding: 15px 20px;
+  background: rgba(0, 0, 0, 0.9);
 }
-header .logo {
-  font-size: 1.8em;
+
+header h1 {
+  font-size: 2em;
   font-weight: bold;
-  margin-left: 60px;
-  color: #00bfff;
 }
-header .logo span { color: #fff; }
-header .nav-buttons { display: flex; gap: 10px; }
-header input { padding: 8px; border-radius: 4px; border: none; }
-header button {
-  background: #111; color: #fff;
-  border: none; padding: 8px 12px;
-  border-radius: 6px; cursor: pointer;
+
+header h1 span {
+  color: #ffffff;
+}
+
+header h1::first-letter {
+  color: #00bfff; /* Flix in cyan */
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-buttons input {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: none;
+}
+
+.nav-buttons button {
+  background: #00bfff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
   transition: background 0.3s;
 }
-header button:hover { background: #00bfff; }
 
-/* Sidebar */
+.nav-buttons button:hover {
+  background: #009acd;
+}
+
+/* =====================
+   Sidebar
+   ===================== */
 .sidebar {
   position: fixed;
-  top: 60px; left: -200px;
-  width: 200px; height: calc(100% - 60px);
+  top: 0;
+  left: -200px;
+  width: 200px;
+  height: 100%;
   background: #111;
+  color: #fff;
   padding: 20px;
-  box-shadow: 4px 0 10px rgba(0,0,0,0.6);
-  transition: left 0.3s ease;
-  z-index: 900;
+  transition: left 0.4s ease; /* smooth transition fix */
+  z-index: 1000;
 }
-.sidebar h3 { margin: 0 0 15px; color: #00bfff; }
-.sidebar ul { list-style: none; margin: 0; padding: 0; }
-.sidebar ul li { padding: 10px 0; cursor: pointer; }
-.sidebar ul li:hover { color: #00bfff; }
-body.sidebar-open .sidebar { left: 0; }
 
-/* Page + Main Content */
-.page { display: flex; }
-.main-content { flex-grow: 1; padding: 30px; margin-left: 60px; transition: margin-left 0.3s; }
-body.sidebar-open .main-content { margin-left: 220px; }
-.welcome { font-size: 1.4em; margin-bottom: 20px; color: #00bfff; text-shadow: 0 0 6px #00bfff; }
+.sidebar h3 {
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  color: #00bfff;
+}
 
-/* Movie Grid */
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar ul li {
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.sidebar ul li:hover {
+  background: #00bfff;
+  color: #fff;
+}
+
+/* Sidebar active state */
+body.sidebar-open .sidebar {
+  left: 0;
+}
+
+body.sidebar-open .main-content {
+  margin-left: 200px;
+  transition: margin-left 0.4s ease; /* smooth push */
+}
+
+/* =====================
+   Main Content
+   ===================== */
+.main-content {
+  padding: 20px;
+  transition: margin-left 0.3s;
+}
+
+.welcome {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
+
+/* =====================
+   Movie Grid
+   ===================== */
 .movie-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 20px;
 }
+
 .movie-card {
-  background: #111;
+  background: #1a1a1a;
   border-radius: 10px;
   overflow: hidden;
-  text-decoration: none;
-  color: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  text-align: center;
   transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
 }
-.movie-card:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.8); }
-.movie-card img { width: 100%; height: 240px; object-fit: cover; }
-.movie-card h3 { text-align: center; padding: 10px; }
 
-/* Watchlist + Continue Watching */
-.watchlist, .continue-watching { margin-top: 40px; }
-.watchlist h2, .continue-watching h2 { margin-bottom: 20px; color: #00bfff; }
-.watchlist-item, .continue-item { display: inline-block; margin-right: 15px; text-align: center; }
-.watchlist-item img, .continue-item img {
-  width: 120px; height: 180px;
-  border-radius: 6px; object-fit: cover;
+.movie-card img {
+  width: 100%;
+  height: 270px;
+  object-fit: cover;
+}
+
+.movie-card h3 {
+  padding: 10px;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 191, 255, 0.6);
+}
+
+/* =====================
+   Profiles Page
+   ===================== */
+.profiles-grid {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.profile-card {
+  width: 150px;
+  height: 200px;
+  background: #111;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
   box-shadow: 0 4px 10px rgba(0,0,0,0.6);
 }
-.watchlist-item p, .continue-item p { margin-top: 8px; font-size: 0.9em; }
 
-/* Video Player */
-video { width: 100%; height: auto; background: black; }
-.fullscreen {
-  position: fixed; top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  z-index: 2000; background: black;
+.profile-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
 }
-.exit-fullscreen {
-  position: absolute; top: 15px; right: 20px;
-  font-size: 28px; font-weight: bold;
-  color: red; cursor: pointer; z-index: 2100;
+
+.profile-card h3 {
+  font-size: 1.2em;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.profile-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0,191,255,0.6);
+}
+
+/* =====================
+   Login Page
+   ===================== */
+.login-container {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 30px;
+  background: #111;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+  text-align: center;
+}
+
+.login-container h2 {
+  margin-bottom: 20px;
+  color: #00bfff;
+}
+
+.login-container input {
+  display: block;
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 10px;
+  background: #00bfff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.login-container button:hover {
+  background: #009acd;
+}
+
+/* =====================
+   Watchlist & Continue Watching
+   ===================== */
+.banner {
+  margin-top: 20px;
+}
+
+.banner h2 {
+  font-size: 1.3em;
+  margin-bottom: 10px;
+  color: #00bfff;
+}
+
+.banner .movie-grid {
+  margin-top: 10px;
+}
+
+/* Buttons (watchlist + continue watching) */
+button.watchlist-btn,
+button.continue-btn {
+  background: #00bfff;
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button.watchlist-btn:hover,
+button.continue-btn:hover {
+  background: #009acd;
+}
+
+/* =====================
+   Video Player
+   ===================== */
+.video-player {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.video-player video {
+  width: 100%;
+  height: 100%;
+  background: black;
+}
+
+.video-player .close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(0,191,255,0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5em;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 2100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-player .close-btn:hover {
+  background: #009acd;
+}
+
+/* =====================
+   Footer
+   ===================== */
+footer {
+  text-align: center;
+  padding: 15px;
+  background: rgba(0,0,0,0.8);
+  margin-top: auto;
+  font-size: 0.9em;
 }

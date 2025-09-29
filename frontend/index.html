@@ -9,7 +9,7 @@
 <body>
   <!-- Header / Navbar -->
   <header>
-    <h1 class="logo">Flix<span>HubTV</span></h1>
+    <h1>Flix<span>HubTV</span></h1>
     <div class="nav-buttons">
       <input id="searchInput" type="text" placeholder="Search movies..." aria-label="Search movies"/>
       <button id="switchProfileBtn" onclick="location.href='profiles.html'">Switch Profile</button>
@@ -18,6 +18,7 @@
     </div>
   </header>
 
+  <!-- Page wrapper -->
   <div class="page">
     <!-- Sidebar -->
     <aside class="sidebar" id="leftSidebar" aria-label="Genres">
@@ -34,128 +35,89 @@
     <main class="main-content" id="content">
       <div class="welcome" id="welcomeText">Welcome, Serna</div>
 
-      <!-- Movie Grid -->
-      <section class="movie-grid" id="movieGrid">
-        <!-- The Matrix -->
-        <a class="movie-card" href="movie.html?id=tt0133093" data-genres="Action,Sci-Fi">
-          <img id="poster-matrix" src="placeholder.jpg" alt="The Matrix poster" />
-          <h3>The Matrix</h3>
-        </a>
-
-        <!-- Dante’s Peak -->
-        <a class="movie-card" href="movie.html?id=tt0118928" data-genres="Thriller,Action">
-          <img id="poster-dante" src="placeholder.jpg" alt="Dante's Peak poster" />
-          <h3>Dante’s Peak</h3>
-        </a>
-      </section>
-
       <!-- Continue Watching -->
-      <section class="continue-watching" id="continueWatching">
+      <section class="banner" id="continueWatching">
         <h2>Continue Watching</h2>
-        <div id="continueList"></div>
+        <div class="movie-grid" id="continueGrid"></div>
       </section>
 
       <!-- Watchlist -->
-      <section class="watchlist" id="watchlist">
-        <h2>Your Watchlist</h2>
-        <div id="watchlistItems"></div>
+      <section class="banner" id="watchlist">
+        <h2>My Watchlist</h2>
+        <div class="movie-grid" id="watchlistGrid"></div>
+      </section>
+
+      <!-- Movies -->
+      <section class="movie-grid" id="movieGrid">
+        <!-- Matrix -->
+        <a class="movie-card" href="movie.html?id=tt0133093" data-genres="Action,Sci-Fi">
+          <img id="poster-matrix" src="" alt="The Matrix poster" />
+          <h3>The Matrix</h3>
+          <button class="watchlist-btn" onclick="toggleWatchlist('tt0133093'); event.preventDefault();">+ Watchlist</button>
+        </a>
+
+        <!-- Dante’s Peak -->
+        <a class="movie-card" href="movie.html?id=tt0118928" data-genres="Action,Thriller">
+          <img id="poster-dante" src="" alt="Dante's Peak poster" />
+          <h3>Dante's Peak</h3>
+          <button class="watchlist-btn" onclick="toggleWatchlist('tt0118928'); event.preventDefault();">+ Watchlist</button>
+        </a>
       </section>
     </main>
   </div>
 
-  <!-- Scripts -->
+  <footer>
+    <p>&copy; 2025 FlixHubTV. All rights reserved.</p>
+  </footer>
+
   <script>
-    /***************
-     * API KEYS
-     ***************/
-    const OMDB_KEY = "ea7569d7"; 
+    const OMDB_KEY = "ea7569d7";
     const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f";
 
-    /***************
-     * SIDEBAR
-     ***************/
-    (function setupSidebarShift() {
-      const sidebar = document.getElementById('leftSidebar');
-      if (!sidebar) return;
-      sidebar.addEventListener('mouseenter', () => document.body.classList.add('sidebar-open'));
-      sidebar.addEventListener('mouseleave', () => document.body.classList.remove('sidebar-open'));
-    })();
+    // Sidebar hover push
+    const sidebar = document.getElementById("leftSidebar");
+    sidebar.addEventListener("mouseenter", () => document.body.classList.add("sidebar-open"));
+    sidebar.addEventListener("mouseleave", () => document.body.classList.remove("sidebar-open"));
 
-    /***************
-     * POSTERS (with caching)
-     ***************/
-    async function loadPoster(imdbID, elementId) {
-      const img = document.getElementById(elementId);
-      if (!img) return;
-
-      let poster = localStorage.getItem(`poster_${imdbID}`);
-      if (!poster) {
-        try {
-          const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
-          const data = await res.json();
-          poster = (data && data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg";
-          localStorage.setItem(`poster_${imdbID}`, poster);
-        } catch {
-          poster = "placeholder.jpg";
-        }
-      }
-      img.src = poster;
-    }
-
-    loadPoster("tt0133093", "poster-matrix"); // Matrix
-    loadPoster("tt0118928", "poster-dante");  // Dante’s Peak
-
-    /***************
-     * GENRE FILTER
-     ***************/
-    (function setupGenreFilter() {
-      const list = document.querySelector('.sidebar ul');
-      const cards = document.querySelectorAll('.movie-card');
-      if (!list || !cards.length) return;
-      list.addEventListener('click', (e) => {
-        const li = e.target.closest('li'); if (!li) return;
-        const filter = li.getAttribute('data-filter');
-        cards.forEach(card => {
-          const genres = (card.getAttribute('data-genres') || "").split(',');
-          card.style.display = (filter === 'all' || genres.includes(filter)) ? '' : 'none';
+    // Posters
+    function loadPoster(imdbID, imgId) {
+      fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.Poster && data.Poster !== "N/A") {
+            document.getElementById(imgId).src = data.Poster;
+          } else {
+            document.getElementById(imgId).src = "placeholder.jpg";
+          }
         });
-      });
-    })();
+    }
+    loadPoster("tt0133093", "poster-matrix");
+    loadPoster("tt0118928", "poster-dante");
 
-    /***************
-     * WATCHLIST
-     ***************/
-    const watchlist = JSON.parse(localStorage.getItem("watchlist") || "[]");
-    function toggleWatchlist(imdbID, title, poster) {
-      const index = watchlist.findIndex(m => m.id === imdbID);
-      if (index >= 0) watchlist.splice(index, 1);
-      else watchlist.push({ id: imdbID, title, poster });
+    // Watchlist toggle
+    function toggleWatchlist(imdbID) {
+      let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+      if (watchlist.includes(imdbID)) {
+        watchlist = watchlist.filter(id => id !== imdbID);
+      } else {
+        watchlist.push(imdbID);
+      }
       localStorage.setItem("watchlist", JSON.stringify(watchlist));
       renderWatchlist();
     }
+
     function renderWatchlist() {
-      const container = document.getElementById("watchlistItems");
-      if (!container) return;
+      const watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+      const container = document.getElementById("watchlistGrid");
       container.innerHTML = "";
-      watchlist.forEach(m => {
-        container.innerHTML += `<div class="watchlist-item"><img src="${m.poster}" alt="${m.title}" /><p>${m.title}</p></div>`;
+      watchlist.forEach(imdbID => {
+        const card = document.createElement("div");
+        card.classList.add("movie-card");
+        card.innerHTML = `<img src="placeholder.jpg" alt="${imdbID} poster"><h3>${imdbID}</h3>`;
+        container.appendChild(card);
       });
     }
     renderWatchlist();
-
-    /***************
-     * CONTINUE WATCHING
-     ***************/
-    const continueWatching = JSON.parse(localStorage.getItem("continueWatching") || "[]");
-    function renderContinueWatching() {
-      const container = document.getElementById("continueList");
-      if (!container) return;
-      container.innerHTML = "";
-      continueWatching.forEach(m => {
-        container.innerHTML += `<div class="continue-item"><img src="${m.poster}" alt="${m.title}" /><p>${m.title}</p></div>`;
-      });
-    }
-    renderContinueWatching();
   </script>
 </body>
 </html>

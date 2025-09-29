@@ -7,219 +7,94 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Header -->
   <header>
-    <h1 class="logo">Flix<span>HubTV</span></h1>
+    <h1>Flix<span>HubTV</span></h1>
     <div class="nav-buttons">
-      <button id="homeBtn" onclick="location.href='index.html'">Home</button>
-      <button id="logoutBtn" onclick="location.href='login.html'">Logout</button>
+      <button onclick="location.href='index.html'">Home</button>
+      <button onclick="location.href='profiles.html'">Switch Profile</button>
+      <button onclick="location.href='login.html'">Logout</button>
     </div>
   </header>
 
-  <div class="page">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="leftSidebar" aria-label="Genres">
-      <h3>Genres</h3>
-      <ul>
-        <li data-filter="all">All</li>
-        <li data-filter="Action">Action</li>
-        <li data-filter="Sci-Fi">Sci-Fi</li>
-        <li data-filter="Thriller">Thriller</li>
-      </ul>
-    </aside>
+  <main class="main-content">
+    <div id="movieInfo"></div>
+    <button class="watchlist-btn" id="watchlistBtn">+ Add to Watchlist</button>
+    <button class="continue-btn" id="playBtn">▶ Play</button>
+  </main>
 
-    <!-- Main content -->
-    <main class="main-content" id="content">
-      <section id="movieDetails"></section>
+  <footer>
+    <p>&copy; 2025 FlixHubTV. All rights reserved.</p>
+  </footer>
 
-      <section class="watchlist">
-        <h2>My Watchlist</h2>
-        <div id="watchlistItems"></div>
-      </section>
-
-      <section class="continue-watching">
-        <h2>Continue Watching</h2>
-        <div id="continueItems"></div>
-      </section>
-    </main>
+  <div id="playerContainer" class="video-player" style="display:none;">
+    <button class="close-btn" onclick="closePlayer()">✕</button>
+    <video id="videoPlayer" controls></video>
   </div>
 
-  <!-- Video Player Modal -->
-  <div id="videoPlayer" class="fullscreen" style="display:none;">
-    <span class="exit-fullscreen" id="closePlayer">✕</span>
-    <video id="movieVideo" controls></video>
-  </div>
-
-  <!-- Inline Scripts -->
   <script>
-    /***************
-     * API KEYS
-     ***************/
-    const OMDB_KEY = "ea7569d7"; 
-    const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f"; 
+    const OMDB_KEY = "ea7569d7";
+    const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f";
 
-    /***************
-     * SIDEBAR
-     ***************/
-    (function setupSidebarShift() {
-      const sidebar = document.getElementById('leftSidebar');
-      if (!sidebar) return;
-      sidebar.addEventListener('mouseenter', () => document.body.classList.add('sidebar-open'));
-      sidebar.addEventListener('mouseleave', () => document.body.classList.remove('sidebar-open'));
-    })();
+    const urlParams = new URLSearchParams(window.location.search);
+    const imdbID = urlParams.get("id");
 
-    /***************
-     * MOVIE DETAILS
-     ***************/
-    const params = new URLSearchParams(window.location.search);
-    const imdbID = params.get("id") || "tt0133093"; 
+    const movieInfo = document.getElementById("movieInfo");
+    const videoPlayer = document.getElementById("videoPlayer");
 
-    async function loadMovieDetails() {
-      const details = document.getElementById("movieDetails");
-      try {
-        // Poster caching
-        let poster = localStorage.getItem(`poster_${imdbID}`);
-        let data;
+    // Map imdbID to MediaFire links
+    const mediaLinks = {
+      "tt0133093": "https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4",
+      "tt0118928": "https://download1324.mediafire.com/cd5ev8gxoajggy5dbp_1pagixal-14NXp2krW0s3WdxiRxacbt_tmKEN5wBSXGhBxaHmQRL6a_oqit-_4Uqm6r7Th8gd02jAsy_iWXSiGUZejYG1i7-rTMQrhWr5Q8OQan-9adl7oEEEJK7mmWiPIvTIT_iyRk3hboxiQfNDUHmnI0Q/jtd07wddlls76o2/Dantes+Peak.mp4"
+    };
 
-        if (!poster) {
-          const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
-          data = await res.json();
-          poster = (data && data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg";
-          localStorage.setItem(`poster_${imdbID}`, poster);
-        } else {
-          const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
-          data = await res.json();
-        }
-
-        if (!data || data.Response === "False") {
-          details.innerHTML = "<p>Movie not found.</p>";
-          return;
-        }
-
-        details.innerHTML = `
-          <div class="movie-header">
-            <img src="${poster}" alt="${data.Title} poster" />
-            <div>
-              <h2>${data.Title}</h2>
-              <p>${data.Year} | Runtime: ${data.Runtime} | Genre: ${data.Genre}</p>
-              <p>${data.Plot}</p>
-              <button id="playBtn">▶ Play</button>
-              <button id="watchlistBtn">+ Add to Watchlist</button>
-            </div>
-          </div>
-          <h3>Cast</h3>
-          <div id="cast" class="cast"></div>
-          <h3>Recommended</h3>
-          <div id="recommended" class="recommended"></div>
+    // Load metadata
+    fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`)
+      .then(r => r.json())
+      .then(data => {
+        movieInfo.innerHTML = `
+          <h2>${data.Title} (${data.Year})</h2>
+          <p><strong>Genre:</strong> ${data.Genre}</p>
+          <p><strong>Runtime:</strong> ${data.Runtime}</p>
+          <p>${data.Plot}</p>
+          <img src="${data.Poster}" alt="${data.Title} poster">
         `;
+      });
 
-        document.getElementById("playBtn").addEventListener("click", () => playMovie(data.Title));
-        document.getElementById("watchlistBtn").addEventListener("click", () => toggleWatchlist(data));
-      } catch (err) {
-        details.innerHTML = "<p>Error loading movie details.</p>";
-      }
-    }
-
-    /***************
-     * WATCHLIST
-     ***************/
-    function toggleWatchlist(movie) {
+    // Watchlist button
+    const watchlistBtn = document.getElementById("watchlistBtn");
+    watchlistBtn.addEventListener("click", () => {
       let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
-      const exists = watchlist.find(m => m.imdbID === movie.imdbID);
-      if (exists) {
-        watchlist = watchlist.filter(m => m.imdbID !== movie.imdbID);
+      if (watchlist.includes(imdbID)) {
+        watchlist = watchlist.filter(id => id !== imdbID);
+        watchlistBtn.textContent = "+ Add to Watchlist";
       } else {
-        watchlist.push(movie);
+        watchlist.push(imdbID);
+        watchlistBtn.textContent = "✓ In Watchlist";
       }
       localStorage.setItem("watchlist", JSON.stringify(watchlist));
-      renderWatchlist();
-    }
+    });
 
-    function renderWatchlist() {
-      const watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
-      const container = document.getElementById("watchlistItems");
-      if (!container) return;
-      container.innerHTML = "";
-      watchlist.forEach(movie => {
-        container.innerHTML += `
-          <div class="watchlist-item">
-            <img src="${movie.Poster !== "N/A" ? movie.Poster : "placeholder.jpg"}" alt="${movie.Title}" />
-            <p>${movie.Title}</p>
-          </div>
-        `;
-      });
-    }
-
-    /***************
-     * CONTINUE WATCHING
-     ***************/
-    function saveProgress(title, time) {
-      let progress = JSON.parse(localStorage.getItem("continueWatching")) || {};
-      progress[title] = time;
-      localStorage.setItem("continueWatching", JSON.stringify(progress));
-      renderContinueWatching();
-    }
-
-    function renderContinueWatching() {
-      const progress = JSON.parse(localStorage.getItem("continueWatching")) || {};
-      const container = document.getElementById("continueItems");
-      if (!container) return;
-      container.innerHTML = "";
-      Object.keys(progress).forEach(title => {
-        container.innerHTML += `
-          <div class="continue-item">
-            <img src="placeholder.jpg" alt="${title}" />
-            <p>${title}</p>
-          </div>
-        `;
-      });
-    }
-
-    /***************
-     * VIDEO PLAYER
-     ***************/
-    function playMovie(title) {
-      const player = document.getElementById("videoPlayer");
-      const video = document.getElementById("movieVideo");
-      const close = document.getElementById("closePlayer");
-
-      let src = "";
-      if (title === "The Matrix") {
-        src = "https://download1351.mediafire.com/moph99vymelgB4tgVyH9-EiWi8-NqEibljxmsFvx7MJGEr6mF6KBkWiSUCA99-DhpkeeA1m42myFlnxm20g63-4yxCtqulAo-babZQt1Nu68RQGklpbZcsAnQlBFgd8Qfgto6AOQrxZ7DqkDJ0Mw0RDXGlcCFra4ZLOqktfQiw2sbJY/rks796idw5xqo2i/The+Matrix.mp4";
-      } else if (title === "Dante's Peak") {
-        src = "https://download1324.mediafire.com/cd5ev8gxoajggy5dbp_1pagixal-14NXp2krW0s3WdxiRxacbt_tmKEN5wBSXGhBxaHmQRL6a_oqit-_4Uqm6r7Th8gd02jAsy_iWXSiGUZejYG1i7-rTMQrhWr5Q8OQan-9adl7oEEEJK7mmWiPIvTIT_iyRk3hboxiQfNDUHmnI0Q/jtd07wddlls76o2/Dantes+Peak.mp4";
+    // Play button
+    document.getElementById("playBtn").addEventListener("click", () => {
+      const link = mediaLinks[imdbID];
+      if (link) {
+        document.getElementById("playerContainer").style.display = "flex";
+        videoPlayer.src = link;
+        videoPlayer.play();
+        videoPlayer.requestFullscreen();
       }
+    });
 
-      video.src = src;
-      player.style.display = "block";
-
-      // True fullscreen request
-      if (video.requestFullscreen) {
-        video.requestFullscreen();
-      } else if (video.webkitRequestFullscreen) {
-        video.webkitRequestFullscreen();
-      } else if (video.msRequestFullscreen) {
-        video.msRequestFullscreen();
+    // Close player
+    function closePlayer() {
+      const container = document.getElementById("playerContainer");
+      container.style.display = "none";
+      videoPlayer.pause();
+      videoPlayer.src = "";
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
       }
-
-      video.play();
-
-      video.ontimeupdate = () => saveProgress(title, video.currentTime);
-      close.onclick = () => {
-        player.style.display = "none";
-        video.pause();
-        if (document.fullscreenElement) {
-          document.exitFullscreen();
-        }
-      };
     }
-
-    /***************
-     * INIT
-     ***************/
-    loadMovieDetails();
-    renderWatchlist();
-    renderContinueWatching();
   </script>
 </body>
 </html>
