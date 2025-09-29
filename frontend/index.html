@@ -69,20 +69,15 @@
 
   <!-- Footer -->
   <footer>
-    © 2025 FlixHubTV. All rights reserved.
+    <p>© 2025 FlixHubTV. All rights reserved.</p>
   </footer>
 
   <!-- Inline scripts -->
   <script>
-    /**************
-     * API KEYS
-     **************/
     const OMDB_KEY = "ea7569d7"; // OMDb
     const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f"; // TMDb
 
-    /**************
-     * Sidebar Hover
-     **************/
+    // Sidebar Hover
     (function setupSidebarShift() {
       const sidebar = document.getElementById('leftSidebar');
       if (!sidebar) return;
@@ -94,9 +89,7 @@
       });
     })();
 
-    /**************
-     * Posters (OMDb)
-     **************/
+    // Posters (OMDb)
     function loadPoster(imdbID, elementId) {
       const img = document.getElementById(elementId);
       if (!img) return;
@@ -117,9 +110,7 @@
     loadPoster("tt0133093", "poster-matrix"); // The Matrix
     loadPoster("tt0118928", "poster-dantes"); // Dante's Peak
 
-    /**************
-     * Genre Filter
-     **************/
+    // Genre Filter
     (function setupGenreFilter() {
       const list = document.querySelector('.sidebar ul');
       const cards = document.querySelectorAll('.movie-card');
@@ -140,20 +131,14 @@
       });
     })();
 
-    /**************
-     * Watchlist Toggle
-     **************/
+    // Watchlist Toggle
     (function setupWatchlist() {
       const buttons = document.querySelectorAll('.watchlist-toggle');
       let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
 
       function updateButton(btn) {
         const id = btn.getAttribute("data-id");
-        if (watchlist.includes(id)) {
-          btn.textContent = "✓ Added";
-        } else {
-          btn.textContent = "+ Add to Watchlist";
-        }
+        btn.textContent = watchlist.includes(id) ? "✓ Added" : "+ Add to Watchlist";
       }
 
       buttons.forEach(btn => {
@@ -187,20 +172,21 @@
       renderWatchlist();
     })();
 
-    /**************
-     * Continue Watching (safe text, no [object Object])
-     **************/
+    // Continue Watching
     (function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
-      const continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
+      let continued = [];
+      try {
+        continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
+      } catch (e) {
+        continued = [];
+      }
       list.innerHTML = "";
       continued.forEach(item => {
-        if (!item.poster || !item.title) return;
+        if (!item || !item.poster || !item.title) return;
         const div = document.createElement("div");
         div.className = "continue-item";
-        div.innerHTML = `
-          <img src="${item.poster}" alt="Poster for ${item.title}" />
-        `;
+        div.innerHTML = `<img src="${item.poster}" alt="Poster for ${item.title}" />`;
         list.appendChild(div);
       });
     })();
