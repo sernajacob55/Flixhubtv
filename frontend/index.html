@@ -132,45 +132,46 @@
     })();
 
     // Watchlist Toggle
-    (function setupWatchlist() {
-      const buttons = document.querySelectorAll('.watchlist-toggle');
-      let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+(function setupWatchlist() {
+  const buttons = document.querySelectorAll('.watchlist-toggle');
+  let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
 
-      function updateButton(btn) {
-        const id = btn.getAttribute("data-id");
-        btn.textContent = watchlist.includes(id) ? "✓ Added" : "+ Add to Watchlist";
+  function updateButton(btn) {
+    const id = btn.getAttribute("data-id");
+    btn.textContent = watchlist.includes(id) ? "✓ Added" : "+ Add to Watchlist";
+  }
+
+  buttons.forEach(btn => {
+    updateButton(btn);
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation(); // ✅ Prevents click from bubbling up to movie card
+      const id = btn.getAttribute("data-id");
+      if (watchlist.includes(id)) {
+        watchlist = watchlist.filter(x => x !== id);
+      } else {
+        watchlist.push(id);
       }
-
-      buttons.forEach(btn => {
-        updateButton(btn);
-        btn.addEventListener("click", () => {
-          const id = btn.getAttribute("data-id");
-          if (watchlist.includes(id)) {
-            watchlist = watchlist.filter(x => x !== id);
-          } else {
-            watchlist.push(id);
-          }
-          localStorage.setItem("watchlist", JSON.stringify(watchlist));
-          updateButton(btn);
-          renderWatchlist();
-        });
-      });
-
-      function renderWatchlist() {
-        const grid = document.getElementById("watchlistGrid");
-        grid.innerHTML = "";
-        watchlist.forEach(id => {
-          const posterId = id === "tt0133093" ? "poster-matrix" : "poster-dantes";
-          const img = document.getElementById(posterId);
-          const div = document.createElement("div");
-          div.className = "watchlist-item";
-          div.innerHTML = `<img src="${img.src}" alt="Poster for ${id}" />`;
-          grid.appendChild(div);
-        });
-      }
-
+      localStorage.setItem("watchlist", JSON.stringify(watchlist));
+      updateButton(btn);
       renderWatchlist();
-    })();
+    });
+  });
+
+  function renderWatchlist() {
+    const grid = document.getElementById("watchlistGrid");
+    grid.innerHTML = "";
+    watchlist.forEach(id => {
+      const posterId = id === "tt0133093" ? "poster-matrix" : "poster-dantes";
+      const img = document.getElementById(posterId);
+      const div = document.createElement("div");
+      div.className = "watchlist-item";
+      div.innerHTML = `<img src="${img.src}" alt="Poster for ${id}" />`;
+      grid.appendChild(div);
+    });
+  }
+
+  renderWatchlist();
+})();
 
     // Continue Watching (fixed [object Object])
     (function setupContinueWatching() {
