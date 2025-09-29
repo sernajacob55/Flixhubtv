@@ -84,7 +84,7 @@ header h1::first-letter {
   height: calc(100% - 60px);
   background: #111;
   padding: 20px;
-  transition: left 0.3s ease;
+  transition: left 0.3s ease, transform 0.3s ease;
   z-index: 900;
 }
 
@@ -111,6 +111,7 @@ header h1::first-letter {
 
 body.sidebar-open .sidebar {
   left: 0;
+  transform: translateX(0);
 }
 
 /* =====================
@@ -388,9 +389,10 @@ footer, footer p {
    Profiles Page
    ===================== */
 .profiles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  display: flex;
+  justify-content: center; /* ✅ center horizontally */
   gap: 25px;
+  flex-wrap: wrap;
   margin-top: 40px;
 }
 

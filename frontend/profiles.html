@@ -45,9 +45,15 @@
 
   <script>
     function selectProfile(name) {
+      // Save profile in localStorage
       localStorage.setItem("flixhubtvProfile", name);
+
+      // Update welcome message when user returns to index
       window.location.href = "index.html";
     }
+
+    // Centering fix: ensure body fills viewport
+    document.body.style.minHeight = "100vh";
   </script>
 </body>
 </html>

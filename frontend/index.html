@@ -51,14 +51,14 @@
       <!-- Movie Grid -->
       <section class="movie-grid" id="movieGrid">
         <!-- The Matrix -->
-        <div class="movie-card" data-id="tt0133093" data-genres="Action,Sci-Fi">
+        <div class="movie-card" data-id="tt0133093" data-genres="Action,Sci-Fi" onclick="location.href='movie.html?id=tt0133093'">
           <img id="poster-matrix" src="" alt="The Matrix poster" />
           <h3>The Matrix</h3>
           <button class="action-btn watchlist-toggle" data-id="tt0133093">+ Add to Watchlist</button>
         </div>
 
         <!-- Dante’s Peak -->
-        <div class="movie-card" data-id="tt0118928" data-genres="Action,Thriller">
+        <div class="movie-card" data-id="tt0118928" data-genres="Action,Thriller" onclick="location.href='movie.html?id=tt0118928'">
           <img id="poster-dantes" src="" alt="Dante's Peak poster" />
           <h3>Dante's Peak</h3>
           <button class="action-btn watchlist-toggle" data-id="tt0118928">+ Add to Watchlist</button>
@@ -172,7 +172,7 @@
       renderWatchlist();
     })();
 
-    // Continue Watching
+    // Continue Watching (fixed [object Object])
     (function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
       let continued = [];
@@ -183,10 +183,12 @@
       }
       list.innerHTML = "";
       continued.forEach(item => {
-        if (!item || !item.poster || !item.title) return;
+        if (!item || typeof item !== "object") return;
+        const { poster, title } = item;
+        if (!poster || !title) return;
         const div = document.createElement("div");
         div.className = "continue-item";
-        div.innerHTML = `<img src="${item.poster}" alt="Poster for ${item.title}" />`;
+        div.innerHTML = `<img src="${poster}" alt="Poster for ${title}" />`;
         list.appendChild(div);
       });
     })();
