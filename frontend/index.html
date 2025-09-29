@@ -21,7 +21,7 @@
 
   <!-- Page wrapper to keep sidebar and main content siblings -->
   <div class="page">
-    <!-- Slide-out Sidebar (autohide via CSS) -->
+    <!-- Sidebar -->
     <aside class="sidebar" id="leftSidebar" aria-label="Genres">
       <h3>Genres</h3>
       <ul>
@@ -49,7 +49,6 @@
 
       <!-- Movies -->
       <section class="movie-grid" id="movieGrid">
-        <!-- Only The Matrix (links to movie page with imdbID) -->
         <a class="movie-card" href="movie.html?id=tt0133093" data-genres="Action,Sci-Fi">
           <img id="poster-matrix" src="" alt="The Matrix poster" />
           <h3>The Matrix</h3>
@@ -60,14 +59,8 @@
 
   <!-- Inline scripts -->
   <script>
-    /***************
-     * CONFIG KEYS *
-     ***************/
-    const OMDB_KEY = "ea7569d7"; // OMDb (posters/metadata)
+    const OMDB_KEY = "ea7569d7";
 
-    /***************************
-     * LOGIN ENFORCEMENT LOGIC *
-     ***************************/
     if (!localStorage.getItem("loggedIn")) {
       window.location.href = "login.html";
     }
@@ -77,20 +70,26 @@
       window.location.href = "login.html";
     }
 
-    /****************************
-     * ACTIVE PROFILE HANDLER   *
-     ****************************/
     const activeProfile = localStorage.getItem("activeProfile") || "Guest";
     document.getElementById("welcomeText").textContent = `Welcome, ${activeProfile}`;
 
-    /***************************************
-     * FETCH POSTER FOR "THE MATRIX" (OMDb)
-     ***************************************/
+    /* Sidebar hover behavior (toggle body class) */
+    (function setupSidebarShift() {
+      const sidebar = document.getElementById('leftSidebar');
+      if (!sidebar) return;
+      sidebar.addEventListener('mouseenter', () => {
+        document.body.classList.add('sidebar-open');
+      });
+      sidebar.addEventListener('mouseleave', () => {
+        document.body.classList.remove('sidebar-open');
+      });
+    })();
+
+    /* Matrix Poster */
     (function loadMatrixPoster() {
       const img = document.getElementById('poster-matrix');
       if (!img) return;
-      const imdbID = "tt0133093";
-      fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`)
+      fetch(`https://www.omdbapi.com/?i=tt0133093&apikey=${OMDB_KEY}`)
         .then(r => r.json())
         .then(data => {
           if (data && data.Poster && data.Poster !== "N/A") {
@@ -99,44 +98,31 @@
             img.src = "placeholder.jpg";
           }
         })
-        .catch(() => {
-          img.src = "placeholder.jpg";
-        });
+        .catch(() => { img.src = "placeholder.jpg"; });
     })();
 
-    /*****************************************
-     * SIMPLE CLIENT-SIDE GENRE FILTER (Grid)
-     *****************************************/
+    /* Genre Filter */
     (function setupGenreFilter() {
       const list = document.querySelector('.sidebar ul');
       const cards = document.querySelectorAll('.movie-card');
       if (!list || !cards.length) return;
-
       list.addEventListener('click', (e) => {
         const li = e.target.closest('li');
         if (!li) return;
         const filter = li.getAttribute('data-filter');
         cards.forEach(card => {
           const genres = (card.getAttribute('data-genres') || "").split(',');
-          if (filter === 'all' || genres.includes(filter)) {
-            card.style.display = '';
-          } else {
-            card.style.display = 'none';
-          }
+          card.style.display = (filter === 'all' || genres.includes(filter)) ? '' : 'none';
         });
       });
     })();
 
-    /********************************
-     * CONTINUE WATCHING (Profile-Specific)
-     ********************************/
+    /* Continue Watching */
     (function loadContinueWatching() {
       const contData = JSON.parse(localStorage.getItem("continueWatching_" + activeProfile) || "null");
       if (!contData) return;
-
       const section = document.getElementById("continueWatchingSection");
       const container = document.getElementById("continueWatching");
-
       fetch(`https://www.omdbapi.com/?i=${contData.imdbID}&apikey=${OMDB_KEY}`)
         .then(r => r.json())
         .then(data => {
@@ -147,25 +133,19 @@
                 <img src="${data.Poster}" alt="${data.Title}" />
                 <h3>${data.Title}</h3>
                 <p style="color:cyan; font-size:14px;">Resume at ${Math.floor(contData.currentTime/60)}m</p>
-              </a>
-            `;
+              </a>`;
           }
         });
     })();
 
-    /********************************
-     * WATCHLIST (Profile-Specific)
-     ********************************/
+    /* Watchlist */
     (function loadWatchlist() {
       const watchlist = JSON.parse(localStorage.getItem("watchlist_" + activeProfile) || "[]");
       if (!watchlist.length) return;
-
       const section = document.getElementById("watchlistSection");
       const container = document.getElementById("watchlist");
       section.style.display = "block";
-
-      container.innerHTML = ""; // clear before appending
-
+      container.innerHTML = "";
       watchlist.forEach(imdbID => {
         fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`)
           .then(r => r.json())
@@ -174,10 +154,7 @@
               const card = document.createElement("a");
               card.className = "movie-card";
               card.href = `movie.html?id=${imdbID}`;
-              card.innerHTML = `
-                <img src="${data.Poster}" alt="${data.Title}" />
-                <h3>${data.Title}</h3>
-              `;
+              card.innerHTML = `<img src="${data.Poster}" alt="${data.Title}" /><h3>${data.Title}</h3>`;
               container.appendChild(card);
             }
           });
