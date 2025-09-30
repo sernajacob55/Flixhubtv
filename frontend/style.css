@@ -406,6 +406,7 @@ footer, footer p {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 2100; /* ✅ ensures it's always above the video */
 }
 
 /* =====================

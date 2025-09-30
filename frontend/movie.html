@@ -196,9 +196,10 @@
       }
     });
 
-    // ✅ Exit fullscreen
+    // ✅ Exit fullscreen (fixed with stopPropagation)
     const exitBtn = document.getElementById("exitFullscreen");
-    exitBtn.addEventListener("click", () => {
+    exitBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // ✅ prevents click from toggling video play/pause
       const player = document.getElementById("videoPlayer");
       const video = document.getElementById("movieVideo");
 
