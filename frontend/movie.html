@@ -166,7 +166,7 @@
       localStorage.setItem("watchlist", JSON.stringify(watchlist));
     });
 
-    // Play button
+    // ✅ Play button (Backblaze links)
     const playBtn = document.getElementById("playBtn");
     playBtn.addEventListener("click", () => {
       const player = document.getElementById("videoPlayer");
@@ -174,9 +174,9 @@
 
       let movieSrc = "";
       if (imdbID === "tt0133093") { // The Matrix
-        movieSrc = "https://download1351.mediafire.com/.../The+Matrix.mp4";
+        movieSrc = "https://f005.backblazeb2.com/file/FlixhubTV/The_Matrix.mp4";
       } else if (imdbID === "tt0118928") { // Dante's Peak
-        movieSrc = "https://download1324.mediafire.com/.../Dantes+Peak.mp4";
+        movieSrc = "https://f005.backblazeb2.com/file/FlixhubTV/Dantes_Peak.mp4";
       }
 
       if (movieSrc) {
