@@ -247,20 +247,38 @@ body.sidebar-open .main-content {
    Action Buttons (Play & Watchlist)
    ===================== */
 .action-btn {
-  background: #111;
-  color: #fff;
   border: none;
   padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.3s;
   margin: 8px 5px;
   font-size: 1em;
   display: inline-block;
+  transition: background 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s;
 }
 
-.action-btn:hover {
+/* Default dark button (Watchlist style) */
+#watchlistBtn.action-btn {
+  background: #111;
+  color: #fff;
+}
+#watchlistBtn.action-btn:hover {
   background: #00bfff;
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0px 6px 15px rgba(0, 191, 255, 0.6);
+}
+
+/* Highlighted Play button */
+#playBtn.action-btn {
+  background: #00bfff;
+  color: #fff;
+  font-weight: bold;
+}
+#playBtn.action-btn:hover {
+  background: #009acd; /* darker cyan hover */
+  transform: scale(1.05);
+  box-shadow: 0px 6px 15px rgba(0, 191, 255, 0.8);
 }
 
 /* =====================
