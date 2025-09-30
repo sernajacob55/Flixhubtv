@@ -166,7 +166,7 @@
       localStorage.setItem("watchlist", JSON.stringify(watchlist));
     });
 
-    // ✅ Play button (Backblaze links)
+    // ✅ Play button (Backblaze links + fullscreen)
     const playBtn = document.getElementById("playBtn");
     playBtn.addEventListener("click", () => {
       const player = document.getElementById("videoPlayer");
@@ -182,18 +182,52 @@
       if (movieSrc) {
         video.src = movieSrc;
         player.style.display = "flex";
+
+        // ✅ Enter fullscreen
+        if (player.requestFullscreen) {
+          player.requestFullscreen();
+        } else if (player.webkitRequestFullscreen) { // Safari
+          player.webkitRequestFullscreen();
+        } else if (player.msRequestFullscreen) { // IE/Edge
+          player.msRequestFullscreen();
+        }
+
         video.play();
       }
     });
 
-    // Exit fullscreen
+    // ✅ Exit fullscreen
     const exitBtn = document.getElementById("exitFullscreen");
     exitBtn.addEventListener("click", () => {
       const player = document.getElementById("videoPlayer");
       const video = document.getElementById("movieVideo");
+
       video.pause();
       video.src = "";
       player.style.display = "none";
+
+      // ✅ Leave fullscreen
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) { // Safari
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { // IE/Edge
+        document.msExitFullscreen();
+      }
+    });
+
+    // ✅ Esc key exits video too
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const player = document.getElementById("videoPlayer");
+        const video = document.getElementById("movieVideo");
+        if (player.style.display === "flex") {
+          video.pause();
+          video.src = "";
+          player.style.display = "none";
+          if (document.exitFullscreen) document.exitFullscreen();
+        }
+      }
     });
 
     // Init
