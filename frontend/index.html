@@ -54,25 +54,26 @@
     <p>© 2025 FlixHubTV. All rights reserved.</p>
   </footer>
 
-  <!-- Load movies.js BEFORE scripts -->
+  <!-- ✅ Load movies.js BEFORE main script -->
   <script src="movies.js"></script>
 
   <script>
     const OMDB_KEY = "ea7569d7";
 
-    // ✅ Sidebar Toggle
+    // Sidebar Toggle
     document.getElementById("menuToggle").addEventListener("click", () => {
       document.body.classList.toggle("sidebar-open");
     });
 
-    // ✅ Load movie list from movies.js
+    // Load movie list from movies.js
     async function loadMovies() {
       try {
-        const movieMap = window.movieMap; // ✅ now using movies.js
+        const movieMap = window.movieMap; // ✅ comes from movies.js
+        console.log("Loaded movieMap:", movieMap);
+
         const grid = document.getElementById("movieGrid");
 
         for (const imdbID of Object.keys(movieMap)) {
-          // fetch poster/title from OMDb
           const omdbRes = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
           const data = await omdbRes.json();
 
@@ -80,7 +81,6 @@
           const poster = (data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg";
           const genres = data.Genre || "";
 
-          // build movie card
           const wrapper = document.createElement("div");
           wrapper.className = "movie-card-wrapper";
           wrapper.innerHTML = `
@@ -101,7 +101,7 @@
       }
     }
 
-    // ✅ Live Search
+    // Live Search
     function setupSearch() {
       const searchInput = document.getElementById("searchInput");
       const cards = document.querySelectorAll(".movie-card");
@@ -115,7 +115,7 @@
       });
     }
 
-    // ✅ Auto-Populate Genres Sidebar
+    // Auto-Populate Genres Sidebar
     function setupSidebar() {
       const sidebar = document.getElementById("leftSidebar");
       const genreList = sidebar.querySelector("ul");
@@ -146,7 +146,7 @@
       });
     }
 
-    // ✅ Watchlist Toggle
+    // Watchlist Toggle
     function setupWatchlist() {
       const buttons = document.querySelectorAll('.watchlist-toggle');
       let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
@@ -195,7 +195,7 @@
       }
     }
 
-    // ✅ Continue Watching
+    // Continue Watching
     (function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
       const section = document.querySelector(".continue-watching");
