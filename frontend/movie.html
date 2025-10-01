@@ -80,7 +80,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const imdbID = urlParams.get("id");
 
-    let currentMovieData = {}; // will hold poster & title for continueWatching
+    let currentMovieData = {}; // holds poster & title for continueWatching
 
     // Sidebar hover
     const sidebar = document.getElementById('leftSidebar');
@@ -200,9 +200,10 @@
           player.msRequestFullscreen();
         }
 
-        // ✅ Check for resumeRequest OR stored continueWatching
+        // ✅ Resume from saved time if available
         video.addEventListener("loadedmetadata", () => {
           try {
+            // ResumeRequest from index tile
             let resumeReq = JSON.parse(localStorage.getItem("resumeRequest"));
             if (resumeReq && resumeReq.imdbID === imdbID) {
               if (resumeReq.time > 0 && resumeReq.time < video.duration) {
@@ -211,6 +212,7 @@
               localStorage.removeItem("resumeRequest");
               return;
             }
+            // Fall back to continueWatching
             let continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
             if (!Array.isArray(continued)) continued = [];
             const entry = continued.find(m => m.imdbID === imdbID && typeof m.time === "number");
@@ -222,7 +224,7 @@
 
         video.play();
 
-        // Track progress in continue watching + auto-remove if <10 min left
+        // Track progress in continueWatching
         video.addEventListener("timeupdate", () => {
           let continued = [];
           try { continued = JSON.parse(localStorage.getItem("continueWatching")) || []; }
