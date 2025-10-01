@@ -202,7 +202,7 @@ body.sidebar-open .main-content {
   font-weight: normal;
   color: #fff;
   text-decoration: none;
-  pointer-events: none;
+  /* ✅ FIX: removed pointer-events: none; */
 }
 
 /* =====================
