@@ -53,11 +53,17 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (player.msRequestFullscreen) player.msRequestFullscreen();
   }
 
-  // Helper: Exit fullscreen
+  // Helper: Exit fullscreen (✅ Fix: check if in fullscreen first)
   function exitFullscreen() {
-    if (document.exitFullscreen) document.exitFullscreen();
-    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-    else if (document.msExitFullscreen) document.msExitFullscreen();
+    if (
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.msFullscreenElement
+    ) {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+    }
   }
 
   // ✅ Resume playback if possible
