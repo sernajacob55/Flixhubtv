@@ -10,8 +10,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const imdbID = urlParams.get("id");
   let currentMovieData = {};
 
-  // ❌ Removed the auto-load block here
-  // ✅ Player is now only opened by the Play button inside movie.html
+  // ✅ Load currentMovieData (set by movie.html)
+  try {
+    const saved = JSON.parse(localStorage.getItem("currentMovieData"));
+    if (saved && saved.imdbID === imdbID) {
+      currentMovieData = saved;
+    }
+  } catch (e) {
+    currentMovieData = {};
+  }
 
   // Helper: Enter fullscreen
   function enterFullscreen() {
@@ -61,7 +68,12 @@ document.addEventListener("DOMContentLoaded", () => {
       continued = continued.filter(m => m.imdbID !== imdbID);
     } else {
       const i = continued.findIndex(m => m.imdbID === imdbID);
-      const payload = { imdbID, time: video.currentTime || 0 };
+      const payload = {
+        imdbID,
+        time: video.currentTime || 0,
+        title: currentMovieData.title || "Unknown",
+        poster: currentMovieData.poster || "placeholder.jpg"
+      };
       if (i >= 0) continued[i] = payload; else continued.push(payload);
     }
 

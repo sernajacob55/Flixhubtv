@@ -209,7 +209,7 @@
       }
     }
 
-    // ✅ Continue Watching (tiles only, handled by player.js for playback)
+    // ✅ Continue Watching
     function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
       const section = document.querySelector(".continue-watching");
@@ -225,14 +225,16 @@
       continued.forEach(item => {
         if (!item || typeof item !== "object") return;
         const { poster, title, imdbID } = item;
-        if (!poster || !title) return;
+        if (!poster || !title || !imdbID) return;
 
         const div = document.createElement("div");
         div.className = "movie-card";
         div.dataset.id = imdbID;
         div.innerHTML = `
-          <img src="${poster}" alt="Poster for ${title}" />
-          <h3>${title}</h3>
+          <a href="movie.html?id=${imdbID}">
+            <img src="${poster}" alt="Poster for ${title}" />
+            <h3>${title}</h3>
+          </a>
         `;
         list.appendChild(div);
       });
