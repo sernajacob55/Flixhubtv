@@ -34,8 +34,15 @@
 
       <!-- ✅ Movie Info Section -->
       <section id="movieInfo"></section>
+
       <!-- ✅ Cast Grid Section -->
       <section id="castGrid"></section>
+
+      <!-- ✅ Recommended Movies Section -->
+      <section>
+        <h2 style="margin-top:40px; color:#00bfff;">Recommended Movies</h2>
+        <div id="recommendGrid"></div>
+      </section>
     </main>
   </div>
 
@@ -71,23 +78,34 @@
         return;
       }
 
-      let data = {};
-      try {
-        const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
-        data = await res.json();
-      } catch (err) {
-        console.warn("OMDb fetch failed, using fallback", err);
+      // ✅ Prefer local metadata if available
+      let data = window.movieMeta && window.movieMeta[imdbID] ? window.movieMeta[imdbID] : {};
+
+      // ✅ Fallback to OMDb if missing key fields
+      if (!data.plot || !data.director) {
+        try {
+          const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
+          const apiData = await res.json();
+          data = { ...apiData, ...data }; // merge OMDb into local
+        } catch (err) {
+          console.warn("OMDb fetch failed, using local only", err);
+        }
       }
 
-      const title = data.Title || "Unknown Title";
-      const year = data.Year || "";
-      const runtime = data.Runtime || "";
-      const genre = data.Genre || "";
-      const plot = data.Plot || "Plot not available.";
-      const poster = (data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg";
-      const director = data.Director || "N/A";
-      const writer = data.Writer || "N/A";
-      const actors = data.Actors || "N/A";
+      const title = data.title || data.Title || "Unknown Title";
+      const year = data.year || data.Year || "";
+      const runtime = data.runtime || data.Runtime || "";
+      const genre = data.genre || data.Genre || "";
+      const plot = data.plot || data.Plot || "Plot not available.";
+      const poster = (data.poster && data.poster !== "N/A") ? data.poster : (data.Poster && data.Poster !== "N/A" ? data.Poster : "placeholder.jpg");
+      const director = data.director || data.Director || "N/A";
+      const writer = data.writer || data.Writer || "N/A";
+      const actors = data.actors || data.Actors || "N/A";
+      const rated = data.rated || data.Rated || "N/A";
+      const awards = data.awards || data.Awards || "N/A";
+      const boxOffice = data.boxOffice || data.BoxOffice || "N/A";
+      const imdbRating = data.imdbRating || "N/A";
+      const imdbVotes = data.imdbVotes || "N/A";
 
       // ✅ Save current movie context for resume
       localStorage.setItem("currentMovieData", JSON.stringify({ imdbID, title, poster }));
@@ -101,9 +119,13 @@
             <p><strong>Year:</strong> ${year}</p>
             <p><strong>Runtime:</strong> ${runtime}</p>
             <p><strong>Genre:</strong> ${genre}</p>
+            <p><strong>Rated:</strong> ${rated}</p>
             <p><strong>Director:</strong> ${director}</p>
             <p><strong>Writer:</strong> ${writer}</p>
             <p><strong>Actors:</strong> ${actors}</p>
+            <p><strong>Awards:</strong> ${awards}</p>
+            <p><strong>Box Office:</strong> ${boxOffice}</p>
+            <p><strong>IMDb Rating:</strong> ${imdbRating} (${imdbVotes} votes)</p>
             <p><strong>Plot:</strong> ${plot}</p>
             <button id="playBtn" class="action-btn">▶ Play</button>
           </div>
@@ -125,12 +147,30 @@
         });
       }
 
+      // ✅ Recommended Movies (use local metadata for speed)
+      const recommendDiv = document.getElementById("recommendGrid");
+      recommendDiv.innerHTML = "";
+      if (genre) {
+        const genreKeywords = genre.split(",").map(g => g.trim().toLowerCase());
+        for (const [id, meta] of Object.entries(window.movieMeta || {})) {
+          if (id !== imdbID && meta.genre) {
+            const recGenre = meta.genre.toLowerCase();
+            if (genreKeywords.some(g => recGenre.includes(g))) {
+              recommendDiv.innerHTML += `
+                <div class="movie-card" onclick="location.href='movie.html?id=${id}'">
+                  <img src="${meta.poster}" alt="${meta.title}"/>
+                  <h3>${meta.title}</h3>
+                </div>
+              `;
+            }
+          }
+        }
+      }
+
       // ✅ Play button
       document.getElementById("playBtn").addEventListener("click", () => {
         const videoPlayer = document.getElementById("videoPlayer");
         const video = document.getElementById("movieVideo");
-
-        // Fix: reset src only when button clicked
         video.src = window.movieMap[imdbID] || "";
         video.load();
 
