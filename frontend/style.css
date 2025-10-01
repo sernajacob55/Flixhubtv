@@ -154,7 +154,9 @@ body.sidebar-open .main-content {
 .movie-card-wrapper {
   display: flex;
   flex-direction: column;
+  justify-content: space-between; /* ✅ ensures button is always aligned at bottom */
   align-items: center;
+  height: 100%; /* ✅ all wrappers same height */
 }
 
 .movie-card {
@@ -165,6 +167,7 @@ body.sidebar-open .main-content {
   padding: 10px;
   cursor: pointer;
   transition: transform 0.3s, box-shadow 0.3s;
+  flex-grow: 1; /* ✅ make card take remaining space so button pushes down */
 }
 
 .movie-card:hover {
