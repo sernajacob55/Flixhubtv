@@ -166,61 +166,39 @@
       localStorage.setItem("watchlist", JSON.stringify(watchlist));
     });
 
-    // ✅ Play button (Backblaze links + fullscreen + Continue Watching)
+    // ✅ Play button using movies.json
     const playBtn = document.getElementById("playBtn");
-    playBtn.addEventListener("click", () => {
-      const player = document.getElementById("videoPlayer");
-      const video = document.getElementById("movieVideo");
+    playBtn.addEventListener("click", async () => {
+      try {
+        const res = await fetch("movies.json");
+        const movieMap = await res.json();
+        const movieSrc = movieMap[imdbID];
 
-      let movieSrc = "";
-      let title = document.getElementById("movieTitle").textContent || "Unknown";
-      let poster = document.getElementById("moviePoster").src || "placeholder.jpg";
+        if (movieSrc) {
+          const player = document.getElementById("videoPlayer");
+          const video = document.getElementById("movieVideo");
 
-      if (imdbID === "tt0133093") {
-        movieSrc = "https://f005.backblazeb2.com/file/FlixhubTV/The_Matrix.mp4";
-      } else if (imdbID === "tt0118928") {
-        movieSrc = "https://f005.backblazeb2.com/file/FlixhubTV/Dantes_Peak.mp4";
-      } else if (imdbID === "tt0318627") {
-        movieSrc = "https://f005.backblazeb2.com/file/FlixhubTV/Resident_Evil_Apocalypse.mp4";
-      } else if (imdbID === "tt0120804") {
-        movieSrc = "https://f005.backblazeb2.com/file/FlixhubTV/Resident_Evil.mp4";
-      } else if (imdbID === "tt0258463") {
-        movieSrc = "https://f005.backblazeb2.com/file/FlixhubTV/The_Bourne_Identity.mp4";
-      }
+          video.src = movieSrc;
+          player.style.display = "flex";
 
-      if (movieSrc) {
-        video.src = movieSrc;
-        player.style.display = "flex";
-
-        // ✅ Add to Continue Watching
-        let continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
-        continued = continued.filter(item => item.title !== title); // prevent duplicates
-        continued.unshift({ poster, title }); // add latest on top
-        localStorage.setItem("continueWatching", JSON.stringify(continued.slice(0, 10))); // max 10
-
-        // ✅ Enter fullscreen
-        if (player.requestFullscreen) {
-          player.requestFullscreen();
-        } else if (player.webkitRequestFullscreen) {
-          player.webkitRequestFullscreen();
-        } else if (player.msRequestFullscreen) {
-          player.msRequestFullscreen();
-        }
-
-        video.play();
-
-        // ✅ Remove from Continue Watching if < 10 minutes left
-        video.addEventListener("timeupdate", () => {
-          if (video.duration && (video.duration - video.currentTime) < 600) {
-            let continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
-            continued = continued.filter(item => item.title !== title);
-            localStorage.setItem("continueWatching", JSON.stringify(continued));
+          if (player.requestFullscreen) {
+            player.requestFullscreen();
+          } else if (player.webkitRequestFullscreen) {
+            player.webkitRequestFullscreen();
+          } else if (player.msRequestFullscreen) {
+            player.msRequestFullscreen();
           }
-        });
+
+          video.play();
+        } else {
+          alert("Movie source not found. Please check movies.json.");
+        }
+      } catch (err) {
+        console.error("Error loading movies.json:", err);
       }
     });
 
-    // ✅ Exit fullscreen
+    // Exit fullscreen
     const exitBtn = document.getElementById("exitFullscreen");
     exitBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -240,7 +218,7 @@
       }
     });
 
-    // ✅ Esc key exits video too
+    // Esc key exits video too
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         const player = document.getElementById("videoPlayer");
