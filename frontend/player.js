@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => { 
   const video = document.getElementById("movieVideo");
   const player = document.getElementById("videoPlayer");
   const closeBtn = document.getElementById("exitFullscreen");
@@ -65,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const remaining = (video.duration || 0) - (video.currentTime || 0);
 
     if (video.duration && remaining <= 600) {
+      // ✅ Remove finished movies from continue watching
       continued = continued.filter(m => m.imdbID !== imdbID);
     } else {
       const i = continued.findIndex(m => m.imdbID === imdbID);
@@ -74,7 +75,15 @@ document.addEventListener("DOMContentLoaded", () => {
         title: currentMovieData.title || "Unknown",
         poster: currentMovieData.poster || "placeholder.jpg"
       };
-      if (i >= 0) continued[i] = payload; else continued.push(payload);
+      if (i >= 0) {
+        continued.splice(i, 1); // remove old entry
+      }
+      continued.unshift(payload); // add to front (most recent first)
+    }
+
+    // ✅ Cap at 10 items (drop oldest)
+    if (continued.length > 10) {
+      continued = continued.slice(0, 10);
     }
 
     localStorage.setItem("continueWatching", JSON.stringify(continued));
