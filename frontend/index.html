@@ -200,16 +200,34 @@
             const title = card.querySelector("h3").textContent;
             const div = document.createElement("div");
             div.className = "watchlist-item";
-            div.innerHTML = `<img src="${img}" alt="Poster for ${title}" />`;
+            div.innerHTML = `
+              <img src="${img}" alt="Poster for ${title}" />
+              <button class="remove-btn" data-id="${id}">X</button>
+            `;
             grid.appendChild(div);
           }
+        });
+
+        // Attach remove button listeners for Watchlist
+        grid.querySelectorAll(".remove-btn").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const id = btn.getAttribute("data-id");
+            watchlist = watchlist.filter(x => x !== id);
+            localStorage.setItem("watchlist", JSON.stringify(watchlist));
+            renderWatchlist();
+            // Update main grid button state too
+            document.querySelectorAll(`.watchlist-toggle[data-id="${id}"]`).forEach(b => {
+              b.textContent = "+ Add to Watchlist";
+            });
+          });
         });
 
         section.style.display = grid.children.length > 0 ? "block" : "none";
       }
     }
 
-    // ✅ Continue Watching
+    // ✅ Continue Watching with remove button
     function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
       const section = document.querySelector(".continue-watching");
@@ -236,8 +254,21 @@
             <img src="${poster}" alt="Poster for ${title}" />
             <h3>${title}</h3>
           </a>
+          <button class="remove-btn" data-id="${imdbID}">X</button>
         `;
         list.appendChild(div);
+      });
+
+      // Attach remove button listeners
+      list.querySelectorAll(".remove-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = btn.getAttribute("data-id");
+          let continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
+          continued = continued.filter(m => m.imdbID !== id);
+          localStorage.setItem("continueWatching", JSON.stringify(continued));
+          setupContinueWatching();
+        });
       });
 
       section.style.display = list.children.length > 0 ? "block" : "none";
