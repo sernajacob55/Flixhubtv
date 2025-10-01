@@ -39,6 +39,13 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
+  // ✅ Fix: Only set video.src if empty
+  if (imdbID && window.movieMap && window.movieMap[imdbID]) {
+    if (!video.src || video.src === window.location.href) {
+      video.src = window.movieMap[imdbID];
+    }
+  }
+
   // Helper: Enter fullscreen
   function enterFullscreen() {
     if (player.requestFullscreen) player.requestFullscreen();

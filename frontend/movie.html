@@ -34,6 +34,8 @@
 
       <!-- ✅ Movie Info Section -->
       <section id="movieInfo"></section>
+      <!-- ✅ Cast Grid Section -->
+      <section id="castGrid"></section>
     </main>
   </div>
 
@@ -108,14 +110,36 @@
         </div>
       `;
 
+      // ✅ Build Cast Grid
+      const castDiv = document.getElementById("castGrid");
+      castDiv.innerHTML = "";
+      if (actors && actors !== "N/A") {
+        const actorList = actors.split(",").map(a => a.trim());
+        actorList.forEach(actor => {
+          castDiv.innerHTML += `
+            <div class="actor-card">
+              <img src="placeholder.jpg" alt="${actor}"/>
+              <p>${actor}</p>
+            </div>
+          `;
+        });
+      }
+
       // ✅ Play button
       document.getElementById("playBtn").addEventListener("click", () => {
         const videoPlayer = document.getElementById("videoPlayer");
         const video = document.getElementById("movieVideo");
-        video.src = window.movieMap[imdbID];
+
+        // Fix: reset src only when button clicked
+        video.src = window.movieMap[imdbID] || "";
         video.load();
-        videoPlayer.style.display = "flex";
-        video.play().catch(() => {});
+
+        if (video.src) {
+          videoPlayer.style.display = "flex";
+          video.play().catch(err => console.warn("Playback failed:", err));
+        } else {
+          alert("Video source not found.");
+        }
       });
     }
 
