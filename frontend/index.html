@@ -114,8 +114,9 @@
             <button class="action-btn watchlist-toggle" data-id="${imdbID}">+ Add to Watchlist</button>
           `;
 
+          // ✅ Fixed: Correct template literal
           wrapper.querySelector(".movie-card").addEventListener("click", () => {
-            location.href = \`movie.html?id=${imdbID}\`;
+            location.href = `movie.html?id=${imdbID}`;
           });
 
           grid.appendChild(wrapper);
@@ -209,20 +210,21 @@
         grid.innerHTML = "";
 
         watchlist.forEach(id => {
-          const card = document.querySelector(\`.movie-card[data-id="\${id}"]\`);
+          const card = document.querySelector(`.movie-card[data-id="${id}"]`);
           if (card) {
             const img = card.querySelector("img").src;
             const title = card.querySelector("h3").textContent;
             const div = document.createElement("div");
             div.className = "movie-card watchlist-item";
             div.dataset.id = id;
-            div.innerHTML = \`
-              <img src="\${img}" alt="Poster for \${title}" />
-              <h3>\${title}</h3>
-              <button class="remove-btn" data-id="\${id}">X</button>
-            \`;
+            div.innerHTML = `
+              <img src="${img}" alt="Poster for ${title}" />
+              <h3>${title}</h3>
+              <button class="remove-btn" data-id="${id}">X</button>
+            `;
+            // ✅ Fixed: Correct template literal
             div.addEventListener("click", () => {
-              location.href = \`movie.html?id=\${id}\`;
+              location.href = `movie.html?id=${id}`;
             });
             grid.appendChild(div);
           }
@@ -235,7 +237,7 @@
             watchlist = watchlist.filter(x => x !== id);
             localStorage.setItem("watchlist", JSON.stringify(watchlist));
             renderWatchlist();
-            document.querySelectorAll(\`.watchlist-toggle[data-id="\${id}"]\`).forEach(b => {
+            document.querySelectorAll(`.watchlist-toggle[data-id="${id}"]`).forEach(b => {
               b.textContent = "+ Add to Watchlist";
             });
           });
@@ -267,11 +269,11 @@
         const div = document.createElement("div");
         div.className = "movie-card";
         div.dataset.id = imdbID;
-        div.innerHTML = \`
-          <img src="\${poster}" alt="Poster for \${title}" />
-          <h3>\${title}</h3>
-          <button class="remove-btn" data-id="\${imdbID}">X</button>
-        \`;
+        div.innerHTML = `
+          <img src="${poster}" alt="Poster for ${title}" />
+          <h3>${title}</h3>
+          <button class="remove-btn" data-id="${imdbID}">X</button>
+        `;
 
         div.addEventListener("click", () => {
           localStorage.setItem("resumeRequest", JSON.stringify({ imdbID, time }));
