@@ -87,22 +87,37 @@
         const grid = document.getElementById("movieGrid");
 
         for (const imdbID of Object.keys(movieMap)) {
-          const omdbRes = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
-          const data = await omdbRes.json();
+          let title = imdbID;
+          let poster = "placeholder.jpg";
+          let genres = "";
 
-          const title = data.Title || "Unknown";
-          const poster = (data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg";
-          const genres = data.Genre || "";
+          try {
+            const omdbRes = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
+            const data = await omdbRes.json();
+            if (data && data.Response !== "False") {
+              title = data.Title || title;
+              poster = (data.Poster && data.Poster !== "N/A") ? data.Poster : poster;
+              genres = data.Genre || "";
+            }
+          } catch (err) {
+            console.warn("OMDb fetch failed, using fallback for:", imdbID);
+          }
 
           const wrapper = document.createElement("div");
           wrapper.className = "movie-card-wrapper";
           wrapper.innerHTML = `
-            <div class="movie-card" data-id="${imdbID}" data-genres="${genres}" onclick="location.href='movie.html?id=${imdbID}'">
+            <div class="movie-card" data-id="${imdbID}" data-genres="${genres}">
               <img src="${poster}" alt="${title} poster" />
               <h3>${title}</h3>
             </div>
             <button class="action-btn watchlist-toggle" data-id="${imdbID}">+ Add to Watchlist</button>
           `;
+
+          // ✅ Navigate when card is clicked
+          wrapper.querySelector(".movie-card").addEventListener("click", () => {
+            location.href = \`movie.html?id=${imdbID}\`;
+          });
+
           grid.appendChild(wrapper);
         }
 
@@ -110,7 +125,6 @@
         setupSidebar();
         setupWatchlist();
         setupContinueWatching();
-        installSafeNavigationGuards(); // ✅ ensure clicks navigate even if something overlays
       } catch (err) {
         console.error("Error loading movies.js:", err);
       }
@@ -119,11 +133,10 @@
     // Live Search
     function setupSearch() {
       const searchInput = document.getElementById("searchInput");
-      const cards = document.querySelectorAll(".movie-card");
       if (!searchInput) return;
       searchInput.addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase();
-        cards.forEach(card => {
+        document.querySelectorAll(".movie-card").forEach(card => {
           const title = card.querySelector("h3").textContent.toLowerCase();
           card.style.display = title.includes(query) ? "" : "none";
         });
@@ -161,7 +174,7 @@
       });
     }
 
-    // Watchlist Toggle
+    // Watchlist Toggle (unchanged)
     function setupWatchlist() {
       const buttons = document.querySelectorAll('.watchlist-toggle');
       let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
@@ -200,7 +213,6 @@
             const img = card.querySelector("img").src;
             const title = card.querySelector("h3").textContent;
             const div = document.createElement("div");
-            // ✅ give same look/feel as movie-card and store id for nav
             div.className = "movie-card watchlist-item";
             div.dataset.id = id;
             div.innerHTML = `
@@ -208,7 +220,6 @@
               <h3>${title}</h3>
               <button class="remove-btn" data-id="${id}">X</button>
             `;
-            // ✅ clicking the tile goes to movie info page
             div.addEventListener("click", () => {
               location.href = \`movie.html?id=${id}\`;
             });
@@ -216,7 +227,6 @@
           }
         });
 
-        // Attach remove button listeners for Watchlist (don’t navigate)
         grid.querySelectorAll(".remove-btn").forEach(btn => {
           btn.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -224,7 +234,6 @@
             watchlist = watchlist.filter(x => x !== id);
             localStorage.setItem("watchlist", JSON.stringify(watchlist));
             renderWatchlist();
-            // Update main grid button state too
             document.querySelectorAll(\`.watchlist-toggle[data-id="${id}"]\`).forEach(b => {
               b.textContent = "+ Add to Watchlist";
             });
@@ -235,7 +244,7 @@
       }
     }
 
-    // ✅ Continue Watching with direct player launch + remove button
+    // Continue Watching (unchanged)
     function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
       const section = document.querySelector(".continue-watching");
@@ -263,7 +272,6 @@
           <button class="remove-btn" data-id="${imdbID}">X</button>
         `;
 
-        // ✅ Direct play on click
         div.addEventListener("click", () => {
           localStorage.setItem("resumeRequest", JSON.stringify({ imdbID, time }));
           const videoPlayer = document.getElementById("videoPlayer");
@@ -277,7 +285,6 @@
         list.appendChild(div);
       });
 
-      // Attach remove button listeners
       list.querySelectorAll(".remove-btn").forEach(btn => {
         btn.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -292,32 +299,10 @@
       section.style.display = list.children.length > 0 ? "block" : "none";
     }
 
-    // ✅ Safety net: ensure clicks navigate even if inline onclick is blocked
-    function installSafeNavigationGuards() {
-      document.addEventListener("click", (e) => {
-        // ignore clicks on special controls
-        if (e.target.closest(".remove-btn") || e.target.closest(".watchlist-toggle")) return;
-
-        // main movie grid cards
-        const gridCard = e.target.closest("#movieGrid .movie-card");
-        if (gridCard && gridCard.dataset.id) {
-          location.href = `movie.html?id=${gridCard.dataset.id}`;
-        }
-
-        // watchlist tiles (already have explicit listeners, this is backup)
-        const wlCard = e.target.closest("#watchlistGrid .watchlist-item");
-        if (wlCard && wlCard.dataset.id) {
-          location.href = `movie.html?id=${wlCard.dataset.id}`;
-        }
-      });
-    }
-
-    // ✅ Auto-refresh Continue Watching on storage changes
     window.addEventListener("storage", () => {
       setupContinueWatching();
     });
 
-    // Init
     loadMovies();
   </script>
 </body>
