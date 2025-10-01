@@ -106,7 +106,7 @@
           poster: (data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg"
         };
 
-        // 🔑 Save movie context so player.js knows what to play/resume
+        // 🔑 Save movie context
         localStorage.setItem("currentMovieData", JSON.stringify(currentMovieData));
       } catch (err) {
         console.error("Error loading movie details:", err);

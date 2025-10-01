@@ -5,20 +5,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!video || !player) return;
 
-  // Get imdbID passed via query or resumeRequest
+  // Get imdbID passed via query (for resume/continue features)
   const urlParams = new URLSearchParams(window.location.search);
   const imdbID = urlParams.get("id");
   let currentMovieData = {};
 
-  // ✅ Load video only when Play button was clicked
-  // This runs because movie.html redirects to itself with ?id=
-  if (imdbID && window.movieMap && window.movieMap[imdbID]) {
-    video.src = window.movieMap[imdbID];
-    player.style.display = "flex";
-    video.play().catch(() => {
-      // Autoplay might fail; user may need to press Play
-    });
-  }
+  // ❌ Removed the auto-load block here
+  // ✅ Player is now only opened by the Play button inside movie.html
 
   // Helper: Enter fullscreen
   function enterFullscreen() {
@@ -87,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
       video.src = "";
       player.style.display = "none";
       exitFullscreen();
+      // ✅ Back to info page (details still visible)
     });
   }
 
