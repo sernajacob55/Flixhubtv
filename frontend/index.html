@@ -223,7 +223,6 @@
 
       list.innerHTML = "";
 
-      // ✅ Already stored most-recent-first in player.js
       continued.forEach(item => {
         if (!item || typeof item !== "object") return;
         const { poster, title, imdbID } = item;
@@ -241,9 +240,13 @@
         list.appendChild(div);
       });
 
-      // Hide or show the section
       section.style.display = list.children.length > 0 ? "block" : "none";
     }
+
+    // ✅ Auto-refresh Continue Watching on storage changes
+    window.addEventListener("storage", () => {
+      setupContinueWatching();
+    });
 
     // Init
     loadMovies();

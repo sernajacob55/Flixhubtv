@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (document.msExitFullscreen) document.msExitFullscreen();
   }
 
-  // Resume playback if possible
+  // ✅ Resume playback if possible
   video.addEventListener("loadedmetadata", () => {
     try {
       let resumeReq = JSON.parse(localStorage.getItem("resumeRequest"));
@@ -49,12 +49,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!Array.isArray(continued)) continued = [];
       const entry = continued.find(m => m.imdbID === imdbID && typeof m.time === "number");
       if (entry && entry.time > 0 && entry.time < video.duration) {
-        video.currentTime = entry.time;
+        video.currentTime = entry.time; // ✅ always seek to saved time
       }
     } catch (e) {}
   });
 
-  // Save progress to continueWatching
+  // ✅ Save progress to continueWatching
   video.addEventListener("timeupdate", () => {
     if (!imdbID) return;
     let continued = [];
@@ -68,25 +68,25 @@ document.addEventListener("DOMContentLoaded", () => {
       // ✅ Remove finished movies from continue watching
       continued = continued.filter(m => m.imdbID !== imdbID);
     } else {
-      const i = continued.findIndex(m => m.imdbID === imdbID);
       const payload = {
         imdbID,
         time: video.currentTime || 0,
         title: currentMovieData.title || "Unknown",
         poster: currentMovieData.poster || "placeholder.jpg"
       };
-      if (i >= 0) {
-        continued.splice(i, 1); // remove old entry
-      }
-      continued.unshift(payload); // add to front (most recent first)
+      // remove old entry if exists
+      continued = continued.filter(m => m.imdbID !== imdbID);
+      // add newest to front
+      continued.unshift(payload);
     }
 
-    // ✅ Cap at 10 items (drop oldest)
+    // ✅ Cap at 10 items
     if (continued.length > 10) {
       continued = continued.slice(0, 10);
     }
 
     localStorage.setItem("continueWatching", JSON.stringify(continued));
+    window.dispatchEvent(new Event("storage")); // ✅ trigger live update
   });
 
   // Force fullscreen when video starts
@@ -101,7 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
       video.src = "";
       player.style.display = "none";
       exitFullscreen();
-      // ✅ Back to info page (details still visible)
     });
   }
 

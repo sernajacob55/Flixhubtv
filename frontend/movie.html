@@ -187,6 +187,14 @@
       if (imdbID && window.movieMap && window.movieMap[imdbID]) {
         const video = document.getElementById("movieVideo");
         const player = document.getElementById("videoPlayer");
+
+        // ✅ If resuming from Continue Watching, set resumeRequest
+        const continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
+        const entry = continued.find(m => m.imdbID === imdbID);
+        if (entry && entry.time > 0) {
+          localStorage.setItem("resumeRequest", JSON.stringify({ imdbID, time: entry.time }));
+        }
+
         video.src = window.movieMap[imdbID];
         player.style.display = "flex";
         video.play().catch(() => {});
