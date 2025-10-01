@@ -166,40 +166,64 @@
       localStorage.setItem("watchlist", JSON.stringify(watchlist));
     });
 
-    // ✅ Play button (Backblaze links + fullscreen)
+    // ✅ Play button (Backblaze links + fullscreen + Continue Watching)
     const playBtn = document.getElementById("playBtn");
     playBtn.addEventListener("click", () => {
       const player = document.getElementById("videoPlayer");
       const video = document.getElementById("movieVideo");
 
       let movieSrc = "";
-      if (imdbID === "tt0133093") { // The Matrix
+      let title = document.getElementById("movieTitle").textContent || "Unknown";
+      let poster = document.getElementById("moviePoster").src || "placeholder.jpg";
+
+      if (imdbID === "tt0133093") {
         movieSrc = "https://f005.backblazeb2.com/file/FlixhubTV/The_Matrix.mp4";
-      } else if (imdbID === "tt0118928") { // Dante's Peak
+      } else if (imdbID === "tt0118928") {
         movieSrc = "https://f005.backblazeb2.com/file/FlixhubTV/Dantes_Peak.mp4";
+      } else if (imdbID === "tt0318627") {
+        movieSrc = "https://f005.backblazeb2.com/file/FlixhubTV/Resident_Evil_Apocalypse.mp4";
+      } else if (imdbID === "tt0120804") {
+        movieSrc = "https://f005.backblazeb2.com/file/FlixhubTV/Resident_Evil.mp4";
+      } else if (imdbID === "tt0258463") {
+        movieSrc = "https://f005.backblazeb2.com/file/FlixhubTV/The_Bourne_Identity.mp4";
       }
 
       if (movieSrc) {
         video.src = movieSrc;
         player.style.display = "flex";
 
+        // ✅ Add to Continue Watching
+        let continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
+        continued = continued.filter(item => item.title !== title); // prevent duplicates
+        continued.unshift({ poster, title }); // add latest on top
+        localStorage.setItem("continueWatching", JSON.stringify(continued.slice(0, 10))); // max 10
+
         // ✅ Enter fullscreen
         if (player.requestFullscreen) {
           player.requestFullscreen();
-        } else if (player.webkitRequestFullscreen) { // Safari
+        } else if (player.webkitRequestFullscreen) {
           player.webkitRequestFullscreen();
-        } else if (player.msRequestFullscreen) { // IE/Edge
+        } else if (player.msRequestFullscreen) {
           player.msRequestFullscreen();
         }
 
         video.play();
+
+        // ✅ Remove from Continue Watching if < 10 minutes left
+        video.addEventListener("timeupdate", () => {
+          if (video.duration && (video.duration - video.currentTime) < 600) {
+            let continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
+            continued = continued.filter(item => item.title !== title);
+            localStorage.setItem("continueWatching", JSON.stringify(continued));
+          }
+        });
       }
     });
 
-    // ✅ Exit fullscreen (fixed with stopPropagation)
+    // ✅ Exit fullscreen
     const exitBtn = document.getElementById("exitFullscreen");
     exitBtn.addEventListener("click", (e) => {
-      e.stopPropagation(); // ✅ prevents click from toggling video play/pause
+      e.stopPropagation();
       const player = document.getElementById("videoPlayer");
       const video = document.getElementById("movieVideo");
 
@@ -207,12 +231,11 @@
       video.src = "";
       player.style.display = "none";
 
-      // ✅ Leave fullscreen
       if (document.exitFullscreen) {
         document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) { // Safari
+      } else if (document.webkitExitFullscreen) {
         document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) { // IE/Edge
+      } else if (document.msExitFullscreen) {
         document.msExitFullscreen();
       }
     });

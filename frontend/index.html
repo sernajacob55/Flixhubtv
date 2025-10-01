@@ -63,6 +63,33 @@
           </div>
           <button class="action-btn watchlist-toggle" data-id="tt0118928">+ Add to Watchlist</button>
         </div>
+
+        <!-- Resident Evil Apocalypse -->
+        <div class="movie-card-wrapper">
+          <div class="movie-card" data-id="tt0318627" data-genres="Action,Horror,Sci-Fi" onclick="location.href='movie.html?id=tt0318627'">
+            <img id="poster-re2apoc" src="" alt="Resident Evil Apocalypse poster" />
+            <h3>Resident Evil: Apocalypse</h3>
+          </div>
+          <button class="action-btn watchlist-toggle" data-id="tt0318627">+ Add to Watchlist</button>
+        </div>
+
+        <!-- Resident Evil -->
+        <div class="movie-card-wrapper">
+          <div class="movie-card" data-id="tt0120804" data-genres="Action,Horror,Sci-Fi" onclick="location.href='movie.html?id=tt0120804'">
+            <img id="poster-re1" src="" alt="Resident Evil poster" />
+            <h3>Resident Evil</h3>
+          </div>
+          <button class="action-btn watchlist-toggle" data-id="tt0120804">+ Add to Watchlist</button>
+        </div>
+
+        <!-- The Bourne Identity -->
+        <div class="movie-card-wrapper">
+          <div class="movie-card" data-id="tt0258463" data-genres="Action,Thriller" onclick="location.href='movie.html?id=tt0258463'">
+            <img id="poster-bourne" src="" alt="The Bourne Identity poster" />
+            <h3>The Bourne Identity</h3>
+          </div>
+          <button class="action-btn watchlist-toggle" data-id="tt0258463">+ Add to Watchlist</button>
+        </div>
       </section>
     </main>
   </div>
@@ -95,6 +122,9 @@
     }
     loadPoster("tt0133093", "poster-matrix");
     loadPoster("tt0118928", "poster-dantes");
+    loadPoster("tt0318627", "poster-re2apoc");
+    loadPoster("tt0120804", "poster-re1");
+    loadPoster("tt0258463", "poster-bourne");
 
     // ✅ Live Search
     (function setupLiveSearch() {
@@ -182,6 +212,15 @@
           } else if (id === "tt0118928") {
             posterSrc = document.getElementById("poster-dantes").src;
             title = "Dante's Peak";
+          } else if (id === "tt0318627") {
+            posterSrc = document.getElementById("poster-re2apoc").src;
+            title = "Resident Evil: Apocalypse";
+          } else if (id === "tt0120804") {
+            posterSrc = document.getElementById("poster-re1").src;
+            title = "Resident Evil";
+          } else if (id === "tt0258463") {
+            posterSrc = document.getElementById("poster-bourne").src;
+            title = "The Bourne Identity";
           }
           if (posterSrc && !posterSrc.includes("placeholder.jpg")) {
             const div = document.createElement("div");
