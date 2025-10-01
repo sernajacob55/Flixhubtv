@@ -64,16 +64,8 @@
     <p>© 2025 FlixHubTV. All rights reserved.</p>
   </footer>
 
-  <!-- ✅ Shared Fullscreen Player -->
-  <div id="videoPlayer" class="video-player" style="display:none;">
-    <button id="exitFullscreen" class="close-btn">X</button>
-    <video id="movieVideo" controls autoplay></video>
-  </div>
-
   <!-- ✅ Scripts -->
   <script src="movies.js"></script>
-  <script src="player.js"></script>
-
   <script>
     const OMDB_KEY = "ea7569d7"; 
     const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f";
@@ -179,6 +171,14 @@
         watchlistBtn.textContent = "✓ Added";
       }
       localStorage.setItem("watchlist", JSON.stringify(watchlist));
+    });
+
+    // ✅ Play button → redirect to player.html
+    const playBtn = document.getElementById("playBtn");
+    playBtn.addEventListener("click", () => {
+      if (imdbID) {
+        window.location.href = `player.html?id=${imdbID}`;
+      }
     });
 
     // Init

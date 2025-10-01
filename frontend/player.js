@@ -10,10 +10,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const imdbID = urlParams.get("id");
   let currentMovieData = {};
 
-  // ✅ Load movie source if ID is passed
+  // ✅ Load video only when Play button was clicked
+  // This runs because movie.html redirects to itself with ?id=
   if (imdbID && window.movieMap && window.movieMap[imdbID]) {
     video.src = window.movieMap[imdbID];
     player.style.display = "flex";
+    video.play().catch(() => {
+      // Autoplay might fail; user may need to press Play
+    });
   }
 
   // Helper: Enter fullscreen
