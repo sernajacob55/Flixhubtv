@@ -202,7 +202,6 @@ body.sidebar-open .main-content {
   font-weight: normal;
   color: #fff;
   text-decoration: none;
-  /* ✅ FIX: removed pointer-events: none; */
 }
 
 /* =====================
@@ -248,50 +247,14 @@ body.sidebar-open .main-content {
   color: #00bfff;
 }
 
-/* ✅ Watchlist same as movie grid */
-#watchlistGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 20px;
-}
-
-#watchlistGrid .watchlist-item {
-  background: #111;
-  border-radius: 10px;
-  overflow: hidden;
-  text-align: center;
-  padding: 10px;
-  cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-  position: relative;
-}
-
-#watchlistGrid .watchlist-item:hover {
-  transform: scale(1.05);
-  box-shadow: 0px 10px 20px rgba(0,0,0,0.8);
-}
-
-#watchlistGrid .watchlist-item img {
-  width: 100%;
-  height: 240px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-#watchlistGrid .watchlist-item h3 {
-  margin: 10px 0 0;
-  font-size: 1em;
-  font-weight: normal;
-  color: #fff;
-}
-
-/* ✅ Continue Watching same as movie grid */
+#watchlistGrid,
 #continueWatchingList {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 20px;
 }
 
+#watchlistGrid .watchlist-item,
 #continueWatchingList .movie-card {
   background: #111;
   border-radius: 10px;
@@ -303,11 +266,13 @@ body.sidebar-open .main-content {
   position: relative;
 }
 
+#watchlistGrid .watchlist-item:hover,
 #continueWatchingList .movie-card:hover {
   transform: scale(1.05);
   box-shadow: 0px 10px 20px rgba(0,0,0,0.8);
 }
 
+#watchlistGrid .watchlist-item img,
 #continueWatchingList .movie-card img {
   width: 100%;
   height: 240px;
@@ -315,6 +280,7 @@ body.sidebar-open .main-content {
   border-radius: 6px;
 }
 
+#watchlistGrid .watchlist-item h3,
 #continueWatchingList .movie-card h3 {
   margin: 10px 0 0;
   font-size: 1em;
@@ -322,7 +288,9 @@ body.sidebar-open .main-content {
   color: #fff;
 }
 
-/* ✅ Remove Button */
+/* =====================
+   Remove Button
+   ===================== */
 .remove-btn {
   position: absolute;
   top: 8px;
@@ -553,4 +521,38 @@ footer, footer p {
   margin: 0;
   font-size: 1em;
   color: #fff;
+}
+
+/* =====================
+   Movie Detail (Info Page)
+   ===================== */
+.movie-detail {
+  display: flex;
+  gap: 25px;
+  align-items: flex-start;
+  background: #111;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 8px 20px rgba(0,0,0,0.7);
+}
+
+.movie-detail-poster {
+  width: 220px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.movie-detail-text h2 {
+  font-size: 1.8em;
+  margin-bottom: 15px;
+  color: #00bfff;
+}
+
+.movie-detail-text p {
+  margin: 6px 0;
+  line-height: 1.5;
+}
+
+.movie-detail-text strong {
+  color: #00bfff;
 }

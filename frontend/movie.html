@@ -14,9 +14,9 @@
     <div class="nav-buttons">
       <button id="menuToggle">☰</button>
       <input id="searchInput" type="text" placeholder="Search movies..." aria-label="Search movies"/>
+      <button id="homeBtn" onclick="location.href='index.html'">Home</button>
       <button id="switchProfileBtn" onclick="location.href='profiles.html'">Switch Profile</button>
       <button id="logoutBtn" onclick="location.href='login.html'">Logout</button>
-      <button id="homeBtn" onclick="location.href='index.html'">Home</button>
     </div>
   </header>
 
@@ -34,18 +34,6 @@
 
       <!-- ✅ Movie Info Section -->
       <section id="movieInfo"></section>
-
-      <!-- Continue Watching -->
-      <section class="continue-watching">
-        <h2>Continue Watching</h2>
-        <div id="continueWatchingList" class="movie-grid"></div>
-      </section>
-
-      <!-- Watchlist -->
-      <section class="watchlist">
-        <h2>My Watchlist</h2>
-        <div id="watchlistGrid"></div>
-      </section>
     </main>
   </div>
 
@@ -95,6 +83,9 @@
       const genre = data.Genre || "";
       const plot = data.Plot || "Plot not available.";
       const poster = (data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg";
+      const director = data.Director || "N/A";
+      const writer = data.Writer || "N/A";
+      const actors = data.Actors || "N/A";
 
       // ✅ Save current movie context for resume
       localStorage.setItem("currentMovieData", JSON.stringify({ imdbID, title, poster }));
@@ -108,6 +99,9 @@
             <p><strong>Year:</strong> ${year}</p>
             <p><strong>Runtime:</strong> ${runtime}</p>
             <p><strong>Genre:</strong> ${genre}</p>
+            <p><strong>Director:</strong> ${director}</p>
+            <p><strong>Writer:</strong> ${writer}</p>
+            <p><strong>Actors:</strong> ${actors}</p>
             <p><strong>Plot:</strong> ${plot}</p>
             <button id="playBtn" class="action-btn">▶ Play</button>
           </div>
@@ -125,14 +119,8 @@
       });
     }
 
-    // Reuse your existing helpers
-    function setupWatchlist() { /* same as index.html */ }
-    function setupContinueWatching() { /* same as index.html */ }
-
     // Init
     loadMovieInfo();
-    setupContinueWatching();
-    setupWatchlist();
   </script>
 </body>
 </html>
