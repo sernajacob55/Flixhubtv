@@ -103,7 +103,7 @@
             console.warn("OMDb fetch failed, using fallback for:", imdbID);
           }
 
-          // ✅ Always create a tile, even if OMDb fails
+          // ✅ Always render a card even if OMDb fails
           const wrapper = document.createElement("div");
           wrapper.className = "movie-card-wrapper";
           wrapper.innerHTML = `
@@ -114,7 +114,6 @@
             <button class="action-btn watchlist-toggle" data-id="${imdbID}">+ Add to Watchlist</button>
           `;
 
-          // ✅ Navigate when card is clicked
           wrapper.querySelector(".movie-card").addEventListener("click", () => {
             location.href = \`movie.html?id=${imdbID}\`;
           });
@@ -122,6 +121,7 @@
           grid.appendChild(wrapper);
         }
 
+        // ✅ Call setup *after* tiles are ready
         setupSearch();
         setupSidebar();
         setupWatchlist();
@@ -144,7 +144,7 @@
       });
     }
 
-    // Auto-Populate Genres Sidebar
+    // Sidebar rebuilds genres from all cards
     function setupSidebar() {
       const sidebar = document.getElementById("leftSidebar");
       const genreList = sidebar.querySelector("ul");
@@ -168,14 +168,14 @@
         const li = e.target.closest("li");
         if (!li) return;
         const filter = li.getAttribute("data-filter");
-        cards.forEach(card => {
+        document.querySelectorAll(".movie-card").forEach(card => {
           const cardGenres = (card.getAttribute("data-genres") || "").split(",");
           card.style.display = (filter === "all" || cardGenres.includes(filter)) ? "" : "none";
         });
       });
     }
 
-    // Watchlist Toggle (unchanged)
+    // ✅ Watchlist Toggle
     function setupWatchlist() {
       const buttons = document.querySelectorAll('.watchlist-toggle');
       let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
@@ -209,20 +209,20 @@
         grid.innerHTML = "";
 
         watchlist.forEach(id => {
-          const card = document.querySelector(`.movie-card[data-id="${id}"]`);
+          const card = document.querySelector(\`.movie-card[data-id="\${id}"]\`);
           if (card) {
             const img = card.querySelector("img").src;
             const title = card.querySelector("h3").textContent;
             const div = document.createElement("div");
             div.className = "movie-card watchlist-item";
             div.dataset.id = id;
-            div.innerHTML = `
-              <img src="${img}" alt="Poster for ${title}" />
-              <h3>${title}</h3>
-              <button class="remove-btn" data-id="${id}">X</button>
-            `;
+            div.innerHTML = \`
+              <img src="\${img}" alt="Poster for \${title}" />
+              <h3>\${title}</h3>
+              <button class="remove-btn" data-id="\${id}">X</button>
+            \`;
             div.addEventListener("click", () => {
-              location.href = \`movie.html?id=${id}\`;
+              location.href = \`movie.html?id=\${id}\`;
             });
             grid.appendChild(div);
           }
@@ -235,7 +235,7 @@
             watchlist = watchlist.filter(x => x !== id);
             localStorage.setItem("watchlist", JSON.stringify(watchlist));
             renderWatchlist();
-            document.querySelectorAll(\`.watchlist-toggle[data-id="${id}"]\`).forEach(b => {
+            document.querySelectorAll(\`.watchlist-toggle[data-id="\${id}"]\`).forEach(b => {
               b.textContent = "+ Add to Watchlist";
             });
           });
@@ -245,7 +245,7 @@
       }
     }
 
-    // Continue Watching (unchanged)
+    // ✅ Continue Watching
     function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
       const section = document.querySelector(".continue-watching");
@@ -267,11 +267,11 @@
         const div = document.createElement("div");
         div.className = "movie-card";
         div.dataset.id = imdbID;
-        div.innerHTML = `
-          <img src="${poster}" alt="Poster for ${title}" />
-          <h3>${title}</h3>
-          <button class="remove-btn" data-id="${imdbID}">X</button>
-        `;
+        div.innerHTML = \`
+          <img src="\${poster}" alt="Poster for \${title}" />
+          <h3>\${title}</h3>
+          <button class="remove-btn" data-id="\${imdbID}">X</button>
+        \`;
 
         div.addEventListener("click", () => {
           localStorage.setItem("resumeRequest", JSON.stringify({ imdbID, time }));
