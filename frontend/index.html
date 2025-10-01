@@ -69,6 +69,10 @@
     async function loadMovies() {
       try {
         const movieMap = window.movieMap; // ✅ comes from movies.js
+        if (!movieMap || typeof movieMap !== "object") {
+          console.error("movies.js not loaded or movieMap missing.");
+          return;
+        }
         console.log("Loaded movieMap:", movieMap);
 
         const grid = document.getElementById("movieGrid");
@@ -195,23 +199,37 @@
       }
     }
 
-    // Continue Watching
+    // ✅ Continue Watching (safe + clickable to resume)
     (function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
       const section = document.querySelector(".continue-watching");
       let continued = [];
-      try { continued = JSON.parse(localStorage.getItem("continueWatching")) || []; }
-      catch (e) { continued = []; }
+      try { 
+        continued = JSON.parse(localStorage.getItem("continueWatching")) || []; 
+      } catch (e) { 
+        continued = []; 
+      }
+      if (!Array.isArray(continued)) continued = [];
+
       list.innerHTML = "";
       continued.forEach(item => {
         if (!item || typeof item !== "object") return;
-        const { poster, title } = item;
+        const { poster, title, imdbID, time } = item;
         if (!poster || !title) return;
         const div = document.createElement("div");
         div.className = "continue-item";
-        div.innerHTML = `<img src="${poster}" alt="Poster for ${title}" />`;
+        div.innerHTML = `<img src="${poster}" alt="Poster for ${title}" title="Continue: ${title}" />`;
+        // 🔁 Click to resume playback on the movie page
+        div.addEventListener("click", () => {
+          if (imdbID) {
+            // store the desired resume time so movie page can seek immediately
+            localStorage.setItem("resumeRequest", JSON.stringify({ imdbID, time: time || 0 }));
+            location.href = `movie.html?id=${imdbID}`;
+          }
+        });
         list.appendChild(div);
       });
+
       section.style.display = list.children.length > 0 ? "block" : "none";
     })();
 
