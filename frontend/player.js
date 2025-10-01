@@ -1,30 +1,94 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const video = document.querySelector("video");
-  const closeBtn = document.getElementById("closePlayer");
+  const video = document.getElementById("movieVideo");
+  const player = document.getElementById("videoPlayer");
+  const closeBtn = document.getElementById("exitFullscreen");
 
-  // Force true fullscreen when playback starts
-  video.addEventListener("play", () => {
-    if (video.requestFullscreen) {
-      video.requestFullscreen();
-    } else if (video.webkitRequestFullscreen) {
-      video.webkitRequestFullscreen();
-    } else if (video.msRequestFullscreen) {
-      video.msRequestFullscreen();
+  if (!video || !player) return;
+
+  // Get imdbID passed via query or resumeRequest
+  const urlParams = new URLSearchParams(window.location.search);
+  const imdbID = urlParams.get("id");
+  let currentMovieData = {};
+
+  // Helper: Enter fullscreen
+  function enterFullscreen() {
+    if (player.requestFullscreen) player.requestFullscreen();
+    else if (player.webkitRequestFullscreen) player.webkitRequestFullscreen();
+    else if (player.msRequestFullscreen) player.msRequestFullscreen();
+  }
+
+  // Helper: Exit fullscreen
+  function exitFullscreen() {
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    else if (document.msExitFullscreen) document.msExitFullscreen();
+  }
+
+  // Resume playback if possible
+  video.addEventListener("loadedmetadata", () => {
+    try {
+      let resumeReq = JSON.parse(localStorage.getItem("resumeRequest"));
+      if (resumeReq && resumeReq.imdbID === imdbID) {
+        if (resumeReq.time > 0 && resumeReq.time < video.duration) {
+          video.currentTime = resumeReq.time;
+        }
+        localStorage.removeItem("resumeRequest");
+        return;
+      }
+      let continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
+      if (!Array.isArray(continued)) continued = [];
+      const entry = continued.find(m => m.imdbID === imdbID && typeof m.time === "number");
+      if (entry && entry.time > 0 && entry.time < video.duration) {
+        video.currentTime = entry.time;
+      }
+    } catch (e) {}
+  });
+
+  // Save progress to continueWatching
+  video.addEventListener("timeupdate", () => {
+    if (!imdbID) return;
+    let continued = [];
+    try { continued = JSON.parse(localStorage.getItem("continueWatching")) || []; }
+    catch (e) { continued = []; }
+    if (!Array.isArray(continued)) continued = [];
+
+    const remaining = (video.duration || 0) - (video.currentTime || 0);
+
+    if (video.duration && remaining <= 600) {
+      continued = continued.filter(m => m.imdbID !== imdbID);
+    } else {
+      const i = continued.findIndex(m => m.imdbID === imdbID);
+      const payload = { imdbID, time: video.currentTime || 0 };
+      if (i >= 0) continued[i] = payload; else continued.push(payload);
     }
+
+    localStorage.setItem("continueWatching", JSON.stringify(continued));
+  });
+
+  // Force fullscreen when video starts
+  video.addEventListener("play", () => {
+    enterFullscreen();
   });
 
   // Close button exits fullscreen + pauses video
   if (closeBtn) {
     closeBtn.addEventListener("click", () => {
       video.pause();
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
-      window.location.href = "index.html";
+      video.src = "";
+      player.style.display = "none";
+      exitFullscreen();
     });
   }
+
+  // Esc key also exits video
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (player.style.display === "flex") {
+        video.pause();
+        video.src = "";
+        player.style.display = "none";
+        exitFullscreen();
+      }
+    }
+  });
 });

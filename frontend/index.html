@@ -57,8 +57,15 @@
     <p>© 2025 FlixHubTV. All rights reserved.</p>
   </footer>
 
-  <!-- ✅ Load movies.js BEFORE main script -->
+  <!-- ✅ Shared Fullscreen Player -->
+  <div id="videoPlayer" class="video-player" style="display:none;">
+    <button id="exitFullscreen" class="close-btn">X</button>
+    <video id="movieVideo" controls autoplay></video>
+  </div>
+
+  <!-- ✅ Scripts -->
   <script src="movies.js"></script>
+  <script src="player.js"></script>
 
   <script>
     const OMDB_KEY = "ea7569d7";
@@ -71,12 +78,11 @@
     // Load movie list from movies.js
     async function loadMovies() {
       try {
-        const movieMap = window.movieMap; // ✅ comes from movies.js
+        const movieMap = window.movieMap;
         if (!movieMap || typeof movieMap !== "object") {
           console.error("movies.js not loaded or movieMap missing.");
           return;
         }
-        console.log("Loaded movieMap:", movieMap);
 
         const grid = document.getElementById("movieGrid");
 
@@ -103,6 +109,7 @@
         setupSearch();
         setupSidebar();
         setupWatchlist();
+        setupContinueWatching();
       } catch (err) {
         console.error("Error loading movies.js:", err);
       }
@@ -202,8 +209,8 @@
       }
     }
 
-    // ✅ Continue Watching (now styled + clickable to resume)
-    (function setupContinueWatching() {
+    // ✅ Continue Watching (only builds tiles, playback handled by player.js)
+    function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
       const section = document.querySelector(".continue-watching");
       let continued = [];
@@ -217,28 +224,21 @@
       list.innerHTML = "";
       continued.forEach(item => {
         if (!item || typeof item !== "object") return;
-        const { poster, title, imdbID, time } = item;
+        const { poster, title, imdbID } = item;
         if (!poster || !title) return;
 
         const div = document.createElement("div");
         div.className = "movie-card";
+        div.dataset.id = imdbID;
         div.innerHTML = `
           <img src="${poster}" alt="Poster for ${title}" />
           <h3>${title}</h3>
         `;
-
-        div.addEventListener("click", () => {
-          if (imdbID) {
-            localStorage.setItem("resumeRequest", JSON.stringify({ imdbID, time: time || 0 }));
-            location.href = `movie.html?id=${imdbID}`;
-          }
-        });
-
         list.appendChild(div);
       });
 
       section.style.display = list.children.length > 0 ? "block" : "none";
-    })();
+    }
 
     // Init
     loadMovies();

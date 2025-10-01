@@ -41,7 +41,7 @@
           <p id="moviePlot"></p>
 
           <button id="watchlistBtn" class="action-btn">+ Add to Watchlist</button>
-          <button id="playBtn" class="action-btn">▶ Play</button>
+          <button id="playBtn" class="action-btn" data-play>▶ Play</button>
         </div>
       </section>
 
@@ -64,14 +64,15 @@
     <p>© 2025 FlixHubTV. All rights reserved.</p>
   </footer>
 
-  <!-- Fullscreen Player -->
+  <!-- ✅ Shared Fullscreen Player -->
   <div id="videoPlayer" class="video-player" style="display:none;">
     <button id="exitFullscreen" class="close-btn">X</button>
     <video id="movieVideo" controls autoplay></video>
   </div>
 
-  <!-- ✅ Load movies.js before main script -->
+  <!-- ✅ Scripts -->
   <script src="movies.js"></script>
+  <script src="player.js"></script>
 
   <script>
     const OMDB_KEY = "ea7569d7"; 
@@ -80,7 +81,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const imdbID = urlParams.get("id");
 
-    let currentMovieData = {}; // holds poster & title for continueWatching
+    let currentMovieData = {};
 
     // Sidebar hover
     const sidebar = document.getElementById('leftSidebar');
@@ -99,12 +100,14 @@
         document.getElementById("movieRuntime").textContent = data.Runtime || "N/A";
         document.getElementById("moviePlot").textContent = data.Plot || "No plot available.";
 
-        // save for continue watching
         currentMovieData = {
           imdbID,
           title: data.Title,
           poster: (data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg"
         };
+
+        // 🔑 Save movie context so player.js knows what to play/resume
+        localStorage.setItem("currentMovieData", JSON.stringify(currentMovieData));
       } catch (err) {
         console.error("Error loading movie details:", err);
       }
@@ -176,110 +179,6 @@
         watchlistBtn.textContent = "✓ Added";
       }
       localStorage.setItem("watchlist", JSON.stringify(watchlist));
-    });
-
-    // ✅ Play button using movies.js + continueWatching + resume seek
-    const playBtn = document.getElementById("playBtn");
-    playBtn.addEventListener("click", () => {
-      const movieMap = window.movieMap;
-      const movieSrc = movieMap ? movieMap[imdbID] : null;
-
-      if (movieSrc) {
-        const player = document.getElementById("videoPlayer");
-        const video = document.getElementById("movieVideo");
-
-        video.src = movieSrc;
-        player.style.display = "flex";
-
-        // Enter fullscreen
-        if (player.requestFullscreen) {
-          player.requestFullscreen();
-        } else if (player.webkitRequestFullscreen) {
-          player.webkitRequestFullscreen();
-        } else if (player.msRequestFullscreen) {
-          player.msRequestFullscreen();
-        }
-
-        // ✅ Resume from saved time if available
-        video.addEventListener("loadedmetadata", () => {
-          try {
-            // ResumeRequest from index tile
-            let resumeReq = JSON.parse(localStorage.getItem("resumeRequest"));
-            if (resumeReq && resumeReq.imdbID === imdbID) {
-              if (resumeReq.time > 0 && resumeReq.time < video.duration) {
-                video.currentTime = resumeReq.time;
-              }
-              localStorage.removeItem("resumeRequest");
-              return;
-            }
-            // Fall back to continueWatching
-            let continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
-            if (!Array.isArray(continued)) continued = [];
-            const entry = continued.find(m => m.imdbID === imdbID && typeof m.time === "number");
-            if (entry && entry.time > 0 && entry.time < video.duration) {
-              video.currentTime = entry.time;
-            }
-          } catch (e) {}
-        }, { once: true });
-
-        video.play();
-
-        // Track progress in continueWatching
-        video.addEventListener("timeupdate", () => {
-          let continued = [];
-          try { continued = JSON.parse(localStorage.getItem("continueWatching")) || []; }
-          catch (e) { continued = []; }
-          if (!Array.isArray(continued)) continued = [];
-
-          const remaining = (video.duration || 0) - (video.currentTime || 0);
-
-          if (video.duration && remaining <= 600) {
-            continued = continued.filter(m => m.imdbID !== imdbID);
-          } else {
-            const i = continued.findIndex(m => m.imdbID === imdbID);
-            const payload = { ...currentMovieData, time: video.currentTime || 0 };
-            if (i >= 0) continued[i] = payload; else continued.push(payload);
-          }
-
-          localStorage.setItem("continueWatching", JSON.stringify(continued));
-        });
-      } else {
-        alert("Movie source not found. Please check movies.js.");
-      }
-    });
-
-    // Exit fullscreen
-    const exitBtn = document.getElementById("exitFullscreen");
-    exitBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const player = document.getElementById("videoPlayer");
-      const video = document.getElementById("movieVideo");
-
-      video.pause();
-      video.src = "";
-      player.style.display = "none";
-
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
-    });
-
-    // Esc key exits video too
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        const player = document.getElementById("videoPlayer");
-        const video = document.getElementById("movieVideo");
-        if (player.style.display === "flex") {
-          video.pause();
-          video.src = "";
-          player.style.display = "none";
-          if (document.exitFullscreen) document.exitFullscreen();
-        }
-      }
     });
 
     // Init
