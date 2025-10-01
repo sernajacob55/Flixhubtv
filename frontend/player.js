@@ -10,6 +10,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const imdbID = urlParams.get("id");
   let currentMovieData = {};
 
+  // ✅ Load movie source if ID is passed
+  if (imdbID && window.movieMap && window.movieMap[imdbID]) {
+    video.src = window.movieMap[imdbID];
+    player.style.display = "flex";
+  }
+
   // Helper: Enter fullscreen
   function enterFullscreen() {
     if (player.requestFullscreen) player.requestFullscreen();
