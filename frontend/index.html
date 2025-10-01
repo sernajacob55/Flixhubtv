@@ -227,7 +227,7 @@
       }
     }
 
-    // ✅ Continue Watching with remove button
+    // ✅ Continue Watching with direct player launch + remove button
     function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
       const section = document.querySelector(".continue-watching");
@@ -243,19 +243,29 @@
 
       continued.forEach(item => {
         if (!item || typeof item !== "object") return;
-        const { poster, title, imdbID } = item;
+        const { poster, title, imdbID, time } = item;
         if (!poster || !title || !imdbID) return;
 
         const div = document.createElement("div");
         div.className = "movie-card";
         div.dataset.id = imdbID;
         div.innerHTML = `
-          <a href="movie.html?id=${imdbID}">
-            <img src="${poster}" alt="Poster for ${title}" />
-            <h3>${title}</h3>
-          </a>
+          <img src="${poster}" alt="Poster for ${title}" />
+          <h3>${title}</h3>
           <button class="remove-btn" data-id="${imdbID}">X</button>
         `;
+
+        // ✅ Direct play on click
+        div.addEventListener("click", () => {
+          localStorage.setItem("resumeRequest", JSON.stringify({ imdbID, time }));
+          const videoPlayer = document.getElementById("videoPlayer");
+          const video = document.getElementById("movieVideo");
+          if (window.movieMap && window.movieMap[imdbID]) {
+            video.src = window.movieMap[imdbID];
+            videoPlayer.style.display = "flex";
+          }
+        });
+
         list.appendChild(div);
       });
 

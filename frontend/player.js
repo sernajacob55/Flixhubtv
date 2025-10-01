@@ -5,12 +5,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!video || !player) return;
 
-  // Get imdbID passed via query (for resume/continue features)
+  // Get imdbID either from querystring or resumeRequest
   const urlParams = new URLSearchParams(window.location.search);
-  const imdbID = urlParams.get("id");
+  let imdbID = urlParams.get("id");
   let currentMovieData = {};
 
-  // ✅ Load currentMovieData (set by movie.html)
+  // ✅ Fallback: use resumeRequest if no id in URL
+  if (!imdbID) {
+    try {
+      const resumeReq = JSON.parse(localStorage.getItem("resumeRequest"));
+      if (resumeReq && resumeReq.imdbID) {
+        imdbID = resumeReq.imdbID;
+      }
+    } catch (e) {}
+  }
+
+  // ✅ Load currentMovieData (set by movie.html if present)
   try {
     const saved = JSON.parse(localStorage.getItem("currentMovieData"));
     if (saved && saved.imdbID === imdbID) {

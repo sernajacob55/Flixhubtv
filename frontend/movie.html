@@ -188,6 +188,9 @@
         const video = document.getElementById("movieVideo");
         const player = document.getElementById("videoPlayer");
 
+        // ✅ Save current movie context before playback
+        localStorage.setItem("currentMovieData", JSON.stringify(currentMovieData));
+
         // ✅ If resuming from Continue Watching, set resumeRequest
         const continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
         const entry = continued.find(m => m.imdbID === imdbID);
