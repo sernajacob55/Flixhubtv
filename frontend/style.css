@@ -143,6 +143,19 @@ body.sidebar-open .main-content {
 }
 
 /* =====================
+   Movies Banner
+   ===================== */
+.movies-banner {
+  text-align: center;
+  font-size: 2em;
+  font-weight: bold;
+  color: #00bfff;   /* cyan accent */
+  margin: 40px 0 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* =====================
    Movie Grid
    ===================== */
 .movie-grid {
