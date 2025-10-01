@@ -3,5 +3,7 @@ window.movieMap = {
   "tt0118928": "https://f005.backblazeb2.com/file/FlixhubTV/Dantes_Peak.mp4",
   "tt0318627": "https://f005.backblazeb2.com/file/FlixhubTV/Resident_Evil_Apocalypse.mp4",
   "tt0120804": "https://f005.backblazeb2.com/file/FlixhubTV/Resident_Evil.mp4",
-  "tt0258463": "https://f005.backblazeb2.com/file/FlixhubTV/The_Bourne_Identity.mp4"
+  "tt0258463": "https://f005.backblazeb2.com/file/FlixhubTV/The_Bourne_Identity.mp4",
+  "tt0440963": "https://f005.backblazeb2.com/file/FlixhubTV/The_Bourne_Ultimatum.mp4",
+  "tt0234215": "https://f005.backblazeb2.com/file/FlixhubTV/The_Matrix_Reloaded.mp4"
 };
