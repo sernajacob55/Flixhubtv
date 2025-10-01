@@ -54,6 +54,9 @@
     <p>© 2025 FlixHubTV. All rights reserved.</p>
   </footer>
 
+  <!-- Load movies.js BEFORE scripts -->
+  <script src="movies.js"></script>
+
   <script>
     const OMDB_KEY = "ea7569d7";
 
@@ -62,11 +65,10 @@
       document.body.classList.toggle("sidebar-open");
     });
 
-    // ✅ Load movie list from movies.json
+    // ✅ Load movie list from movies.js
     async function loadMovies() {
       try {
-        const res = await fetch("movies.json");
-        const movieMap = await res.json();
+        const movieMap = window.movieMap; // ✅ now using movies.js
         const grid = document.getElementById("movieGrid");
 
         for (const imdbID of Object.keys(movieMap)) {
@@ -95,7 +97,7 @@
         setupSidebar();
         setupWatchlist();
       } catch (err) {
-        console.error("Error loading movies.json:", err);
+        console.error("Error loading movies.js:", err);
       }
     }
 

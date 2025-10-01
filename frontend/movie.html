@@ -70,6 +70,9 @@
     <video id="movieVideo" controls autoplay></video>
   </div>
 
+  <!-- Load movies.js before script -->
+  <script src="movies.js"></script>
+
   <script>
     const OMDB_KEY = "ea7569d7"; 
     const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f";
@@ -166,35 +169,30 @@
       localStorage.setItem("watchlist", JSON.stringify(watchlist));
     });
 
-    // ✅ Play button using movies.json
+    // ✅ Play button using movies.js
     const playBtn = document.getElementById("playBtn");
-    playBtn.addEventListener("click", async () => {
-      try {
-        const res = await fetch("movies.json");
-        const movieMap = await res.json();
-        const movieSrc = movieMap[imdbID];
+    playBtn.addEventListener("click", () => {
+      const movieMap = window.movieMap;
+      const movieSrc = movieMap[imdbID];
 
-        if (movieSrc) {
-          const player = document.getElementById("videoPlayer");
-          const video = document.getElementById("movieVideo");
+      if (movieSrc) {
+        const player = document.getElementById("videoPlayer");
+        const video = document.getElementById("movieVideo");
 
-          video.src = movieSrc;
-          player.style.display = "flex";
+        video.src = movieSrc;
+        player.style.display = "flex";
 
-          if (player.requestFullscreen) {
-            player.requestFullscreen();
-          } else if (player.webkitRequestFullscreen) {
-            player.webkitRequestFullscreen();
-          } else if (player.msRequestFullscreen) {
-            player.msRequestFullscreen();
-          }
-
-          video.play();
-        } else {
-          alert("Movie source not found. Please check movies.json.");
+        if (player.requestFullscreen) {
+          player.requestFullscreen();
+        } else if (player.webkitRequestFullscreen) {
+          player.webkitRequestFullscreen();
+        } else if (player.msRequestFullscreen) {
+          player.msRequestFullscreen();
         }
-      } catch (err) {
-        console.error("Error loading movies.json:", err);
+
+        video.play();
+      } else {
+        alert("Movie source not found. Please check movies.js.");
       }
     });
 
