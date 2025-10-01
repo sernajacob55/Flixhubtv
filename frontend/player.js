@@ -5,12 +5,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!video || !player) return;
 
-  // Get imdbID either from querystring or resumeRequest
+  // Get imdbID from querystring or resumeRequest
   const urlParams = new URLSearchParams(window.location.search);
   let imdbID = urlParams.get("id");
   let currentMovieData = {};
 
-  // ✅ Fallback: use resumeRequest if no id in URL
+  // ✅ Fallback: if no id in URL, use resumeRequest
   if (!imdbID) {
     try {
       const resumeReq = JSON.parse(localStorage.getItem("resumeRequest"));
@@ -28,6 +28,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   } catch (e) {
     currentMovieData = {};
+  }
+
+  // ✅ Fallback if currentMovieData missing
+  if (!currentMovieData.imdbID && imdbID) {
+    currentMovieData = {
+      imdbID,
+      title: "Unknown",
+      poster: "placeholder.jpg"
+    };
   }
 
   // Helper: Enter fullscreen

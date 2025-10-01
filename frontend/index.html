@@ -41,7 +41,7 @@
       <!-- Watchlist -->
       <section class="watchlist">
         <h2>My Watchlist</h2>
-        <div id="watchlistGrid"></div>
+        <div id="watchlistGrid" class="movie-grid"></div>
       </section>
 
       <!-- Banner Above Movie Grid -->
@@ -199,16 +199,22 @@
             const img = card.querySelector("img").src;
             const title = card.querySelector("h3").textContent;
             const div = document.createElement("div");
-            div.className = "watchlist-item";
+            div.className = "movie-card";  
+            div.dataset.id = id;
             div.innerHTML = `
               <img src="${img}" alt="Poster for ${title}" />
+              <h3>${title}</h3>
               <button class="remove-btn" data-id="${id}">X</button>
             `;
+            // ✅ Clicking watchlist tile → movie info page
+            div.addEventListener("click", () => {
+              location.href = "movie.html?id=" + id;
+            });
             grid.appendChild(div);
           }
         });
 
-        // Attach remove button listeners for Watchlist
+        // Attach remove button listeners
         grid.querySelectorAll(".remove-btn").forEach(btn => {
           btn.addEventListener("click", (e) => {
             e.stopPropagation();

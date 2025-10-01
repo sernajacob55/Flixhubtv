@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Movie • FlixHubTV</title>
+  <title>Browse • FlixHubTV</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Header -->
+  <!-- Header / Navbar -->
   <header>
     <h1><span class="flix">FLIX</span><span class="hub">HubTV</span></h1>
+
     <div class="nav-buttons">
-      <button onclick="location.href='index.html'">Home</button>
-      <button onclick="location.href='profiles.html'">Switch Profile</button>
-      <button onclick="location.href='login.html'">Logout</button>
+      <button id="menuToggle">☰</button>
+      <input id="searchInput" type="text" placeholder="Search movies..." aria-label="Search movies"/>
+      <button id="switchProfileBtn" onclick="location.href='profiles.html'">Switch Profile</button>
+      <button id="logoutBtn" onclick="location.href='login.html'">Logout</button>
+      <button id="homeBtn" onclick="location.href='index.html'">Home</button>
     </div>
   </header>
 
@@ -22,40 +25,30 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="leftSidebar" aria-label="Genres">
       <h3>Genres</h3>
-      <ul>
-        <li data-filter="all">All</li>
-        <li data-filter="Action">Action</li>
-        <li data-filter="Sci-Fi">Sci-Fi</li>
-      </ul>
+      <ul></ul>
     </aside>
 
     <!-- Main Content -->
-    <main class="main-content" id="movieContent">
-      <!-- Movie Metadata -->
-      <section id="movieDetails" class="movie-details">
-        <img id="moviePoster" alt="Movie Poster"/>
-        <div>
-          <h2 id="movieTitle"></h2>
-          <p><strong>Genre:</strong> <span id="movieGenre"></span></p>
-          <p><strong>Runtime:</strong> <span id="movieRuntime"></span></p>
-          <p id="moviePlot"></p>
+    <main class="main-content" id="content">
+      <div class="welcome" id="welcomeText">Welcome, Serna</div>
 
-          <button id="watchlistBtn" class="action-btn">+ Add to Watchlist</button>
-          <button id="playBtn" class="action-btn" data-play>▶ Play</button>
-        </div>
+      <!-- Continue Watching -->
+      <section class="continue-watching">
+        <h2>Continue Watching</h2>
+        <div id="continueWatchingList" class="movie-grid"></div>
       </section>
 
-      <!-- Cast Section -->
-      <section id="castSection">
-        <h3>Cast</h3>
-        <div id="castGrid"></div>
+      <!-- Watchlist -->
+      <section class="watchlist">
+        <h2>My Watchlist</h2>
+        <div id="watchlistGrid"></div>
       </section>
 
-      <!-- Recommended Movies -->
-      <section id="recommendations">
-        <h3>Recommended</h3>
-        <div id="recommendGrid"></div>
-      </section>
+      <!-- Banner Above Movie Grid -->
+      <div class="movies-banner">Movies</div>
+
+      <!-- Movie Grid (auto-populated) -->
+      <section class="movie-grid" id="movieGrid"></section>
     </main>
   </div>
 
@@ -75,139 +68,238 @@
   <script src="player.js"></script>
 
   <script>
-    const OMDB_KEY = "ea7569d7"; 
-    const TMDB_KEY = "a2942c822ee97bc0df2dba1a65cf2d0f";
+    const OMDB_KEY = "ea7569d7";
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const imdbID = urlParams.get("id");
-
-    let currentMovieData = {};
-
-    // Sidebar hover
-    const sidebar = document.getElementById('leftSidebar');
-    sidebar.addEventListener('mouseenter', () => document.body.classList.add('sidebar-open'));
-    sidebar.addEventListener('mouseleave', () => document.body.classList.remove('sidebar-open'));
-
-    // Load metadata
-    async function loadMovieDetails() {
-      try {
-        const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
-        const data = await res.json();
-        if (!data || !data.Title) return;
-        document.getElementById("moviePoster").src = data.Poster && data.Poster !== "N/A" ? data.Poster : "placeholder.jpg";
-        document.getElementById("movieTitle").textContent = `${data.Title} (${data.Year || "N/A"})`;
-        document.getElementById("movieGenre").textContent = data.Genre || "N/A";
-        document.getElementById("movieRuntime").textContent = data.Runtime || "N/A";
-        document.getElementById("moviePlot").textContent = data.Plot || "No plot available.";
-
-        currentMovieData = {
-          imdbID,
-          title: data.Title,
-          poster: (data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg"
-        };
-
-        // 🔑 Save movie context
-        localStorage.setItem("currentMovieData", JSON.stringify(currentMovieData));
-      } catch (err) {
-        console.error("Error loading movie details:", err);
-      }
-    }
-
-    // Load cast
-    async function loadCast() {
-      try {
-        const tmdbRes = await fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_KEY}&external_source=imdb_id`);
-        const tmdbData = await tmdbRes.json();
-        if (!tmdbData.movie_results || !tmdbData.movie_results.length) return;
-        const movieId = tmdbData.movie_results[0].id;
-        const creditsRes = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${TMDB_KEY}`);
-        const creditsData = await creditsRes.json();
-        const castGrid = document.getElementById("castGrid");
-        castGrid.innerHTML = "";
-        creditsData.cast.slice(0,6).forEach(actor => {
-          if (!actor.name) return;
-          const div = document.createElement("div");
-          div.className = "actor-card";
-          div.innerHTML = `
-            <img src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w200'+actor.profile_path : 'placeholder.jpg'}" alt="${actor.name}" />
-            <p>${actor.name}</p>
-          `;
-          castGrid.appendChild(div);
-        });
-      } catch (err) {
-        console.error("Error loading cast:", err);
-      }
-    }
-
-    // Load recommendations
-    async function loadRecommendations() {
-      try {
-        const tmdbRes = await fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_KEY}&external_source=imdb_id`);
-        const tmdbData = await tmdbRes.json();
-        if (!tmdbData.movie_results || !tmdbData.movie_results.length) return;
-        const movieId = tmdbData.movie_results[0].id;
-        const recRes = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/recommendations?api_key=${TMDB_KEY}`);
-        const recData = await recRes.json();
-        const recGrid = document.getElementById("recommendGrid");
-        recGrid.innerHTML = "";
-        recData.results.slice(0,6).forEach(rec => {
-          if (!rec.title || !rec.id) return;
-          const div = document.createElement("div");
-          div.className = "movie-card";
-          div.innerHTML = `
-            <a href="movie.html?id=tt${rec.id}">
-              <img src="${rec.poster_path ? 'https://image.tmdb.org/t/p/w200'+rec.poster_path : 'placeholder.jpg'}" alt="${rec.title}" />
-              <h3>${rec.title}</h3>
-            </a>
-          `;
-          recGrid.appendChild(div);
-        });
-      } catch (err) {
-        console.error("Error loading recommendations:", err);
-      }
-    }
-
-    // Watchlist button
-    const watchlistBtn = document.getElementById("watchlistBtn");
-    watchlistBtn.addEventListener("click", () => {
-      let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
-      if (watchlist.includes(imdbID)) {
-        watchlist = watchlist.filter(id => id !== imdbID);
-        watchlistBtn.textContent = "+ Add to Watchlist";
-      } else {
-        watchlist.push(imdbID);
-        watchlistBtn.textContent = "✓ Added";
-      }
-      localStorage.setItem("watchlist", JSON.stringify(watchlist));
+    // Sidebar Toggle
+    document.getElementById("menuToggle").addEventListener("click", () => {
+      document.body.classList.toggle("sidebar-open");
     });
 
-    // ✅ Play button → show embedded player
-    const playBtn = document.getElementById("playBtn");
-    playBtn.addEventListener("click", () => {
-      if (imdbID && window.movieMap && window.movieMap[imdbID]) {
-        const video = document.getElementById("movieVideo");
-        const player = document.getElementById("videoPlayer");
-
-        // ✅ Save current movie context before playback
-        localStorage.setItem("currentMovieData", JSON.stringify(currentMovieData));
-
-        // ✅ If resuming from Continue Watching, set resumeRequest
-        const continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
-        const entry = continued.find(m => m.imdbID === imdbID);
-        if (entry && entry.time > 0) {
-          localStorage.setItem("resumeRequest", JSON.stringify({ imdbID, time: entry.time }));
+    // Load movie list from movies.js
+    async function loadMovies() {
+      try {
+        const movieMap = window.movieMap;
+        if (!movieMap || typeof movieMap !== "object") {
+          console.error("movies.js not loaded or movieMap missing.");
+          return;
         }
 
-        video.src = window.movieMap[imdbID];
-        player.style.display = "flex";
-        video.play().catch(() => {});
+        const grid = document.getElementById("movieGrid");
+
+        for (const imdbID of Object.keys(movieMap)) {
+          const omdbRes = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_KEY}`);
+          const data = await omdbRes.json();
+
+          const title = data.Title || "Unknown";
+          const poster = (data.Poster && data.Poster !== "N/A") ? data.Poster : "placeholder.jpg";
+          const genres = data.Genre || "";
+
+          const wrapper = document.createElement("div");
+          wrapper.className = "movie-card-wrapper";
+          wrapper.innerHTML = `
+            <div class="movie-card" data-id="${imdbID}" data-genres="${genres}" onclick="location.href='movie.html?id=${imdbID}'">
+              <img src="${poster}" alt="${title} poster" />
+              <h3>${title}</h3>
+            </div>
+            <button class="action-btn watchlist-toggle" data-id="${imdbID}">+ Add to Watchlist</button>
+          `;
+          grid.appendChild(wrapper);
+        }
+
+        setupSearch();
+        setupSidebar();
+        setupWatchlist();
+        setupContinueWatching();
+      } catch (err) {
+        console.error("Error loading movies.js:", err);
       }
+    }
+
+    // Live Search
+    function setupSearch() {
+      const searchInput = document.getElementById("searchInput");
+      const cards = document.querySelectorAll(".movie-card");
+      if (!searchInput) return;
+      searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase();
+        cards.forEach(card => {
+          const title = card.querySelector("h3").textContent.toLowerCase();
+          card.style.display = title.includes(query) ? "" : "none";
+        });
+      });
+    }
+
+    // Auto-Populate Genres Sidebar
+    function setupSidebar() {
+      const sidebar = document.getElementById("leftSidebar");
+      const genreList = sidebar.querySelector("ul");
+      const cards = document.querySelectorAll(".movie-card");
+      let genres = new Set();
+
+      cards.forEach(card => {
+        const g = (card.getAttribute("data-genres") || "").split(",");
+        g.forEach(x => { if (x.trim()) genres.add(x.trim()); });
+      });
+
+      genreList.innerHTML = `<li data-filter="all">All</li>`;
+      genres.forEach(g => {
+        const li = document.createElement("li");
+        li.textContent = g;
+        li.setAttribute("data-filter", g);
+        genreList.appendChild(li);
+      });
+
+      genreList.addEventListener("click", (e) => {
+        const li = e.target.closest("li");
+        if (!li) return;
+        const filter = li.getAttribute("data-filter");
+        cards.forEach(card => {
+          const cardGenres = (card.getAttribute("data-genres") || "").split(",");
+          card.style.display = (filter === "all" || cardGenres.includes(filter)) ? "" : "none";
+        });
+      });
+    }
+
+    // Watchlist Toggle
+    function setupWatchlist() {
+      const buttons = document.querySelectorAll('.watchlist-toggle');
+      let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+
+      function updateButton(btn) {
+        const id = btn.getAttribute("data-id");
+        btn.textContent = watchlist.includes(id) ? "✓ Added" : "+ Add to Watchlist";
+      }
+
+      buttons.forEach(btn => {
+        updateButton(btn);
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = btn.getAttribute("data-id");
+          if (watchlist.includes(id)) {
+            watchlist = watchlist.filter(x => x !== id);
+          } else {
+            watchlist.push(id);
+          }
+          localStorage.setItem("watchlist", JSON.stringify(watchlist));
+          updateButton(btn);
+          renderWatchlist();
+        });
+      });
+
+      renderWatchlist();
+
+      function renderWatchlist() {
+        const grid = document.getElementById("watchlistGrid");
+        const section = document.querySelector(".watchlist");
+        grid.innerHTML = "";
+
+        watchlist.forEach(id => {
+          const card = document.querySelector(`.movie-card[data-id="${id}"]`);
+          if (card) {
+            const img = card.querySelector("img").src;
+            const title = card.querySelector("h3").textContent;
+            const div = document.createElement("div");
+            div.className = "watchlist-item";
+            div.innerHTML = `
+              <img src="${img}" alt="Poster for ${title}" />
+              <button class="remove-btn" data-id="${id}">X</button>
+            `;
+            grid.appendChild(div);
+          }
+        });
+
+        // Attach remove button listeners for Watchlist
+        grid.querySelectorAll(".remove-btn").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const id = btn.getAttribute("data-id");
+            watchlist = watchlist.filter(x => x !== id);
+            localStorage.setItem("watchlist", JSON.stringify(watchlist));
+            renderWatchlist();
+            // Update main grid button state too
+            document.querySelectorAll(`.watchlist-toggle[data-id="${id}"]`).forEach(b => {
+              b.textContent = "+ Add to Watchlist";
+            });
+          });
+        });
+
+        section.style.display = grid.children.length > 0 ? "block" : "none";
+      }
+    }
+
+    // ✅ Continue Watching with direct player launch + remove button
+    function setupContinueWatching() {
+      const list = document.getElementById("continueWatchingList");
+      const section = document.querySelector(".continue-watching");
+      let continued = [];
+      try { 
+        continued = JSON.parse(localStorage.getItem("continueWatching")) || []; 
+      } catch (e) { 
+        continued = []; 
+      }
+      if (!Array.isArray(continued)) continued = [];
+
+      list.innerHTML = "";
+
+      continued.forEach(item => {
+        if (!item || typeof item !== "object") return;
+        const { poster, title, imdbID, time } = item;
+        if (!poster || !title || !imdbID) return;
+
+        const div = document.createElement("div");
+        div.className = "movie-card";
+        div.dataset.id = imdbID;
+        div.innerHTML = `
+          <img src="${poster}" alt="Poster for ${title}" />
+          <h3>${title}</h3>
+          <button class="remove-btn" data-id="${imdbID}">X</button>
+        `;
+
+        // ✅ Direct play on click with resume support
+        div.addEventListener("click", () => {
+          // Save current movie context
+          localStorage.setItem("currentMovieData", JSON.stringify({ imdbID, title, poster }));
+
+          // Save resume request
+          if (time && time > 0) {
+            localStorage.setItem("resumeRequest", JSON.stringify({ imdbID, time }));
+          }
+
+          const videoPlayer = document.getElementById("videoPlayer");
+          const video = document.getElementById("movieVideo");
+          if (window.movieMap && window.movieMap[imdbID]) {
+            video.src = window.movieMap[imdbID];
+            video.load(); // ✅ force reload
+            videoPlayer.style.display = "flex";
+            video.play().catch(() => {});
+          }
+        });
+
+        list.appendChild(div);
+      });
+
+      // Attach remove button listeners
+      list.querySelectorAll(".remove-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = btn.getAttribute("data-id");
+          let continued = JSON.parse(localStorage.getItem("continueWatching")) || [];
+          continued = continued.filter(m => m.imdbID !== id);
+          localStorage.setItem("continueWatching", JSON.stringify(continued));
+          setupContinueWatching();
+        });
+      });
+
+      section.style.display = list.children.length > 0 ? "block" : "none";
+    }
+
+    // ✅ Auto-refresh Continue Watching on storage changes
+    window.addEventListener("storage", () => {
+      setupContinueWatching();
     });
 
     // Init
-    loadMovieDetails();
-    loadCast();
-    loadRecommendations();
+    loadMovies();
   </script>
 </body>
 </html>
