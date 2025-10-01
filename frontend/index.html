@@ -103,6 +103,7 @@
             console.warn("OMDb fetch failed, using fallback for:", imdbID);
           }
 
+          // ✅ Always create a tile, even if OMDb fails
           const wrapper = document.createElement("div");
           wrapper.className = "movie-card-wrapper";
           wrapper.innerHTML = `
