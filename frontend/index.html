@@ -35,7 +35,7 @@
       <!-- Continue Watching -->
       <section class="continue-watching">
         <h2>Continue Watching</h2>
-        <div id="continueWatchingList"></div>
+        <div id="continueWatchingList" class="movie-grid"></div>
       </section>
 
       <!-- Watchlist -->
@@ -199,7 +199,7 @@
       }
     }
 
-    // ✅ Continue Watching (safe + clickable to resume)
+    // ✅ Continue Watching (now styled + clickable to resume)
     (function setupContinueWatching() {
       const list = document.getElementById("continueWatchingList");
       const section = document.querySelector(".continue-watching");
@@ -216,17 +216,21 @@
         if (!item || typeof item !== "object") return;
         const { poster, title, imdbID, time } = item;
         if (!poster || !title) return;
+
         const div = document.createElement("div");
-        div.className = "continue-item";
-        div.innerHTML = `<img src="${poster}" alt="Poster for ${title}" title="Continue: ${title}" />`;
-        // 🔁 Click to resume playback on the movie page
+        div.className = "movie-card";
+        div.innerHTML = `
+          <img src="${poster}" alt="Poster for ${title}" />
+          <h3>${title}</h3>
+        `;
+
         div.addEventListener("click", () => {
           if (imdbID) {
-            // store the desired resume time so movie page can seek immediately
             localStorage.setItem("resumeRequest", JSON.stringify({ imdbID, time: time || 0 }));
             location.href = `movie.html?id=${imdbID}`;
           }
         });
+
         list.appendChild(div);
       });
 
